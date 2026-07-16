@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { ArrowRight, PlaySquare, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -30,12 +31,43 @@ export function HeroSection() {
     return algorithms.find((a) => a.id === target.algorithm_id) || null;
   }, [userProgressData, algorithms]);
 
+  const continueBlock = user && continueLearningAlgo ? (
+    <Link
+      href={continueLearningAlgo.slug ? `/problem/${continueLearningAlgo.slug}` : `/problem/${continueLearningAlgo.id}`}
+      onClick={() =>
+        trackEvent(posthog, "home_cta_clicked", {
+          cta_label: "Continue Learning Box",
+          destination: continueLearningAlgo.slug || continueLearningAlgo.id,
+          section: "hero",
+        })
+      }
+      className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 hover:border-primary/40 transition-all hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)] group max-w-[280px]"
+    >
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-bold text-primary tracking-wider mb-0.5">
+          Continue
+        </p>
+        <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
+          {continueLearningAlgo.title || continueLearningAlgo.name}
+        </p>
+      </div>
+      <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
+        <ArrowRight className="w-3.5 h-3.5" />
+      </div>
+    </Link>
+  ) : null;
+
   return (
     <div className="relative pt-4 pb-16 lg:pt-8 lg:pb-24 overflow-hidden">
       <div className="w-full max-w-[1700px] mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-12 items-center animate-in fade-in slide-in-from-bottom duration-1000">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-12 items-center">
           {/* Left Column: Text Content */}
-          <div className="flex flex-col justify-center pl-4 lg:pl-12 ">
+          <motion.div 
+            className="flex flex-col justify-center pl-4 lg:pl-12 "
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             {/* Top Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 w-[200px] rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 mb-8 backdrop-blur-md">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -106,68 +138,54 @@ export function HeroSection() {
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-wrap items-center gap-4 mb-16 xl:mb-0">
-              <Button
-                size="lg"
-                className="rounded-full px-8 py-6 text-base font-semibold bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_hsl(var(--primary)/0.3)]"
-                asChild
-              >
-                {hasPremiumAccess ? (
+            <div className="flex flex-col items-start gap-4 mb-16 xl:mb-0">
+              <div className="flex flex-wrap items-center gap-4">
+                <Button
+                  size="lg"
+                  className="rounded-full px-8 py-6 text-base font-semibold bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_hsl(var(--primary)/0.3)]"
+                  asChild
+                >
                   <Link
                     href="/problems"
                     onClick={() =>
                       trackEvent(posthog, "home_cta_clicked", {
-                        cta_label: "Practice",
+                        cta_label: hasPremiumAccess ? "Practice" : "Practice free",
                         destination: "/problems",
                         section: "hero",
                       })
                     }
                   >
-                    Practice <ArrowRight className="ml-2 w-5 h-5" />
+                    {hasPremiumAccess ? "Practice" : "Practice free"} <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
-                ) : (
-                  <Link
-                    href="/pricing"
-                    onClick={() =>
-                      trackEvent(posthog, "home_cta_clicked", {
-                        cta_label: "Go Pro",
-                        destination: "/pricing",
-                        section: "hero",
-                      })
-                    }
-                  >
-                    Go Pro <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                )}
-              </Button>
+                </Button>
 
-              {user && continueLearningAlgo && (
-                <Link
-                  href={continueLearningAlgo.slug ? `/problem/${continueLearningAlgo.slug}` : `/problem/${continueLearningAlgo.id}`}
-                  onClick={() =>
-                    trackEvent(posthog, "home_cta_clicked", {
-                      cta_label: "Continue Learning Box",
-                      destination: continueLearningAlgo.slug || continueLearningAlgo.id,
-                      section: "hero",
-                    })
-                  }
-                  className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 hover:border-primary/40 transition-all hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)] group max-w-[280px]"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-primary tracking-wider mb-0.5">
-                      Continue
-                    </p>
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
-                      {continueLearningAlgo.title || continueLearningAlgo.name}
-                    </p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </div>
-                </Link>
-              )}
+                {!hasPremiumAccess && (
+                  <Button
+                    size="lg"
+                    className="rounded-full px-8 py-6 text-base font-semibold bg-transparent border border-zinc-300 dark:border-white/30 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all hover:scale-105 active:scale-95 shadow-none"
+                    asChild
+                  >
+                    <Link
+                      href="/pricing"
+                      onClick={() =>
+                        trackEvent(posthog, "home_cta_clicked", {
+                          cta_label: "Go Pro",
+                          destination: "/pricing",
+                          section: "hero",
+                        })
+                      }
+                    >
+                      Go Pro
+                    </Link>
+                  </Button>
+                )}
+                
+                {hasPremiumAccess && continueBlock}
+              </div>
+
+              {!hasPremiumAccess && continueBlock}
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column: Interactive Diagram */}
           <div className="hidden lg:flex items-center justify-center relative w-full h-[800px] mt-10 xl:mt-0">

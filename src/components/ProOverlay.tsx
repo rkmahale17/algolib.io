@@ -6,15 +6,19 @@ import { Button } from '@/components/ui/button';
 interface ProOverlayProps {
     className?: string;
     variant?: 'default' | 'compact' | 'transparent';
-    title?: string;
+    title?: React.ReactNode;
     description?: string;
+    hideBadges?: boolean;
+    buttonText?: string;
 }
 
 export const ProOverlay: React.FC<ProOverlayProps> = ({ 
     className = "", 
     variant = "default",
     title,
-    description
+    description,
+    hideBadges = false,
+    buttonText = "View subscription plans"
 }) => {
     const isCompanyTags = title === "Premium company tags";
     const isRula = title === "Rula AI Assistant";
@@ -68,19 +72,21 @@ export const ProOverlay: React.FC<ProOverlayProps> = ({
                     {description || "Purchase premium to unlock official solutions and all the best materials we have to offer."}
                 </p>
 
-                <div className="flex flex-wrap gap-2.5 justify-center max-w-[500px] mb-8">
-                    {badges.map((badge, idx) => (
-                        <span key={idx} className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-foreground bg-muted/40 border border-border/60 rounded-md">
-                            <span className="text-muted-foreground/80 font-bold mr-0.5">✦</span> {badge}
-                        </span>
-                    ))}
-                </div>
+                {!hideBadges && (
+                    <div className="flex flex-wrap gap-2.5 justify-center max-w-[500px] mb-8">
+                        {badges.map((badge, idx) => (
+                            <span key={idx} className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-foreground bg-muted/40 border border-border/60 rounded-md">
+                                <span className="text-muted-foreground/80 font-bold mr-0.5">✦</span> {badge}
+                            </span>
+                        ))}
+                    </div>
+                )}
 
                 <Link href="/pricing">
                     <Button
                         className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-8 py-2.5 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-md shadow-primary/10 border-none"
                     >
-                        View subscription plans <ArrowRight className="w-4 h-4 animate-pulse" />
+                        {buttonText} <ArrowRight className="w-4 h-4 animate-pulse" />
                     </Button>
                 </Link>
             </div>
@@ -99,19 +105,21 @@ export const ProOverlay: React.FC<ProOverlayProps> = ({
                 {description || "Purchase premium to unlock official solutions and all the best materials we have to offer."}
             </p>
 
-            <div className="flex flex-wrap gap-2.5 justify-center max-w-[500px] mb-8">
-                {badges.map((badge, idx) => (
-                    <span key={idx} className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-foreground bg-muted/40 border border-border/60 rounded-md">
-                        <span className="text-muted-foreground/80 font-bold mr-0.5">✦</span> {badge}
-                    </span>
-                ))}
-            </div>
+            {!hideBadges && (
+                <div className="flex flex-wrap gap-2.5 justify-center max-w-[500px] mb-8">
+                    {badges.map((badge, idx) => (
+                        <span key={idx} className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-foreground bg-muted/40 border border-border/60 rounded-md">
+                            <span className="text-muted-foreground/80 font-bold mr-0.5">✦</span> {badge}
+                        </span>
+                    ))}
+                </div>
+            )}
 
             <Link href="/pricing">
                 <Button
                     className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-8 py-2.5 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-md shadow-primary/10 border-none"
                 >
-                    View subscription plans <ArrowRight className="w-4 h-4 animate-pulse" />
+                    {buttonText} <ArrowRight className="w-4 h-4 animate-pulse" />
                 </Button>
             </Link>
         </div>

@@ -175,6 +175,11 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
   const explanations = activeAlgorithm?.metadata?.pattern_explanations || {};
 
   const handleSubmitPatterns = async () => {
+    if (!user?.id) {
+      toast.error("Sign in to submit");
+      return;
+    }
+
     const selected = Array.from(selectedGuessPatterns);
     setIsSubmitting(true);
     
@@ -200,24 +205,20 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
     }
 
     // Save to DB
-    if (user?.id) {
-      const historyUpdate = [...(userAlgoData?.pattern_assessment_history || [])];
-      historyUpdate.push({
-        timestamp: new Date().toISOString(),
-        selected,
-        result: isPass ? 'pass' : 'fail'
-      });
+    const historyUpdate = [...(userAlgoData?.pattern_assessment_history || [])];
+    historyUpdate.push({
+      timestamp: new Date().toISOString(),
+      selected,
+      result: isPass ? 'pass' : 'fail'
+    });
 
-      await updatePatternAssessmentProgress(
-        user.id,
-        activeAlgorithm.id,
-        isPass || (userAlgoData?.pattern_assessment_completed || false),
-        historyUpdate
-      );
-      refetchUserData();
-    } else {
-      toast("Sign in to save your progress.");
-    }
+    await updatePatternAssessmentProgress(
+      user.id,
+      activeAlgorithm.id,
+      isPass || (userAlgoData?.pattern_assessment_completed || false),
+      historyUpdate
+    );
+    refetchUserData();
 
     setIsSubmitting(false);
     setOutputPanelState({

@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { useAIProfileScan } from '@/hooks/useAIProfileScan';
 import { Bot, Loader2, Sparkles, TrendingUp, AlertTriangle, ArrowRight, Activity, Crosshair } from 'lucide-react';
 
+import { ProOverlay } from '@/components/ProOverlay';
+
 interface AIProfileScanProps {
     userId: string;
     stats: any;
@@ -21,22 +23,59 @@ export const AIProfileScan: React.FC<AIProfileScanProps> = ({ userId, stats, has
 
     if (!hasPremiumAccess) {
         return (
-            <Card className="p-6 border-amber-500/30 bg-amber-500/5 relative overflow-hidden group">
-                <div className="flex flex-col sm:flex-row items-center gap-4 relative z-10">
-                    <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                        <Bot className="w-8 h-8 text-amber-500" />
+            <Card className="border-border/50 overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl relative mt-6 group">
+                {/* Dummy Content - Blurred */}
+                <div className="blur-sm opacity-50 pointer-events-none select-none">
+                    <div className="p-6 border-b border-border/50 bg-muted/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center shadow-inner shrink-0">
+                                <Sparkles className="w-7 h-7 text-primary" />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold flex items-center gap-2">Buddy Profile Scan</h4>
+                                <p className="text-sm text-muted-foreground mt-1 max-w-lg leading-relaxed">Great progress! You are showing strong consistency in problem-solving.</p>
+                            </div>
+                        </div>
+                        <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 md:gap-1 bg-background/50 md:bg-transparent p-4 md:p-0 rounded-xl border md:border-0 border-border/50">
+                            <div className="flex flex-col items-start md:items-end">
+                                <span className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-1">Overall Score</span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-4xl font-black text-green-500 tracking-tighter">85</span>
+                                    <span className="text-muted-foreground font-medium">/100</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex-1 text-center sm:text-left">
-                        <h4 className="text-xl font-bold text-foreground flex items-center justify-center sm:justify-start gap-2">
-                            AI Profile Scan <Sparkles className="w-5 h-5 text-amber-500" />
-                        </h4>
-                        <p className="text-muted-foreground mt-1 max-w-xl">
-                            Unlock personalized AI insights about your solving patterns, strengths, weaknesses, and a custom learning roadmap.
-                        </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/50">
+                        <div className="bg-card/80 p-6 flex flex-col h-48">
+                            <h5 className="flex items-center gap-2 font-bold text-green-500 mb-4 text-lg"><TrendingUp className="w-5 h-5" /> Superpowers</h5>
+                            <div className="space-y-3"><div className="h-4 bg-green-500/20 rounded w-3/4"></div><div className="h-4 bg-green-500/20 rounded w-full"></div></div>
+                        </div>
+                        <div className="bg-card/80 p-6 flex flex-col h-48">
+                            <h5 className="flex items-center gap-2 font-bold text-amber-500 mb-4 text-lg"><AlertTriangle className="w-5 h-5" /> Skill Gaps</h5>
+                            <div className="space-y-3"><div className="h-4 bg-amber-500/20 rounded w-5/6"></div><div className="h-4 bg-amber-500/20 rounded w-2/3"></div></div>
+                        </div>
+                        <div className="bg-card/80 p-6 flex flex-col h-48 md:col-span-2 lg:col-span-1">
+                            <h5 className="flex items-center gap-2 font-bold text-primary mb-4 text-lg"><Crosshair className="w-5 h-5" /> Action Plan</h5>
+                            <div className="space-y-3"><div className="h-4 bg-primary/20 rounded w-full"></div><div className="h-4 bg-primary/20 rounded w-4/5"></div></div>
+                        </div>
                     </div>
-                    <Button className="bg-amber-500 hover:bg-amber-600 text-white shrink-0 shadow-lg shadow-amber-500/20 px-6">
-                        Unlock with Pro
-                    </Button>
+                </div>
+
+                {/* Overlay */}
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40">
+                    <ProOverlay 
+                        variant="transparent"
+                        title={
+                            <span className="flex items-center justify-center gap-2">
+                                <Sparkles className="w-6 h-6 text-primary" /> 
+                                Buddy Profile Scan
+                            </span>
+                        }
+                        description="Purchase premium to unlock personalized AI insights about your solving patterns, strengths, weaknesses, and a custom learning roadmap."
+                        buttonText="View subscription plans"
+                        hideBadges={true}
+                    />
                 </div>
             </Card>
         );
@@ -47,7 +86,7 @@ export const AIProfileScan: React.FC<AIProfileScanProps> = ({ userId, stats, has
             <Card className="p-6 border-primary/30 bg-primary/5">
                 <div className="flex flex-col sm:flex-row items-center gap-6">
                     <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                        <Bot className="w-8 h-8 text-primary" />
+                        <Sparkles className="w-8 h-8 text-primary" />
                     </div>
                     <div className="flex-1 text-center sm:text-left">
                         <h4 className="text-xl font-bold text-foreground flex items-center justify-center sm:justify-start gap-2">
@@ -76,7 +115,7 @@ export const AIProfileScan: React.FC<AIProfileScanProps> = ({ userId, stats, has
             <Card className="p-12 border-border/50 flex flex-col items-center justify-center gap-6">
                 <div className="relative">
                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
-                    <Bot className="w-12 h-12 text-primary relative z-10 animate-bounce" />
+                    <Sparkles className="w-12 h-12 text-primary relative z-10 animate-bounce" />
                 </div>
                 <div className="text-center">
                     <h4 className="text-lg font-semibold mb-2 flex items-center justify-center gap-2">
@@ -98,13 +137,12 @@ export const AIProfileScan: React.FC<AIProfileScanProps> = ({ userId, stats, has
             {/* Header */}
             <div className="p-6 border-b border-border/50 bg-muted/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center shadow-inner">
-                        <Bot className="w-7 h-7 text-primary" />
+                    <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center shadow-inner shrink-0">
+                        <Sparkles className="w-7 h-7 text-primary" />
                     </div>
                     <div>
                         <h4 className="text-xl font-bold flex items-center gap-2">
                             Profile Scan Analysis
-                            <Sparkles className="w-4 h-4 text-primary" />
                         </h4>
                         <p className="text-sm text-muted-foreground mt-1 max-w-lg leading-relaxed">{scan.summary}</p>
                     </div>

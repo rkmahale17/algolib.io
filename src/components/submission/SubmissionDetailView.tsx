@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Submission } from '@/types/userAlgorithmData';
 import { useSubmissionStats } from '@/hooks/useSubmissionStats';
 import { StatusHeader } from './StatusHeader';
@@ -9,8 +9,9 @@ import { ComplexityComparison } from './ComplexityComparison';
 import { FailureDetails } from './FailureDetails';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Loader2, Code2, Timer, Cpu, Check, Copy, FlaskConical, X } from 'lucide-react';
+import { Loader2, Code2, Timer, Cpu, Check, Copy, X } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { useAIReview } from '@/hooks/useAIReview';
 import { AIReviewCard } from '../ai/AIReviewCard';
 
 interface SubmissionDetailViewProps {
@@ -30,6 +31,7 @@ export function SubmissionDetailView({
 }: SubmissionDetailViewProps) {
     const isPassed = submission.status === 'passed';
     const [isCopied, setIsCopied] = useState(false);
+    const reviewContainerRef = useRef<HTMLDivElement>(null);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(submission.code);
@@ -47,25 +49,60 @@ export function SubmissionDetailView({
         enabled: isPassed,
     });
 
+    const aiReview = useAIReview(algorithmId, submission.id);
+    const [showReviewCard, setShowReviewCard] = useState(false);
+
+    useEffect(() => {
+        if (hasPremiumAccess) {
+            aiReview.loadReview();
+        }
+    }, [hasPremiumAccess, aiReview.loadReview]);
+
+    useEffect(() => {
+        if ((aiReview.isLoading || showReviewCard) && reviewContainerRef.current) {
+            setTimeout(() => {
+                reviewContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100); // small delay to allow DOM to render the loading card
+        }
+    }, [aiReview.isLoading, showReviewCard]);
+
+    const reviewCard = (
+        <AIReviewCard
+            algorithmId={algorithmId}
+            submissionId={submission.id}
+            code={submission.code}
+            language={submission.language}
+            problemDescription={`Problem ID: ${algorithmId}`}
+            hasPremiumAccess={hasPremiumAccess}
+            review={aiReview.review}
+            isLoading={aiReview.isLoading}
+            error={aiReview.error}
+            onGenerateReview={() => aiReview.generateReview(submission.code, submission.language, `Problem ID: ${algorithmId}`)}
+        />
+    );
+
     return (
         <ScrollArea className="h-full">
             <div className="p-4 space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                {/* Status Header */}
-                <StatusHeader submission={submission} onBack={onBack} />
+                <StatusHeader 
+                    submission={submission} 
+                    algorithmId={algorithmId}
+                    hasPremiumAccess={hasPremiumAccess}
+                    onBack={onBack} 
+                    hideAnalyseButton={!!aiReview.review || aiReview.isLoading || showReviewCard}
+                    onAnalyseClick={() => {
+                        if (hasPremiumAccess) {
+                            aiReview.generateReview(submission.code, submission.language, `Problem ID: ${algorithmId}`);
+                        } else {
+                            setShowReviewCard(true);
+                        }
+                    }}
+                    isGeneratingReview={aiReview.isLoading}
+                />
 
                 {/* Performance Charts (only for passed) */}
                 {isPassed && (
                     <div className="space-y-3">
-                        {/* Beta notice — performance comparison is experimental */}
-                        <div className="flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3.5 py-3 text-xs">
-                            <FlaskConical className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                                <span className="font-semibold text-amber-600 dark:text-amber-400">Beta feature</span>
-                                <span className="text-muted-foreground ml-1.5">
-                                    Performance comparison is experimental. Results are normalized against our reference solution but may vary.
-                                </span>
-                            </div>
-                        </div>
                         {statsLoading ? (
                             <div className="flex items-center justify-center h-48 rounded-xl border border-border/60 bg-card/80">
                                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -158,16 +195,13 @@ export function SubmissionDetailView({
                                     optimalTimeComplexity={optimalTimeComplexity}
                                     optimalSpaceComplexity={optimalSpaceComplexity}
                                 />
-                                
-                                {/* AI Review */}
-                                <AIReviewCard
-                                    algorithmId={algorithmId}
-                                    submissionId={submission.id}
-                                    code={submission.code}
-                                    language={submission.language}
-                                    problemDescription={`Problem ID: ${algorithmId}`} // Can be enhanced by fetching full problem description if needed
-                                    hasPremiumAccess={hasPremiumAccess}
-                                />
+
+                                {/* Inline AI Review if generated, loading, or requested by non-pro */}
+                                {(aiReview.review || aiReview.isLoading || showReviewCard) && (
+                                    <div className="mt-4" ref={reviewContainerRef}>
+                                        {reviewCard}
+                                    </div>
+                                )}
                             </>
                         ) : null}
                     </div>
