@@ -74,10 +74,6 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
           const algo = rec.algorithm;
           const status = (progressMap?.[algo.id] || 'none') as any;
 
-          let ctaText = 'Start';
-          if (status === 'attempted') ctaText = 'Resume';
-          else if (status === 'solved') ctaText = 'Review';
-
           return (
             <PremiumProblemCard
               key={algo.id}
@@ -101,9 +97,7 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
                   </Tooltip>
                 </TooltipProvider>
               }
-              ctaText={ctaText}
               showEstimatedTime={true}
-              hideAction={true}
               categoriesOnSeparateRow={true}
             />
           );
