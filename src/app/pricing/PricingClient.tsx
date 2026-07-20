@@ -3,11 +3,12 @@
 import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Check, Info, Calendar, CreditCard, AlertCircle, ArrowRight, Sparkles, HelpCircle, Copy, X } from 'lucide-react';
+import { Check, Info, Calendar, CreditCard, AlertCircle, ArrowRight, Sparkles, Briefcase, TrendingUp, HelpCircle, Copy, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { pricingData } from '@/data/pricing-data';
+import logo from "@/assets/Rulo/rulo-hi.svg";
 import {
   Accordion,
   AccordionContent,
@@ -278,29 +279,148 @@ const PricingClient = () => {
         )}
 
         {/* Header Section */}
-        <div className="text-left mb-12">
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tight max-w-2xl text-foreground mt-4">
-            {isPremium ? "Manage your subscription" : "Save time, ace interviews, and secure high-paying roles"}
+        <div className={cn("mb-[76px]", !isPremium ? "flex flex-col items-center text-center" : "text-left")}>
+          {!isPremium && (
+            <span className="text-sm font-semibold text-primary bg-primary/10 px-4 py-1.5 rounded-full mb-6 inline-flex items-center gap-1.5">
+              <Briefcase className="w-4 h-4" /> Career Investment
+            </span>
+          )}
+          <h1 className={cn("tracking-tight text-foreground mb-8", !isPremium ? "font-medium text-4xl md:text-5xl lg:text-5xl max-w-3xl" : "font-bold text-4xl md:text-5xl max-w-2xl")}>
+            {isPremium ? "Manage your subscription" : "The Best Investment You'll Make for Your Next Interview."}
           </h1>
+          {!isPremium && (
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
+              Master DSA with interactive visualizations, AI guidance, and structured practice, all designed to help you succeed in coding interviews.
+            </p>
+          )}
         </div>
 
-        {/* Career Investment Message Card */}
         {!isPremium && (
-          <div className="mb-12 p-6 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="font-semibold text-base text-foreground">An Investment in Your Future</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                There is nothing more valuable than preparing yourself to secure a role at a top-tier company. <br className="hidden md:block" /> High-quality preparation is the ultimate multiplier for your career—making this purchase a negligible, high-yield investment compared to the career return and growth you will secure.
-              </p>
+          <div className="w-full max-w-[1000px] mx-auto rounded-2xl bg-gradient-to-br from-orange-500/5 via-card to-card border border-orange-500/10 shadow-lg shadow-orange-500/5 p-8 md:p-12 mb-16 relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 relative">
+              {/* Divider for desktop */}
+              <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-border/60 -translate-x-1/2" />
+              
+              {/* Left Column */}
+              <div className="flex flex-col lg:pr-16 max-w-[600px]">
+                <span className="text-sm font-medium text-muted-foreground mb-3">
+                  Why it's worth it
+                </span>
+                <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">
+                  An investment in your future
+                </h3>
+                <div className="space-y-6 text-muted-foreground/90 leading-relaxed text-[15px] md:text-base">
+                  <p>
+                    There's nothing more valuable than preparing yourself to secure a role at a top tier company.
+                  </p>
+                  <p>
+                    High quality preparation is the ultimate multiplier for your career, a negligible cost against the return and growth it unlocks.
+                  </p>
+                  <div className="pt-6 mt-2 border-t border-border/50">
+                    <p className="text-sm font-medium text-muted-foreground mb-4">
+                      Join engineers cracking interviews at top tech companies like:
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center">
+                        <img src="/icons/companies/google.svg" alt="Google" className="w-4 h-4 object-contain dark:invert opacity-60" />
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center">
+                        <img src="/icons/companies/meta.svg" alt="Meta" className="w-4 h-4 object-contain dark:invert opacity-60" />
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center">
+                        <img src="/icons/companies/amazon.svg" alt="Amazon" className="w-4 h-4 object-contain dark:invert opacity-60" />
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center">
+                        <img src="/icons/companies/netflix.svg" alt="Netflix" className="w-4 h-4 object-contain dark:invert opacity-60" />
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center">
+                        <img src="/icons/companies/microsoft.svg" alt="Microsoft" className="w-4 h-4 object-contain dark:invert opacity-60" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="flex flex-col lg:pl-16">
+                <span className="text-sm font-medium text-muted-foreground mb-8">
+                  Offers don't lie
+                </span>
+                
+                <div className="flex flex-col gap-8 max-h-[320px] overflow-y-auto pr-2 pb-2 hover-scrollbar">
+                  {/* Testimonial 1 */}
+                  <div className="flex gap-4 items-start">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                      R
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <p className="font-medium text-foreground text-[15px] md:text-base leading-snug">
+                        "Cleared my Amazon SDE2 loop, the interactive visualizations were a game changer."
+                      </p>
+                      <span className="text-xs md:text-sm text-muted-foreground">
+                        Rahul S., @rahul_codes
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-px w-full bg-border/60 shrink-0" />
+
+                  {/* Testimonial 2 */}
+                  <div className="flex gap-4 items-start">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                      J
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <p className="font-medium text-foreground text-[15px] md:text-base leading-snug">
+                        "Instead of the solution, it guided me with hints until I found the DP approach myself."
+                      </p>
+                      <span className="text-xs md:text-sm text-muted-foreground">
+                        James T., @jamestech
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-px w-full bg-border/60 shrink-0" />
+
+                  {/* Testimonial 3 */}
+                  <div className="flex gap-4 items-start">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                      S
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <p className="font-medium text-foreground text-[15px] md:text-base leading-snug">
+                        "Practicing with Rulo AI felt exactly like a real interview. It pinpointed the edge cases I missed and helped me optimize my approach perfectly."
+                      </p>
+                      <span className="text-xs md:text-sm text-muted-foreground">
+                        Sarah M., @sarah_dev
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
+        {/* Chips for Cancel Anytime & Trial */}
+        {!isPremium && (
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            {[
+              "14 Days Trial",
+              "Cancel anytime",
+              "Secure Payment",
+              "New Problems added every week"
+            ].map((text, i) => (
+              <div key={i} className="flex items-center gap-2 bg-card border border-border/50 px-4 py-2 rounded-full shadow-sm text-sm">
+                <Check className="w-4 h-4 text-green-500 shrink-0" />
+                <span className="text-foreground font-medium">{text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Subscriptions Grid */}
-        <div id="pricing-grid" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 items-center">
+        <div id="pricing-grid" className="flex flex-col md:flex-row flex-wrap justify-center items-start gap-6 lg:gap-8 mb-12">
           {pricingData.subscriptionPlans.map((plan) => {
             const isFreePlan = plan.productId === "free";
             const isCurrentPlan = isPremium && profile?.subscription_duration === plan.productId;
@@ -308,7 +428,7 @@ const PricingClient = () => {
 
             return (
               <div key={plan.id} className={cn(
-                "rounded-2xl p-8 flex flex-col relative group transition-all duration-300",
+                "rounded-2xl p-8 flex flex-col relative group transition-all duration-300 w-full max-w-[380px]",
                 isAnnual 
                   ? "border-[3px] border-green-500 bg-card/90 shadow-2xl z-10 bg-gradient-to-b from-green-500/5 to-transparent" 
                   : "border border-border bg-card hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 z-0",
@@ -328,13 +448,15 @@ const PricingClient = () => {
                 )}
 
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex flex-col gap-1.5">
-                    {(plan as any).trustedText && (
-                      <div className="text-[11px] font-bold text-amber-500 tracking-wider uppercase">
+                  <div className="flex flex-col gap-1.5 h-[44px]">
+                    {(plan as any).trustedText ? (
+                      <div className="text-[11px] font-bold text-amber-500 tracking-wider uppercase leading-none">
                         {(plan as any).trustedText}
                       </div>
+                    ) : (
+                      <div className="h-[11px]" />
                     )}
-                    <div className="font-semibold text-lg">{plan.title}</div>
+                    <div className="font-semibold text-lg leading-none">{plan.title}</div>
                   </div>
                 </div>
 
@@ -348,7 +470,10 @@ const PricingClient = () => {
                   )}
 
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-semibold tracking-tight">{plan.price}</span>
+                    <span className="text-neutral-900 dark:text-neutral-100 text-pretty xl:text-5xl xl:-tracking-3 text-4xl -tracking-2 font-medium flex items-start mt-1">
+                      {plan.price.startsWith('$') && <span className="text-2xl xl:text-3xl mr-0.5 mt-1">$</span>}
+                      {plan.price.startsWith('$') ? plan.price.slice(1) : plan.price}
+                    </span>
                     <span className="text-muted-foreground font-medium text-sm">{plan.period}</span>
                   </div>
                 </div>
@@ -362,15 +487,26 @@ const PricingClient = () => {
                   )}
                 </div>
 
-                 {plan.hasTrial && !hasBoughtBefore && (
-                  <div className="mb-6 flex flex-col gap-1">
-                    <div className="text-xs font-bold text-green-600 bg-green-500/5 px-2 py-1 rounded border border-green-500/10 w-fit">
+                {plan.hasTrial && !hasBoughtBefore ? (
+                  <div className="mb-6 flex flex-col gap-1 h-[44px]">
+                    <div className="text-xs font-bold text-green-600 bg-green-500/5 px-2 py-0.5 rounded border border-green-500/10 w-fit leading-tight">
                       Includes 14-day free trial
                     </div>
-                    <div className="text-[10px] text-muted-foreground italic">
+                    <div className="text-[10px] text-muted-foreground italic leading-tight">
                       Cancel anytime before 14 days and you will not be charged.
                     </div>
                   </div>
+                ) : plan.productId === "free" ? (
+                  <div className="mb-6 flex flex-col gap-1 h-[44px]">
+                    <div className="text-xs font-bold text-zinc-300 bg-zinc-500/10 px-2.5 py-0.5 rounded-full border border-zinc-500/20 w-fit leading-tight">
+                      Run, Submit, Solution
+                    </div>
+                    <div className="text-[10px] text-muted-foreground italic leading-tight">
+                      Includes visualization for free problems.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-6 h-[44px]" />
                 )}
 
                 <Button
@@ -404,7 +540,7 @@ const PricingClient = () => {
                     <span className="flex items-center gap-2 justify-center">
                       <span className="font-semibold tracking-wide">
                         {isFreePlan 
-                          ? "Start Learning"
+                          ? "Continue Learning"
                           : hasBoughtBefore
                             ? (profile?.subscription_duration === plan.productId ? "Renew" : "Get Pro")
                             : (plan.hasTrial ? "Start 14-day free trial" : "Get Pro")}
@@ -497,31 +633,6 @@ const PricingClient = () => {
           </div>
         )}
 
-        {/* Social Proof Banner */}
-        {!isPremium && (
-          <div className="mb-24 p-8 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-background text-center flex flex-col items-center gap-4">
-            <div className="bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
-              Limited Time Access
-            </div>
-            <h2 className="text-2xl md:text-3xl font-semibold max-w-xl text-foreground">
-              Over 100+ developers have already purchased this course—now it's your turn to ace your interviews!
-            </h2>
-            <p className="text-muted-foreground text-sm max-w-lg">
-              Don't get left behind. Start practicing today with our premium tools, solution explanations, and interactive visualizers.
-            </p>
-            <Button 
-              onClick={() => {
-                const element = document.getElementById('pricing-grid');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-              }}
-              className="mt-2 rounded-full px-8 py-6 font-semibold"
-            >
-              Get Premium Access Now
-            </Button>
-          </div>
-        )}
 
         {/* Features Section */}
         <div className="mb-24">

@@ -97,7 +97,7 @@ import { SubmissionDetailView } from "../submission/SubmissionDetailView";
 import { isTreeType } from "@/utils/treeUtils";
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
-import { RulaPanel } from "../ai/RulaPanel";
+import { RuloPanel } from "../ai/RuloPanel";
 
 // Lazy components via next/dynamic to avoid SSR issues
 const TreeDiagram = dynamic(
@@ -366,7 +366,7 @@ export const ProblemDescriptionPanel = React.memo(
       { id: "submissions", label: "Submissions", icon: History },
       { id: "thinkpad", label: "Thinkpad", icon: Book },
       { id: "editor", label: "Code", icon: Code2 },
-      { id: "rula", label: "Ruly", icon: Sparkles },
+      { id: "rulo", label: "Rulo", icon: Sparkles },
     ];
 
     const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
@@ -578,7 +578,7 @@ export const ProblemDescriptionPanel = React.memo(
                                   .filter(t => {
                                     if (activeTabsList.includes(t.id)) return false;
                                     if (isSqlProblem && (t.id === 'thinkpad' || t.id === 'visualizations')) return false;
-                                    if (isPatternGuessContext && (t.id === 'rula' || t.id === 'visualizations' || t.id === 'thinkpad' || t.id === 'submissions')) return false;
+                                    if (isPatternGuessContext && (t.id === 'rulo' || t.id === 'visualizations' || t.id === 'thinkpad' || t.id === 'submissions')) return false;
                                     if (t.id === 'thinkpad') {
                                       return isBrainstormEnabled && algorithm?.controls?.brainstorm !== false;
                                     }
@@ -2051,8 +2051,8 @@ export const ProblemDescriptionPanel = React.memo(
                 </TabsContent>
               )}
 
-            <TabsContent value="rula" className="h-full m-0 data-[state=inactive]:hidden flex flex-col">
-               <RulaPanel 
+            <TabsContent value="rulo" className="h-full m-0 data-[state=inactive]:hidden flex flex-col">
+               <RuloPanel 
                   algorithmId={algorithm?.id || algorithm?.slug || ''}
                   algorithmData={algorithm}
                   currentCode={currentCode || ""}

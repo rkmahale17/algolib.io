@@ -1,4 +1,4 @@
-import { BookOpen, ShieldCheck, CheckSquare, Building2, Terminal, Hexagon, Network, LineChart } from "lucide-react";
+import { BookOpen, ShieldCheck, CheckSquare, Building2, Terminal, Hexagon, Network, LineChart, Database, Puzzle, Bot, PenTool, FileText } from "lucide-react";
 
 export const pricingData = {
     header: {
@@ -35,12 +35,12 @@ export const pricingData = {
             originalPrice: undefined,
             discountText: undefined,
             features: [
-                "Access to free problems",
-                "x Company-wise Questions",
-                "x Interactive Visualizations for free",
-                "x ThinkPad for free problems",
-                "x Rula AI Assistance",
-                "x Future Updates"
+                "Access to Free Problems",
+                "x Company Interview Questions",
+                "x Interactive DSA Visualizations",
+                "x Whiteboard",
+                "x Rulo AI Assistant",
+                "x Future Feature Updates"
             ]
         },
         {
@@ -56,11 +56,11 @@ export const pricingData = {
             discountText: undefined,
             features: [
                 "All Premium Problems",
-                "Company-wise Questions",
-                "Interactive Visualizations",
-                "ThinkPad",
-                "Rula AI Assistance",
-                "Future Updates"
+                "Company Interview Questions",
+                "Interactive DSA Visualizations",
+                "Whiteboard",
+                "Rulo AI Assistant",
+                "Future Feature Updates"
             ]
         },
         {
@@ -78,16 +78,15 @@ export const pricingData = {
             originalPrice: undefined,
             discountText: undefined,
             features: [
-                "Annual No disruption",
-                "Discord Doubt Solve",
-                "Learning Guidance in one to one call",
                 "All Premium Problems",
-                "Company-wise Questions",
-                "Interactive Visualizations",
-                "ThinkPad",
-                "Rula AI Assistance",
-                "Future Updates",
-                "Get renew same price as we have right now"
+                "Company Interview Questions",
+                "Interactive DSA Visualizations",
+                "Whiteboard",
+                "Rulo AI Assistant",
+                "Future Feature Updates",
+                "Priority Discord Support",
+                "1-on-1 discussion",
+                "Price Lock Guarantee"
             ],
         }
     ],
@@ -105,6 +104,31 @@ export const pricingData = {
                 description: "Unlock step-by-step multi-approach solutions with clear, detailed, and optimized explanations."
             },
             {
+                icon: CheckSquare,
+                title: "Road Map",
+                description: "Master algorithm patterns systematically with our curated collection of interview questions."
+            },
+            {
+                icon: Database,
+                title: "Database questions",
+                description: "Practice SQL and database design problems to ace your backend interviews."
+            },
+            {
+                icon: Puzzle,
+                title: "Pattern matching",
+                description: "Learn to identify and apply the right algorithm patterns to solve unseen problems."
+            },
+            {
+                icon: Bot,
+                title: "Rulo AI",
+                description: "Get personalized hints, edge case analysis, and code reviews from our built-in AI assistant."
+            },
+            {
+                icon: PenTool,
+                title: "Whiteboard",
+                description: "Sketch out your ideas and diagram algorithm approaches using our integrated whiteboard tool."
+            },
+            {
                 icon: Network,
                 title: "Visualization access",
                 description: "Don't just read code — watch it run. Get full interactive access to visualize algorithm execution flow."
@@ -112,12 +136,7 @@ export const pricingData = {
             {
                 icon: BookOpen,
                 title: "Large question bank",
-                description: "200+ interview questions covering fundamental patterns and advanced algorithms."
-            },
-            {
-                icon: CheckSquare,
-                title: "Structured Learning Path",
-                description: "Master algorithm patterns systematically with our curated collection of interview questions."
+                description: "220+ interview questions covering fundamental patterns and advanced algorithms."
             },
             {
                 icon: Terminal,
@@ -133,6 +152,11 @@ export const pricingData = {
                 icon: LineChart,
                 title: "Continuous updates",
                 description: "We constantly add new patterns and visualization improvements for our premium members."
+            },
+            {
+                icon: FileText,
+                title: "Notes",
+                description: "Take and save personal notes on any problem to review later during your interview prep."
             }
         ]
     },

@@ -243,7 +243,7 @@ interface OutputPanelProps {
   // State Lifting
   activeTestCaseTab?: string;
   onTestCaseTabChange?: (val: string) => void;
-  onOpenRula?: () => void;
+  onOpenRulo?: () => void;
   onToggleExpand?: () => void;
   isExpanded?: boolean;
   onMaximize?: () => void;
@@ -276,7 +276,7 @@ export const OutputPanel = React.memo(({
   onSelectSubmission,
   activeTestCaseTab: controlledActiveTestCaseTab,
   onTestCaseTabChange,
-  onOpenRula,
+  onOpenRulo,
   onToggleExpand,
   isExpanded,
   onMaximize,
@@ -352,22 +352,22 @@ export const OutputPanel = React.memo(({
 
         {/* Fixed Right Actions */}
         <div className="flex items-center pr-1 shrink-0 bg-background/50 h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
-          {onOpenRula && (
+          {onOpenRulo && (
             <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={onOpenRula}
+                    onClick={onOpenRulo}
                     className="h-9 w-9 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10 rounded-none border-l border-border/50"
-                    title="Ask Ruly"
+                    title="Ask Rulo"
                   >
                     <Sparkles className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Ask Ruly</p>
+                  <p>Ask Rulo</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

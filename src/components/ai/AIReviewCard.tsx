@@ -42,7 +42,7 @@ export const AIReviewCard: React.FC<AIReviewCardProps> = ({
                                 <Sparkles className="w-5 h-5 text-primary" />
                             </div>
                             <div>
-                                <h4 className="font-semibold flex items-center gap-2">Ruly Review</h4>
+                                <h4 className="font-semibold flex items-center gap-2">Rulo Review</h4>
                                 <p className="text-xs text-muted-foreground">Detailed analysis of your solution.</p>
                             </div>
                         </div>
@@ -96,7 +96,7 @@ export const AIReviewCard: React.FC<AIReviewCardProps> = ({
                         title={
                             <span className="flex items-center justify-center gap-2">
                                 <Sparkles className="w-6 h-6 text-primary" /> 
-                                Ruly Review
+                                Rulo Review
                             </span>
                         }
                         description="Purchase premium to unlock instant, personalized feedback on your code quality, time complexity, and how to improve."
@@ -116,7 +116,7 @@ export const AIReviewCard: React.FC<AIReviewCardProps> = ({
                         <Sparkles className="w-6 h-6 text-primary" />
                     </div>
                     <div className="flex-1 text-center sm:text-left">
-                        <h4 className="text-lg font-semibold text-foreground">Ruly Review</h4>
+                        <h4 className="text-lg font-semibold text-foreground">Rulo Review</h4>
                         <p className="text-sm text-muted-foreground mt-1">
                             Analyze this submission for code quality and improvements.
                         </p>
@@ -141,7 +141,7 @@ export const AIReviewCard: React.FC<AIReviewCardProps> = ({
         return (
             <Card className="mt-6 p-6 border-border/50 flex flex-col items-center justify-center min-h-[200px] gap-4">
                 <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-sm text-muted-foreground animate-pulse">Ruly is reviewing your code...</p>
+                <p className="text-sm text-muted-foreground animate-pulse">Rulo is reviewing your code...</p>
             </Card>
         );
     }
@@ -159,7 +159,7 @@ export const AIReviewCard: React.FC<AIReviewCardProps> = ({
                     </div>
                     <div>
                         <h4 className="font-semibold flex items-center gap-2">
-                            Ruly Review
+                            Rulo Review
                         </h4>
                         <p className="text-xs text-muted-foreground">{review.summary}</p>
                     </div>

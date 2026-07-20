@@ -8,7 +8,7 @@ export const AIWelcomeScreen = () => {
                 <div className="bg-primary/10 p-3 rounded-full">
                     <Sparkles className="w-8 h-8 text-primary" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-foreground">Ask Ruly AI</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-foreground">Ask Rulo AI</h2>
                 <p className="text-sm text-muted-foreground max-w-md">
                     I understand your current problem automatically. No need to paste the question, constraints, or your code! ⭐⭐⭐⭐⭐
                 </p>

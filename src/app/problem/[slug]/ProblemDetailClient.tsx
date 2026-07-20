@@ -534,11 +534,11 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
             layout.addTab("left", "submissions");
           }
         }}
-        onOpenRula={() => {
-          if (!layout.leftTabs.includes("rula")) {
-            layout.addTab("left", "rula");
+        onOpenRulo={() => {
+          if (!layout.leftTabs.includes("rulo")) {
+            layout.addTab("left", "rulo");
           }
-          layout.setActiveLeftTab("rula");
+          layout.setActiveLeftTab("rulo");
         }}
         hideToolbar={!layout.isMobile && !layout.isCodeRunnerMaximized}
       />
@@ -613,11 +613,13 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
           handleShare={interactions.handleShare}
           onToggleSidebar={() => setIsSidebarOpen(true)}
           activeListType={activeListType}
-          onOpenRuly={() => {
-            if (layout.leftTabs.includes("rula")) {
-              layout.setActiveLeftTab("rula");
+          onOpenRulo={() => {
+            if (layout.leftTabs.includes("rulo")) {
+              layout.setActiveLeftTab("rulo");
+            } else if (layout.rightTabs.includes("rulo")) {
+              layout.setActiveRightTab("rulo");
             } else {
-              layout.setActiveRightTab("rula");
+              layout.addTab("left", "rulo");
             }
           }}
         />
