@@ -613,7 +613,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
           handleShare={interactions.handleShare}
           onToggleSidebar={() => setIsSidebarOpen(true)}
           activeListType={activeListType}
-          onOpenBuddy={() => {
+          onOpenRuly={() => {
             if (layout.leftTabs.includes("rula")) {
               layout.setActiveLeftTab("rula");
             } else {

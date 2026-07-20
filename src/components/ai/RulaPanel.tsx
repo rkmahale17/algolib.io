@@ -5,7 +5,8 @@ import { Sparkles, Lightbulb, Brain, Route, CheckCircle2, User as UserIcon, Arro
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useTheme } from 'next-themes';
 import { v4 as uuidv4 } from 'uuid';
 import { AIChatMessage } from '@/types/ai';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,6 +41,9 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
     const [isStreaming, setIsStreaming] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+    const { theme, systemTheme } = useTheme();
+    const currentTheme = theme === 'system' ? systemTheme : theme;
+    const isDark = currentTheme === 'dark';
 
     // Load chat history from DB
     useEffect(() => {
@@ -344,7 +348,7 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
                                             <div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/20 shrink-0">
                                                 <Sparkles className="w-3.5 h-3.5 text-primary" />
                                             </div>
-                                            <span className="text-xs font-semibold text-foreground/80">Buddy</span>
+                                            <span className="text-xs font-semibold text-foreground/80">Ruly</span>
                                         </>
                                     )}
                                     {msg.role === 'user' && (
@@ -381,12 +385,12 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
                                                                     <SyntaxHighlighter
                                                                         {...props}
                                                                         children={codeString}
-                                                                        style={vscDarkPlus as any}
+                                                                        style={(isDark ? vscDarkPlus : oneLight) as any}
                                                                         language={match[1]}
                                                                         PreTag="div"
                                                                         customStyle={{ fontFamily: 'inherit' }}
                                                                         codeTagProps={{ style: { fontFamily: 'inherit' } }}
-                                                                        className="text-[13px] font-mono rounded-lg !bg-zinc-950/50 !p-4 !m-0 overflow-x-auto"
+                                                                        className={`text-[13px] font-mono rounded-lg !p-4 !m-0 overflow-x-auto ${isDark ? '!bg-zinc-950/50' : '!bg-zinc-100/80'}`}
                                                                     />
                                                                     <div className="absolute top-2 right-2 flex gap-2">
                                                                         {onCopyToEditor && (
@@ -426,7 +430,7 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
                                                 {msg.content === '' && isStreaming && (
                                                     <div className="flex items-center gap-2 py-1 text-muted-foreground">
                                                         <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                                                        <span className="text-xs">Buddy is thinking...</span>
+                                                        <span className="text-xs">Ruly is thinking...</span>
                                                     </div>
                                                 )}
                                             </div>

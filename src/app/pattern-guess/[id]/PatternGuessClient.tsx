@@ -318,7 +318,7 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
           handleRandomProblem={handleRandomProblem}
           hideFeedback={true}
           activeListType="pattern-guess"
-          onOpenBuddy={() => handleToggleTab("rula")}
+          onOpenRuly={() => handleToggleTab("rula")}
         />
         
         <div className="flex-1 overflow-hidden relative">
