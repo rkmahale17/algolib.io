@@ -93,7 +93,7 @@ interface NavbarProps {
   hideFeedback?: boolean;
   hideShare?: boolean;
   className?: string;
-  onOpenBuddy?: () => void;
+  onOpenRuly?: () => void;
 }
 
 const Navbar = ({
@@ -115,7 +115,7 @@ const Navbar = ({
   hideFeedback = false,
   hideShare = false,
   className,
-  onOpenBuddy,
+  onOpenRuly,
 }: NavbarProps) => {
   const [mounted, setMounted] = useState(false);
   const { profile, user, hasPremiumAccess, setActiveListType } = useApp();
@@ -963,17 +963,17 @@ const Navbar = ({
                   <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
-              {onOpenBuddy && (
+              {onOpenRuly && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => {
-                          trackEvent(posthog, "ai_buddy_clicked", {
+                          trackEvent(posthog, "ai_ruly_clicked", {
                             location: "navbar_problem_nav",
                             algorithm_slug: algorithm?.slug || algorithm?.id,
                           });
-                          onOpenBuddy();
+                          onOpenRuly();
                         }}
                         className="flex items-center justify-center h-8 w-8 ml-1.5 rounded-md hover:bg-primary/20 bg-secondary/50 border border-border shadow-sm transition-colors text-primary shrink-0"
                       >
@@ -981,7 +981,7 @@ const Navbar = ({
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="text-xs">
-                      <p>Buddy</p>
+                      <p>Ruly</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

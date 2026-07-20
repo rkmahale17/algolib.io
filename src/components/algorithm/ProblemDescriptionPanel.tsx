@@ -366,7 +366,7 @@ export const ProblemDescriptionPanel = React.memo(
       { id: "submissions", label: "Submissions", icon: History },
       { id: "thinkpad", label: "Thinkpad", icon: Book },
       { id: "editor", label: "Code", icon: Code2 },
-      { id: "rula", label: "Buddy", icon: Sparkles },
+      { id: "rula", label: "Ruly", icon: Sparkles },
     ];
 
     const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
@@ -578,7 +578,7 @@ export const ProblemDescriptionPanel = React.memo(
                                   .filter(t => {
                                     if (activeTabsList.includes(t.id)) return false;
                                     if (isSqlProblem && (t.id === 'thinkpad' || t.id === 'visualizations')) return false;
-                                    if (isPatternGuessContext && (t.id === 'buddy' || t.id === 'visualizations' || t.id === 'thinkpad' || t.id === 'submissions')) return false;
+                                    if (isPatternGuessContext && (t.id === 'rula' || t.id === 'visualizations' || t.id === 'thinkpad' || t.id === 'submissions')) return false;
                                     if (t.id === 'thinkpad') {
                                       return isBrainstormEnabled && algorithm?.controls?.brainstorm !== false;
                                     }

@@ -361,13 +361,13 @@ export const OutputPanel = React.memo(({
                     size="icon"
                     onClick={onOpenRula}
                     className="h-9 w-9 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10 rounded-none border-l border-border/50"
-                    title="Ask Buddy"
+                    title="Ask Ruly"
                   >
                     <Sparkles className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Ask Buddy</p>
+                  <p>Ask Ruly</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

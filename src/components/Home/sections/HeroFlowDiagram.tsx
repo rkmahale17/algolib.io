@@ -10,7 +10,7 @@ import {
 
 import React from "react";
 import { motion } from "framer-motion";
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/Ruly/ruly-hi.svg";
 
 export function HeroFlowDiagram() {
   return (
@@ -20,6 +20,11 @@ export function HeroFlowDiagram() {
 
       {/* SVG Dashed Connecting Path */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 600 600">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" className="fill-green-800/40 dark:fill-[#a3e639]/40" />
+          </marker>
+        </defs>
         <motion.path
           id="flow-path"
           d="M 140 100 L 415 100 Q 455 100 455 140 L 455 240 Q 455 280 415 280 L 170 280 Q 130 280 130 320 L 130 440 Q 130 480 170 480 L 450 480"
@@ -27,7 +32,9 @@ export function HeroFlowDiagram() {
           className="stroke-green-800/40 dark:stroke-[#a3e639] opacity-100 dark:opacity-40"
           strokeWidth="2"
           strokeDasharray="8 8"
+          markerEnd="url(#arrowhead)"
         />
+
         {/* Animated glowing dots on the path */}
         {[0, -3, -6, -9, -12].map((delay, i) => (
           <circle
@@ -44,9 +51,7 @@ export function HeroFlowDiagram() {
 
       {/* Central Node */}
       <div className="absolute top-[280px] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center text-center z-20">
-        <div className="w-16 h-16 rounded-full bg-black/60 border border-primary/30 flex items-center justify-center shadow-[0_0_30px_rgba(163,230,57,0.2)] mb-3 backdrop-blur-md">
-          <img src={typeof logo === "string" ? logo : (logo as any).src} alt="RulCode" className="w-8 h-8 animate-pulse" />
-        </div>
+        <img src={typeof logo === "string" ? logo : (logo as any).src} alt="Ruly" className="w-24 h-24 animate-pulse drop-shadow-[0_0_15px_rgba(163,230,57,0.4)] mb-3" />
         <h3 className="text-base font-semibold text-zinc-900 dark:text-white mb-0.5">
           Understand
           <br />
@@ -71,10 +76,10 @@ export function HeroFlowDiagram() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="w-[200px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-2xl backdrop-blur-md">
+        <div className="w-[210px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-2xl backdrop-blur-md">
           {/* Header row — badge + title inline */}
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-xs bg-primary/10 border border-primary/20 shrink-0 leading-none">
               1
             </div>
             <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
@@ -104,10 +109,10 @@ export function HeroFlowDiagram() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="w-[200px] bg-white dark:bg-[#111111]/90 border border-primary/20 dark:border-primary/30 rounded-xl p-4 shadow-[0_0_20px_rgba(163,230,57,0.1)] backdrop-blur-md">
+        <div className="w-[210px] bg-white dark:bg-[#111111]/90 border border-primary/20 dark:border-primary/30 rounded-xl p-4 shadow-[0_0_20px_rgba(163,230,57,0.1)] backdrop-blur-md">
           {/* Header row */}
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-xs bg-primary/10 border border-primary/20 shrink-0 leading-none">
               2
             </div>
             <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
@@ -151,24 +156,24 @@ export function HeroFlowDiagram() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <div className="w-[200px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-[#F97316]/30 rounded-xl p-4 shadow-[0_0_20px_rgba(249,115,22,0.1)] backdrop-blur-md relative">
+        <div className="w-[210px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-[#F97316]/30 rounded-xl p-4 shadow-[0_0_20px_rgba(249,115,22,0.1)] backdrop-blur-md relative">
           {/* Header row */}
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-full border border-[#F97316]/50 flex items-center justify-center text-[#F97316] font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-xs bg-primary/10 border border-primary/20 shrink-0 leading-none">
               3
             </div>
             <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
               Think
             </span>
           </div>
-          <p className="text-xs text-zinc-700 dark:text-gray-300 leading-relaxed font-[var(--font-caveat)] text-sm tracking-wide">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mt-1">
             Use two pointers. Move R left if sum &gt; target, L right if sum &lt; target.
           </p>
           <Lightbulb className="w-5 h-5 text-[#F97316] absolute bottom-3 right-3 opacity-40" />
         </div>
       </motion.div>
 
-      {/* 4. Thinkpad Card (Bottom Right -> now Middle Left) */}
+      {/* 4. Whiteboard Card (Bottom Right -> now Middle Left) */}
       <motion.div
         className="absolute top-[230px] left-[40px] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() =>
@@ -178,23 +183,18 @@ export function HeroFlowDiagram() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
       >
-        <div className="w-[180px] bg-white dark:bg-[#111111]/90 border-2 border-dashed border-zinc-300 dark:border-[#A855F7]/30 rounded-xl p-3 shadow-2xl backdrop-blur-md -rotate-2">
+        <div className="w-[210px] bg-white dark:bg-[#111111]/90 border-2 border-dashed border-zinc-300 dark:border-[#A855F7]/30 rounded-xl p-3 shadow-2xl backdrop-blur-md">
           {/* Header row */}
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-full border border-[#A855F7]/50 flex items-center justify-center text-[#A855F7] font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-xs bg-primary/10 border border-primary/20 shrink-0 leading-none">
               4
             </div>
-            <span className="text-[#A855F7] font-[var(--font-caveat)] text-lg leading-none">
-              Thinkpad
+            <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
+              Whiteboard
             </span>
           </div>
-          <div className="font-[var(--font-caveat)] text-zinc-700 dark:text-gray-300 text-base">
-            <div className="flex items-center justify-between">
-              <span className="text-zinc-500 dark:text-gray-400 text-sm">L=2, R=7</span>
-              <span className="text-green-600 dark:text-[#a3e639] text-sm flex items-center gap-1">
-                Found! <Check className="w-3 h-3 text-green-500" />
-              </span>
-            </div>
+          <div className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mt-1">
+            Sketch & draw ideas freely using <span className="text-zinc-900 dark:text-white font-semibold">Excalidraw</span>.
           </div>
           <div className="flex items-center gap-2 mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
             <PenTool className="w-3 h-3 text-primary" />
@@ -215,13 +215,13 @@ export function HeroFlowDiagram() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
       >
-        <div className="w-[180px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden">
+        <div className="w-[210px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden">
           {/* Header bar — badge + title inline */}
           <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2 bg-zinc-50 dark:bg-black/50">
-            <div className="w-5 h-5 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-[10px] bg-white dark:bg-black/80 shrink-0 leading-none">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-xs bg-primary/10 border border-primary/20 shrink-0 leading-none">
               5
             </div>
-            <span className="text-[11px] text-zinc-500 dark:text-gray-400 leading-none">
+            <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
               Code
             </span>
           </div>
@@ -256,14 +256,14 @@ export function HeroFlowDiagram() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.1 }}
       >
-        <div className="w-[180px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-2xl backdrop-blur-md">
+        <div className="w-[210px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-2xl backdrop-blur-md">
           {/* Header row */}
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-xs bg-primary/10 border border-primary/20 shrink-0 leading-none">
               6
             </div>
             <Lightbulb className="w-3.5 h-3.5 text-zinc-400 dark:text-gray-400 shrink-0" />
-            <span className="text-sm font-semibold text-zinc-900 dark:text-gray-200 leading-none">
+            <span className="text-sm font-semibold text-zinc-900 dark:text-white leading-none">
               Review
             </span>
           </div>
@@ -279,6 +279,15 @@ export function HeroFlowDiagram() {
           </div>
         </div>
       </motion.div>
+
+      {/* Bottom Label */}
+      <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center text-center z-20 pointer-events-none w-full">
+        <div className="px-5 py-2 rounded-full bg-zinc-100/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 backdrop-blur-md shadow-sm whitespace-nowrap">
+          <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            Learning Flow
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
