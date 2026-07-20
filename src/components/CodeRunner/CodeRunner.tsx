@@ -55,7 +55,7 @@ interface CodeRunnerProps {
   setSubmissions?: React.Dispatch<React.SetStateAction<Submission[]>>;
   isPlatformPreview?: boolean;
   hideToolbar?: boolean;
-  onOpenRula?: () => void;
+  onOpenRulo?: () => void;
 }
 
 export interface CodeRunnerRef {
@@ -93,7 +93,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   setSubmissions: setSubmissionsProp,
   isPlatformPreview = false,
   hideToolbar = false,
-  onOpenRula
+  onOpenRulo
 }, ref) => {
   const posthog = usePostHog();
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
@@ -430,7 +430,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           controls={controls}
           activeTestCaseTab={activeTestCaseTab}
           onTestCaseTabChange={setActiveTestCaseTab}
-          onOpenRula={onOpenRula}
+          onOpenRulo={onOpenRulo}
         />
       </div>
 

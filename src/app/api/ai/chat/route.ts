@@ -63,7 +63,7 @@ async function createSafeStream(model: string, messages: any[]): Promise<{ strea
                         }
                     }
                     if (!receivedContent) {
-                        console.warn("RULA Stream warning: Received 200 OK but stream yielded no text content.");
+                        console.warn("RULO Stream warning: Received 200 OK but stream yielded no text content.");
                     }
                     controller.enqueue(encoder.encode('data: [DONE]\n\n'));
                     controller.close();
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
         const safeDesc = truncate(problemDescription || '', MAX_PROBLEM_DESC_CHARS);
         const safeCode = truncate(userCode || 'No code provided yet.', MAX_USER_CODE_CHARS);
 
-        const systemInstruction = `You are RULA, an AI coding assistant for RulCode.
+        const systemInstruction = `You are RULO, an AI coding assistant for RulCode.
 Problem: ${problemId}
 
 ${safeDesc}
@@ -145,7 +145,7 @@ Rules:
             return acc;
         }, []);
 
-        console.log(`RULA — Model: ${PRIMARY_MODEL} | Mode: ${mode}`);
+        console.log(`RULO — Model: ${PRIMARY_MODEL} | Mode: ${mode}`);
 
         // ---- Attempt 1: Primary model ----
         let result = await createSafeStream(PRIMARY_MODEL, collapsedMessages);
@@ -165,7 +165,7 @@ Rules:
                 // ---- Attempt 3: Minimal Context ----
                 console.log('Trying minimal context...');
                 const minimalMessages = [
-                    { role: 'system', content: `You are RULA, a concise AI coding assistant. Problem: ${problemId}. Be very brief.` },
+                    { role: 'system', content: `You are RULO, a concise AI coding assistant. Problem: ${problemId}. Be very brief.` },
                     { role: 'user', content: message }
                 ];
                 result = await createSafeStream(PRIMARY_MODEL, minimalMessages);

@@ -32,7 +32,7 @@ export const AIProfileScan: React.FC<AIProfileScanProps> = ({ userId, stats, has
                                 <Sparkles className="w-7 h-7 text-primary" />
                             </div>
                             <div>
-                                <h4 className="text-xl font-bold flex items-center gap-2">Ruly Profile Scan</h4>
+                                <h4 className="text-xl font-bold flex items-center gap-2">Rulo Profile Scan</h4>
                                 <p className="text-sm text-muted-foreground mt-1 max-w-lg leading-relaxed">Great progress! You are showing strong consistency in problem-solving.</p>
                             </div>
                         </div>
@@ -69,7 +69,7 @@ export const AIProfileScan: React.FC<AIProfileScanProps> = ({ userId, stats, has
                         title={
                             <span className="flex items-center justify-center gap-2">
                                 <Sparkles className="w-6 h-6 text-primary" /> 
-                                Ruly Profile Scan
+                                Rulo Profile Scan
                             </span>
                         }
                         description="Purchase premium to unlock personalized AI insights about your solving patterns, strengths, weaknesses, and a custom learning roadmap."

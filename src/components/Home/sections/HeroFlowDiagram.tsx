@@ -10,7 +10,7 @@ import {
 
 import React from "react";
 import { motion } from "framer-motion";
-import logo from "@/assets/Ruly/ruly-hi.svg";
+import logo from "@/assets/Rulo/rulo-hi.svg";
 
 export function HeroFlowDiagram() {
   return (
@@ -51,7 +51,7 @@ export function HeroFlowDiagram() {
 
       {/* Central Node */}
       <div className="absolute top-[280px] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center text-center z-20">
-        <img src={typeof logo === "string" ? logo : (logo as any).src} alt="Ruly" className="w-24 h-24 animate-pulse drop-shadow-[0_0_15px_rgba(163,230,57,0.4)] mb-3" />
+        <img src={typeof logo === "string" ? logo : (logo as any).src} alt="Rulo" className="w-24 h-24 animate-pulse drop-shadow-[0_0_15px_rgba(163,230,57,0.4)] mb-3" />
         <h3 className="text-base font-semibold text-zinc-900 dark:text-white mb-0.5">
           Understand
           <br />

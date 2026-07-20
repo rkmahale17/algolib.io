@@ -41,7 +41,7 @@ interface UseAlgorithmLayoutReturn {
 
 const BASE_LEFT_TABS = ["description"];
 const BASE_RIGHT_TABS = ["editor"];
-const DEFAULT_LEFT_TABS = ["description", "visualizations", "solutions", "submissions", "rula"];
+const DEFAULT_LEFT_TABS = ["description", "visualizations", "solutions", "submissions", "rulo"];
 const DEFAULT_RIGHT_TABS = ["editor", "thinkpad"];
 
 export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
@@ -274,14 +274,14 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
                 localStorage.setItem("dsa-layout-migrated-thinkpad-v4", "true");
             }
 
-            // Migration: Add rula to left panel for existing users
-            const migratedRula = localStorage.getItem("dsa-layout-migrated-rula-v5");
-            if (!migratedRula) {
+            // Migration: Add rulo to left panel for existing users
+            const migratedRulo = localStorage.getItem("dsa-layout-migrated-rulo-v5");
+            if (!migratedRulo) {
                 let leftChanged = false;
                 
                 let currentLeft = [...leftTabs];
-                if (!currentLeft.includes("rula")) {
-                    currentLeft.push("rula");
+                if (!currentLeft.includes("rulo")) {
+                    currentLeft.push("rulo");
                     leftChanged = true;
                 }
                 
@@ -289,7 +289,7 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
                     setLeftTabs(currentLeft);
                     localStorage.setItem("dsa-layout-left-tabs", JSON.stringify(currentLeft));
                 }
-                localStorage.setItem("dsa-layout-migrated-rula-v5", "true");
+                localStorage.setItem("dsa-layout-migrated-rulo-v5", "true");
             }
         }
     }, [leftTabs, rightTabs, activeLeftTab, setActiveLeftTab]);

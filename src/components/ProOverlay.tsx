@@ -21,14 +21,14 @@ export const ProOverlay: React.FC<ProOverlayProps> = ({
     buttonText = "View subscription plans"
 }) => {
     const isCompanyTags = title === "Premium company tags";
-    const isRula = title === "Rula AI Assistant";
+    const isRulo = title === "Rulo AI Assistant";
 
     const badges = isCompanyTags ? [
         "All premium questions",
         "High quality solutions",
         "Time-savers like focus areas",
         "Front end system design guides"
-    ] : isRula ? [
+    ] : isRulo ? [
         "Step-by-step thinking",
         "Unlimited hints",
         "Optimal approaches",

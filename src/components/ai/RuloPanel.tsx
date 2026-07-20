@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import { ProOverlay } from '@/components/ProOverlay';
 import { AIWelcomeScreen } from './AIWelcomeScreen';
 
-interface RulaPanelProps {
+interface RuloPanelProps {
     algorithmId: string;
     algorithmData: any;
     currentCode: string;
@@ -25,7 +25,7 @@ interface RulaPanelProps {
     onOpenVisualizations?: () => void;
 }
 
-export const RulaPanel: React.FC<RulaPanelProps> = ({
+export const RuloPanel: React.FC<RuloPanelProps> = ({
     algorithmId,
     algorithmData,
     currentCode,
@@ -271,7 +271,7 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
 
             // ---- Auto-retry once if failed with no content ----
             if (result.error && result.content.trim().length === 0) {
-                console.warn('RULA: First attempt failed, retrying...', result.error);
+                console.warn('RULO: First attempt failed, retrying...', result.error);
                 // Reset the placeholder
                 setMessages(prev => prev.map(m =>
                     m.id === aiMessageId ? { ...m, content: '' } : m
@@ -300,7 +300,7 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
             }
 
         } catch (error: any) {
-            console.error('RULA stream error:', error);
+            console.error('RULO stream error:', error);
             setMessages(prev => prev.filter(m => m.id !== aiMessageId));
 
             const friendlyMsg = error.message?.includes('Internal Server Error')
@@ -321,7 +321,7 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
         return (
             <div className="flex-1 w-full h-full">
                 <ProOverlay 
-                    title="Rula AI Assistant" 
+                    title="Rulo AI Assistant" 
                     description="Purchase premium to unlock your personal AI coding assistant, unlimited hints, step-by-step thinking, and optimal approaches."
                     className="border-0 rounded-none h-full"
                 />
@@ -348,7 +348,7 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
                                             <div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary/20 shrink-0">
                                                 <Sparkles className="w-3.5 h-3.5 text-primary" />
                                             </div>
-                                            <span className="text-xs font-semibold text-foreground/80">Ruly</span>
+                                            <span className="text-xs font-semibold text-foreground/80">Rulo</span>
                                         </>
                                     )}
                                     {msg.role === 'user' && (
@@ -430,7 +430,7 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
                                                 {msg.content === '' && isStreaming && (
                                                     <div className="flex items-center gap-2 py-1 text-muted-foreground">
                                                         <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                                                        <span className="text-xs">Ruly is thinking...</span>
+                                                        <span className="text-xs">Rulo is thinking...</span>
                                                     </div>
                                                 )}
                                             </div>
