@@ -304,7 +304,7 @@ const Navbar = ({
               {currentPath === "/" ? (
                 <Link
                   href="/guides/time-complexity"
-                  className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-base font-medium rounded-xl hover:bg-muted/80 hover:text-primary active:scale-[0.97] transition-all shutter-click"
                   onClick={closeMenus}
                 >
                   Learn
@@ -573,7 +573,7 @@ const Navbar = ({
               {currentPath === "/" ? (
                 <Link
                   href="/problems"
-                  className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-base font-medium rounded-xl hover:bg-muted/80 hover:text-primary active:scale-[0.97] transition-all shutter-click"
                   onClick={closeMenus}
                 >
                   Practice
@@ -905,13 +905,23 @@ const Navbar = ({
                 </div>
               )}
               {/* Roadmap Navigation for top nav */}
-              <Link
-                href="/dsa/roadmap"
-                className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
-                onClick={closeMenus}
-              >
-                Roadmap
-              </Link>
+              {currentPath === "/" ? (
+                <Link
+                  href="/dsa/roadmap"
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-base font-medium rounded-xl hover:bg-muted/80 hover:text-primary active:scale-[0.97] transition-all shutter-click"
+                  onClick={closeMenus}
+                >
+                  Roadmap
+                </Link>
+              ) : (
+                <Link
+                  href="/dsa/roadmap"
+                  className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
+                  onClick={closeMenus}
+                >
+                  Roadmap
+                </Link>
+              )}
             </div>
           )}
 
