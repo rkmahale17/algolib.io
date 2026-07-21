@@ -149,6 +149,7 @@ export const visualizationMap: Record<string, any> = {
   'lowest-common-ancestor': dynamic(() => import('@/components/visualizations/algorithms/BinaryLiftingVisualization').then(m => m.BinaryLiftingVisualization), { ssr: false }),
 
   // String Algorithms
+  'longest-common-prefix': dynamic(() => import('@/components/visualizations/algorithms/LongestCommonPrefixVisualization').then(m => m.LongestCommonPrefixVisualization), { ssr: false }),
   'kmp': dynamic(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => m.KMPVisualization), { ssr: false }),
   'kmp-string-matching': dynamic(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => m.KMPVisualization), { ssr: false }),
   'manachers': dynamic(() => import('@/components/visualizations/algorithms/ManachersVisualization').then(m => m.ManachersVisualization), { ssr: false }),
@@ -209,6 +210,10 @@ export const visualizationMap: Record<string, any> = {
 };
 
 export const visualizationMetadataMap: Record<string, { title: string; description: string }> = {
+  'longest-common-prefix': {
+    title: 'Longest Common Prefix',
+    description: 'Visualize finding the longest common prefix string amongst an array of strings by matching characters index by index.'
+  },
   'concatenation-of-array': {
     title: 'Concatenation of Array',
     description: 'Visualize creating an array that is a concatenation of two copies of the input array.'
