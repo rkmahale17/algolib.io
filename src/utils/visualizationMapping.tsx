@@ -7,6 +7,9 @@ import dynamic from 'next/dynamic';
 
 // Lazy load all visualization components
 export const visualizationMap: Record<string, any> = {
+  // Arrays
+  'concatenation-of-array': dynamic(() => import('@/components/visualizations/algorithms/ConcatenationOfArrayVisualization').then(m => m.ConcatenationOfArrayVisualization), { ssr: false }),
+
   // Core Patterns
   'two-pointers': dynamic(() => import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => m.TwoPointersVisualization), { ssr: false }),
   'sliding-window': dynamic(() => import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => m.SlidingWindowVisualization), { ssr: false }),
@@ -146,6 +149,7 @@ export const visualizationMap: Record<string, any> = {
   'lowest-common-ancestor': dynamic(() => import('@/components/visualizations/algorithms/BinaryLiftingVisualization').then(m => m.BinaryLiftingVisualization), { ssr: false }),
 
   // String Algorithms
+  'longest-common-prefix': dynamic(() => import('@/components/visualizations/algorithms/LongestCommonPrefixVisualization').then(m => m.LongestCommonPrefixVisualization), { ssr: false }),
   'kmp': dynamic(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => m.KMPVisualization), { ssr: false }),
   'kmp-string-matching': dynamic(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => m.KMPVisualization), { ssr: false }),
   'manachers': dynamic(() => import('@/components/visualizations/algorithms/ManachersVisualization').then(m => m.ManachersVisualization), { ssr: false }),
@@ -206,6 +210,14 @@ export const visualizationMap: Record<string, any> = {
 };
 
 export const visualizationMetadataMap: Record<string, { title: string; description: string }> = {
+  'longest-common-prefix': {
+    title: 'Longest Common Prefix',
+    description: 'Visualize finding the longest common prefix string amongst an array of strings by matching characters index by index.'
+  },
+  'concatenation-of-array': {
+    title: 'Concatenation of Array',
+    description: 'Visualize creating an array that is a concatenation of two copies of the input array.'
+  },
   'two-pointers': {
     title: 'Two Pointers Technique',
     description: 'Visualize how two pointers starting at opposite ends of a sorted array converge inward to find a pair that meets a target condition in O(n) time.'
