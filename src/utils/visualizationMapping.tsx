@@ -7,6 +7,9 @@ import dynamic from 'next/dynamic';
 
 // Lazy load all visualization components
 export const visualizationMap: Record<string, any> = {
+  // Arrays
+  'concatenation-of-array': dynamic(() => import('@/components/visualizations/algorithms/ConcatenationOfArrayVisualization').then(m => m.ConcatenationOfArrayVisualization), { ssr: false }),
+
   // Core Patterns
   'two-pointers': dynamic(() => import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => m.TwoPointersVisualization), { ssr: false }),
   'sliding-window': dynamic(() => import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => m.SlidingWindowVisualization), { ssr: false }),
@@ -206,6 +209,10 @@ export const visualizationMap: Record<string, any> = {
 };
 
 export const visualizationMetadataMap: Record<string, { title: string; description: string }> = {
+  'concatenation-of-array': {
+    title: 'Concatenation of Array',
+    description: 'Visualize creating an array that is a concatenation of two copies of the input array.'
+  },
   'two-pointers': {
     title: 'Two Pointers Technique',
     description: 'Visualize how two pointers starting at opposite ends of a sorted array converge inward to find a pair that meets a target condition in O(n) time.'
