@@ -486,7 +486,7 @@ const Pricing: React.FC = () => {
         </div>
 
         {/* Footer Notes */}
-        <div className="pt-8">
+        <div className="pt-8 max-w-[1200px] mx-auto">
           <ul className="space-y-1">
             {pricingData.footerNotes.map((note, idx) => (
               <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">

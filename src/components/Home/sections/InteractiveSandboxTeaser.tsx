@@ -30,42 +30,42 @@ export function InteractiveSandboxTeaser() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-[1500px] mx-auto px-6 relative z-10"
+        className="w-full max-w-[1200px] mx-auto px-6 relative z-10"
       >
 
         {/* Section Header - Spans full width above both columns with inline icon aligned left */}
-        <div className="max-w-[1400px] mx-auto mb-14 text-left">
+        <div className="mx-auto mb-14 text-left">
           <h3 className="text-2xl sm:text-3xl font-medium tracking-tight text-zinc-900 dark:text-white leading-[1.1] mb-4 flex items-center gap-3">
             <BarChart3 className="w-[0.85em] h-[0.85em] text-primary shrink-0" />
             <span>Learn by Visualization</span>
           </h3>
         </div>
 
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+        <div className="mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
 
           {/* Detailed Selling Copy - Theme Aware */}
           <div className="lg:col-span-5 order-2 lg:order-2">
-            <h4 className="text-sm md:text-lg font-normal tracking-tight text-zinc-900 dark:text-white mb-3">
+            <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-8 text-zinc-900 dark:text-white leading-[1.1]">
               Visualize, Understand and Solve
-            </h4>
+            </h2>
 
-            <p className="text-zinc-500 dark:text-zinc-400 text-base sm:text-lg mb-8 leading-relaxed font-medium">
+            <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg mb-10 leading-relaxed">
               Watch Kadane&apos;s algorithm slide over contiguous ranges in lockstep motion. Observe live as the running sum decides whether to grow or reset from scratch at each array index, while updating the record-breaking maximum sum in real-time.
             </p>
 
-            <div className="space-y-4 mb-8">
+            <div className="space-y-4 mb-10">
               {[
                 { title: "Local vs. Global Maxima", desc: "Observe currentSum resets to zero when running sums become negative, avoiding sub-optimal ranges." },
                 { title: "Contiguous Window Trace", desc: "Watch the active subarray boundaries dynamically stretch as positive integers expand the sum." },
                 { title: "State Console Tracking", desc: "Inspect running variables like curSum and bestMax change line-by-line as code runs." }
               ].map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3">
+                <div key={idx} className="flex items-start gap-4 text-zinc-700 dark:text-zinc-300">
                   <div className="w-6 h-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-1">
                     <Check className="w-3.5 h-3.5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-zinc-800 dark:text-white mb-0.5">{item.title}</h4>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">{item.desc}</p>
+                    <h4 className="font-medium text-base md:text-lg tracking-tight text-zinc-900 dark:text-white mb-1">{item.title}</h4>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}

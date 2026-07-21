@@ -524,7 +524,7 @@ export const MaximumSubarrayVisualization = () => {
           </div>
 
           <div className="mt-auto space-y-4">
-            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 relative overflow-hidden transition-all duration-300 shadow-sm">
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 relative overflow-hidden transition-all duration-300 shadow-sm min-h-[200px] sm:min-h-[180px] md:min-h-[170px]">
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-border/40">
                   <div className="flex items-center gap-2">

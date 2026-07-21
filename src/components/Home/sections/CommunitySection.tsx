@@ -12,13 +12,13 @@ const COMMUNITY_LINKS = [
 export function CommunitySection() {
     return (
         <section className="py-36 lg:py-48 bg-white dark:bg-black">
-            <div className="w-full max-w-[1600px] mx-auto px-4">
+            <div className="w-full max-w-[1200px] mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-32">
                     <div>
                         <h2 className="text-2xl md:text-3xl font-medium tracking-tight mb-8 text-gray-900 dark:text-white leading-[1.1]">
                             Join our growing community
                         </h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium leading-relaxed">
+                        <p className="text-zinc-600 dark:text-zinc-400 text-lg md:text-xl leading-relaxed">
                             Have questions or feedback? We&apos;re building RulCode for you. Join our social platforms and help us shape the future of tech prep.
                         </p>
                     </div>

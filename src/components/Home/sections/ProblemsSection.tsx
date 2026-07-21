@@ -42,8 +42,8 @@ export function ProblemsSection() {
         }}
       ></div>
 
-      <div className="w-full max-w-[1600px] mx-auto px-4 relative z-10">
-        <div className="max-w-[1400px] mx-auto">
+      <div className="w-full max-w-[1200px] mx-auto px-4 relative z-10">
+        <div className="mx-auto">
           {/* Badge Pill */}
           <div className="flex justify-center mb-12">
             <div className="bg-gray-100/50 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 px-8 py-2 rounded-full text-base font-medium shadow-sm text-gray-900 dark:text-white transition-all hover:border-gray-300 dark:hover:border-zinc-700">
@@ -56,7 +56,7 @@ export function ProblemsSection() {
             <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-4 text-gray-900 dark:text-white">
               Practice
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-base md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+            <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
               Master Data Structures & Algorithms with our curated learning
               paths designed for modern technical interviews.
             </p>

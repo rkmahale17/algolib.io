@@ -40,7 +40,7 @@ const testimonials = [
 export function TestimonialsSection() {
   return (
     <section className="py-24 relative overflow-hidden bg-zinc-50 dark:bg-zinc-950/50">
-      <div className="w-full max-w-[1400px] mx-auto px-4 relative z-10">
+      <div className="w-full max-w-[1200px] mx-auto px-4 relative z-10">
         <div className="mb-16 text-center lg:text-left max-w-3xl">
           <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-6 text-zinc-900 dark:text-white">
             Engineers trust us with their job interviews
