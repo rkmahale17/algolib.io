@@ -256,7 +256,7 @@ export const ProblemDescriptionPanel = React.memo(
     // Auto-open detail view ONLY for submissions added during the current session
     // (i.e. the user just clicked Submit). Never auto-opens on page load / reload.
     useEffect(() => {
-      if (panelId !== 'left') return;
+      if (!tabs.includes("submissions")) return;
 
       if (isInitialLoadRef.current) {
         // Don't do anything if we are still fetching from the database for the FIRST time
@@ -667,7 +667,7 @@ export const ProblemDescriptionPanel = React.memo(
                         })}
 
                           {/* Dynamic Submission Detail Tab */}
-                          {selectedSubmissionDetail && panelId === 'left' && (
+                          {selectedSubmissionDetail && tabs.includes("submissions") && (
                             <TabsTrigger
                               value="submission_detail"
                               className={`group/trigger relative flex-1 text-[12px] data-[state=active]:bg-transparent data-[state=active]:text-foreground border-b-[2px] border-transparent rounded-none h-9 px-3 sm:px-4 transition-all flex items-center justify-center gap-2 ${
@@ -1999,7 +1999,7 @@ export const ProblemDescriptionPanel = React.memo(
             </TabsContent>
 
             {/* Dynamic Submission Detail Content */}
-            {selectedSubmissionDetail && panelId === 'left' && (
+            {selectedSubmissionDetail && tabs.includes("submissions") && (
               <TabsContent
                 value="submission_detail"
                 className="h-full m-0 data-[state=inactive]:hidden"

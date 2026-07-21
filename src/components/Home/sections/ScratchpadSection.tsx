@@ -80,14 +80,14 @@ export function ScratchpadSection() {
 
     return (
         <section className="py-36 lg:py-48 bg-white dark:bg-black">
-            <div className="w-full max-w-[1600px] mx-auto px-4">
+            <div className="w-full max-w-[1200px] mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
                     <div className="order-2 lg:order-1">
                         <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-8 text-gray-900 dark:text-white leading-[1.1]">
                             Stuck in thinking? Try our Thinkpad
                         </h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-base md:text-lg mb-10 leading-relaxed font-medium">
-                            Sometimes code isn&apos;t enough. Our built-in Thinkpad, powered by your favorite drawing tool <strong className="text-gray-700 dark:text-gray-200">Excalidraw</strong>, lets you <strong className="text-gray-700 dark:text-gray-200">draw, sketch</strong>, and <strong className="text-gray-700 dark:text-gray-200">take notes</strong>{" "}alongside complex algorithms before you start typing. It&apos;s the perfect tool for when you need to visualize logic that&apos;s hard to hold in your head.
+                        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg mb-10 leading-relaxed">
+                            Sometimes code isn&apos;t enough. Our built-in Thinkpad, powered by your favorite drawing tool <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">Excalidraw</strong>, lets you <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">draw, sketch</strong>, and <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">take notes</strong>{" "}alongside complex algorithms before you start typing. It&apos;s the perfect tool for when you need to visualize logic that&apos;s hard to hold in your head.
                         </p>
                         <div className="space-y-4 mb-10">
                             {[

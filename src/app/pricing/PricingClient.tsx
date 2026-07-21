@@ -296,7 +296,7 @@ const PricingClient = () => {
         </div>
 
         {!isPremium && (
-          <div className="w-full max-w-[1000px] mx-auto rounded-2xl bg-gradient-to-br from-orange-500/5 via-card to-card border border-orange-500/10 shadow-lg shadow-orange-500/5 p-8 md:p-12 mb-16 relative overflow-hidden">
+          <div className="w-full max-w-[1000px] mx-auto rounded-2xl bg-gradient-to-br from-orange-500/5 via-card to-card border border-orange-500/10 shadow-lg shadow-orange-500/5 p-8 md:p-12 mb-32 relative overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 relative">
               {/* Divider for desktop */}
               <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-border/60 -translate-x-1/2" />
@@ -404,7 +404,7 @@ const PricingClient = () => {
 
         {/* Chips for Cancel Anytime & Trial */}
         {!isPremium && (
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-16 mb-8">
             {[
               "14 Days Trial",
               "Cancel anytime",
@@ -573,7 +573,7 @@ const PricingClient = () => {
         </div>
 
         {/* Trust Badges Section */}
-        <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-16 text-sm font-medium text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-8 text-sm font-medium text-muted-foreground">
           <div className="flex items-center gap-2 bg-muted/40 border border-border/50 px-4 py-2 rounded-full shadow-sm">
             <Check className="w-4 h-4 text-green-500 shrink-0" />
             <span>Cancel anytime</span>
@@ -594,53 +594,67 @@ const PricingClient = () => {
 
         {/* Mini Promo Cards (Below Pricing) */}
         {!isPremium && (
-          <div className="flex flex-col sm:flex-row gap-6 mb-24 max-w-4xl mx-auto">
-            {/* Flash Sale Mini Card */}
-            <div className="flex-1 border border-border rounded-2xl bg-card/50 p-6 flex flex-col justify-center hover:border-primary/50 transition-colors">
-              <div className="w-fit bg-red-500/10 text-red-500 text-xs font-bold px-3 py-1 rounded-full mb-4 border border-red-500/20">
-                🔥 Limited Time
+          <>
+            <div className="flex flex-col sm:flex-row gap-6 mb-8 max-w-4xl mx-auto">
+              {/* Flash Sale Mini Card */}
+              <div className="flex-1 border border-border rounded-2xl bg-card/50 p-6 flex flex-col justify-center hover:border-primary/50 transition-colors">
+                <div className="w-fit bg-red-500/10 text-red-500 text-xs font-bold px-3 py-1 rounded-full mb-4 border border-red-500/20">
+                  🔥 Limited Time
+                </div>
+                <div className="flex items-baseline gap-1.5 mb-2">
+                  <span className="text-5xl font-bold tracking-tight">10%</span>
+                  <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">OFF</span>
+                </div>
+                <div className="text-sm text-muted-foreground font-medium mb-6">Valid till July 31</div>
+                <div 
+                  className="flex items-center gap-2 text-[15px] font-semibold cursor-pointer hover:opacity-80 transition-opacity w-fit" 
+                  onClick={() => { 
+                    navigator.clipboard.writeText('FLASH10'); 
+                    toast.success('Coupon code copied!'); 
+                  }}
+                >
+                  FLASH10 <Copy className="w-4 h-4 text-muted-foreground" />
+                </div>
               </div>
-              <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="text-5xl font-bold tracking-tight">10%</span>
-                <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">OFF</span>
-              </div>
-              <div className="text-sm text-muted-foreground font-medium mb-6">Valid till July 31</div>
-              <div 
-                className="flex items-center gap-2 text-[15px] font-semibold cursor-pointer hover:opacity-80 transition-opacity w-fit" 
-                onClick={() => { 
-                  navigator.clipboard.writeText('FLASH10'); 
-                  toast.success('Coupon code copied!'); 
-                }}
-              >
-                FLASH10 <Copy className="w-4 h-4 text-muted-foreground" />
+
+              {/* Student Mini Card */}
+              <div className="flex-1 border border-border rounded-2xl bg-card/50 p-6 flex flex-col justify-center hover:border-primary/50 transition-colors">
+                <div className="w-fit bg-muted text-foreground text-sm font-bold px-3 py-1 rounded-full mb-6 border border-border">
+                  🎓 Student?
+                </div>
+                <div className="flex items-baseline gap-1.5 mb-8">
+                  <span className="text-2xl font-bold tracking-tight mr-1">Get</span>
+                  <span className="text-5xl font-bold tracking-tight">30%</span>
+                  <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">OFF</span>
+                </div>
+                <a href="mailto:support@rulcode.com" className="flex items-center gap-2 text-[15px] font-semibold hover:text-primary transition-colors w-fit">
+                  Verify your college email <ArrowRight className="w-4 h-4" />
+                </a>
               </div>
             </div>
 
-            {/* Student Mini Card */}
-            <div className="flex-1 border border-border rounded-2xl bg-card/50 p-6 flex flex-col justify-center hover:border-primary/50 transition-colors">
-              <div className="w-fit bg-muted text-foreground text-sm font-bold px-3 py-1 rounded-full mb-6 border border-border">
-                🎓 Student?
-              </div>
-              <div className="flex items-baseline gap-1.5 mb-8">
-                <span className="text-2xl font-bold tracking-tight mr-1">Get</span>
-                <span className="text-5xl font-bold tracking-tight">30%</span>
-                <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">OFF</span>
-              </div>
-              <a href="mailto:support@rulcode.com" className="flex items-center gap-2 text-[15px] font-semibold hover:text-primary transition-colors w-fit">
-                Verify your college email <ArrowRight className="w-4 h-4" />
-              </a>
+            {/* Footer Notes (Moved here right after Student/Promo cards) */}
+            <div className="max-w-[1200px] mx-auto mb-24 px-4">
+              <ul className="space-y-1.5 text-left">
+                {pricingData.footerNotes.map((note, idx) => (
+                  <li key={idx} className="text-xs sm:text-sm text-muted-foreground/80 flex items-start gap-2">
+                    <span className="text-muted-foreground/80 font-medium shrink-0">*</span>
+                    <span className="leading-relaxed">{note}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
+          </>
         )}
 
 
         {/* Features Section */}
-        <div className="mb-24">
+        <div className="mb-24 max-w-[1200px] mx-auto border-t border-border pt-16">
           <h2 className="text-4xl font-semibold tracking-tight mb-16">{pricingData.featuresSection.title}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {pricingData.featuresSection.features.map((feature, idx) => (
-              <div key={idx} className="flex flex-col gap-4">
-                <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card shadow-sm">
+              <div key={idx} className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-300">
+                <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-background shadow-sm">
                   <feature.icon className="w-5 h-5 text-foreground opacity-80" strokeWidth={1.5} />
                 </div>
                 <div>
@@ -729,17 +743,6 @@ const PricingClient = () => {
           </div>
         </div>
 
-        {/* Footer Notes */}
-        <div className="pt-8 pb-24">
-          <ul className="space-y-1">
-            {pricingData.footerNotes.map((note, idx) => (
-              <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                <span>*</span>
-                <span>{note}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
 
       <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>

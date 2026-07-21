@@ -59,7 +59,7 @@ export function HeroSection() {
 
   return (
     <div className="relative pt-4 pb-16 lg:pt-8 lg:pb-24 overflow-hidden">
-      <div className="w-full max-w-[1700px] mx-auto px-4 relative z-10">
+      <div className="w-full mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-12 items-center">
           {/* Left Column: Text Content */}
           <motion.div 

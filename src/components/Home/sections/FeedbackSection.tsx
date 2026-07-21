@@ -28,14 +28,14 @@ export function FeedbackSection() {
 
     return (
         <section className="py-36 lg:py-48 bg-[#FAFAFA] dark:bg-[#050505]">
-            <div className="w-full max-w-[1600px] mx-auto px-4">
+            <div className="w-full max-w-[1200px] mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
                     {/* Left Column: Description & Features */}
                     <div>
                         <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-8 text-gray-900 dark:text-white leading-[1.1]">
                             Instant Feedback & Complexity Analysis
                         </h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-base md:text-lg mb-10 leading-relaxed font-medium">
+                        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg mb-10 leading-relaxed">
                             Go beyond simple correctness. RulCode analyzes your implementation in real-time, helping you optimize for both time and space complexity as you write.
                         </p>
                         <div className="space-y-4 mb-10">

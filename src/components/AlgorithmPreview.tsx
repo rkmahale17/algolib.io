@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { useAlgorithmLayout } from "@/hooks/useAlgorithmLayout";
 import dynamic from "next/dynamic";
 const ProblemDescriptionPanel = dynamic(() => import("@/components/algorithm/ProblemDescriptionPanel").then(mod => mod.ProblemDescriptionPanel), { ssr: false });
 const CodeWorkspacePanel = dynamic(() => import("@/components/algorithm/CodeWorkspacePanel").then(mod => mod.CodeWorkspacePanel), { ssr: false });
@@ -22,10 +23,7 @@ interface AlgorithmPreviewProps {
 }
 
 export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPreview = false }: AlgorithmPreviewProps) {
-  // Mock State for Preview
-  const [activeTab, setActiveTab] = useState("description");
-  const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
-  const [isRightCollapsed, setIsRightCollapsed] = useState(false);
+  const layout = useAlgorithmLayout();
   const { preferredLanguage, setPreferredLanguage } = useLanguagePreference('editor');
   const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
   const selectedLanguage = isSqlProblem ? 'sql' : preferredLanguage;
@@ -34,18 +32,6 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
   const [isVisualizationMaximized, setIsVisualizationMaximized] = useState(false);
   const [isBrainstormMaximized, setIsBrainstormMaximized] = useState(false);
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
-
-  const [isMobile, setIsMobile] = useState(false);
-  React.useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Mock Handlers
-  const toggleLeftPanel = () => setIsLeftCollapsed(!isLeftCollapsed);
-  const toggleRightPanel = () => setIsRightCollapsed(!isRightCollapsed);
 
   if (!algorithm || !algorithm.name) {
     return (
@@ -61,6 +47,72 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
   const previewAlgorithm = {
     ...algorithm,
     implementations: algorithm.implementations || []
+  };
+
+  const codeWorkspacePanel = (
+    <CodeWorkspacePanel
+      algorithm={previewAlgorithm}
+      algorithmId="preview-mode"
+      isMobile={layout.isMobile}
+      toggleRightPanel={layout.toggleRightPanel}
+      savedCode={initialCode}
+      handleCodeChange={() => { }}
+      handleCodeSuccess={() => { }}
+      selectedLanguage={selectedLanguage}
+      setSelectedLanguage={setSelectedLanguage}
+      isCodeRunnerMaximized={isCodeRunnerMaximized}
+      setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
+      submissions={[]}
+      isPlatformPreview={isPlatformPreview}
+    />
+  );
+
+  const renderWorkspacePanel = (panelId: "left" | "right") => {
+    const isActiveTab = panelId === "left" ? layout.activeLeftTab : layout.activeRightTab;
+    const setActiveTab = panelId === "left" ? layout.setActiveLeftTab : layout.setActiveRightTab;
+    
+    return (
+      <ProblemDescriptionPanel
+        algorithm={previewAlgorithm}
+        activeTab={isActiveTab}
+        setActiveTab={setActiveTab}
+        isMobile={layout.isMobile}
+        toggleLeftPanel={panelId === "left" ? layout.toggleLeftPanel : layout.toggleRightPanel}
+        isCompleted={false}
+        likes={previewAlgorithm.metadata?.likes || 0}
+        dislikes={previewAlgorithm.metadata?.dislikes || 0}
+        userVote={null}
+        isFavorite={false}
+        handleVote={() => { }}
+        toggleFavorite={() => { }}
+        setIsVisualizationMaximized={setIsVisualizationMaximized}
+        isVisualizationMaximized={isVisualizationMaximized}
+        handleRichTextClick={() => { }}
+        isPlatformPreview={isPlatformPreview}
+        panelId={panelId}
+        tabs={panelId === "left" ? layout.leftTabs : layout.rightTabs}
+        onAddTab={(tab) => layout.addTab(panelId, tab)}
+        onRemoveTab={(tab) => layout.removeTab(panelId, tab)}
+        onActivateTab={(tabId) => {
+          if (layout.isMobile) {
+            if (layout.leftTabs.includes(tabId)) {
+              layout.setActiveLeftTab(tabId);
+            } else {
+              layout.addTab("left", tabId);
+            }
+            return;
+          }
+          if (layout.leftTabs.includes(tabId)) {
+            layout.setActiveLeftTab(tabId);
+          } else if (layout.rightTabs.includes(tabId)) {
+            layout.setActiveRightTab(tabId);
+          } else {
+            layout.addTab(panelId, tabId);
+          }
+        }}
+        editorContent={codeWorkspacePanel}
+      />
+    );
   };
 
   // Render Maximize Overlays
@@ -134,7 +186,6 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
       )}
 
       {/* Global Preview Expand Overlay */}
-      {/* Global Preview Expand Overlay */}
       <Dialog open={isPreviewExpanded} onOpenChange={setIsPreviewExpanded}>
         <DialogContent className="max-w-[100vw] w-screen h-screen p-0 border-0 rounded-none bg-background flex flex-col focus:outline-none">
           <DialogTitle className="sr-only">Live Preview Fullscreen</DialogTitle>
@@ -178,63 +229,29 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
               />
             </div>
             <div className="flex-1 overflow-hidden relative">
-              <ResizablePanelGroup direction={isMobile ? "vertical" : "horizontal"} className="h-full">
+              <ResizablePanelGroup direction={layout.isMobile ? "vertical" : "horizontal"} className="h-full">
                 {/* Left Panel */}
                 <ResizablePanel
+                  ref={layout.leftPanelRef}
                   defaultSize={40}
                   minSize={20}
                   collapsible={true}
-                  onCollapse={() => setIsLeftCollapsed(true)}
-                  onExpand={() => setIsLeftCollapsed(false)}
-                  className={isLeftCollapsed ? 'min-w-[0px]' : ''}
+                  className={layout.isLeftCollapsed ? 'min-w-[0px]' : ''}
                 >
-                  <ProblemDescriptionPanel
-                    algorithm={previewAlgorithm}
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    isMobile={isMobile}
-                    toggleLeftPanel={toggleLeftPanel}
-                    // Mock interactions
-                    isCompleted={false}
-                    likes={previewAlgorithm.metadata?.likes || 0}
-                    dislikes={previewAlgorithm.metadata?.dislikes || 0}
-                    userVote={null}
-                    isFavorite={false}
-                    handleVote={() => { }}
-                    toggleFavorite={() => { }}
-                    setIsVisualizationMaximized={setIsVisualizationMaximized}
-                    isVisualizationMaximized={isVisualizationMaximized}
-                    handleRichTextClick={() => { }}
-                    isPlatformPreview={isPlatformPreview}
-                  />
+                  {renderWorkspacePanel("left")}
                 </ResizablePanel>
 
                 <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
 
                 {/* Right Panel */}
                 <ResizablePanel
+                  ref={layout.rightPanelRef}
                   defaultSize={60}
                   minSize={20}
                   collapsible={true}
-                  onCollapse={() => setIsRightCollapsed(true)}
-                  onExpand={() => setIsRightCollapsed(false)}
-                  className={isRightCollapsed ? 'min-w-[0px]' : ''}
+                  className={layout.isRightCollapsed ? 'min-w-[0px]' : ''}
                 >
-                  <CodeWorkspacePanel
-                    algorithm={previewAlgorithm}
-                    algorithmId="preview-mode"
-                    isMobile={isMobile}
-                    toggleRightPanel={toggleRightPanel}
-                    savedCode={initialCode}
-                    handleCodeChange={() => { }}
-                    handleCodeSuccess={() => { }}
-                    selectedLanguage={selectedLanguage}
-                    setSelectedLanguage={setSelectedLanguage}
-                    isCodeRunnerMaximized={isCodeRunnerMaximized}
-                    setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
-                    submissions={[]}
-                    isPlatformPreview={isPlatformPreview}
-                  />
+                  {renderWorkspacePanel("right")}
                 </ResizablePanel>
               </ResizablePanelGroup>
             </div>
@@ -285,63 +302,29 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
           </div>
 
           <div className="flex-1 overflow-hidden relative">
-            <ResizablePanelGroup direction={isMobile ? "vertical" : "horizontal"} className="h-full">
+            <ResizablePanelGroup direction={layout.isMobile ? "vertical" : "horizontal"} className="h-full">
               {/* Left Panel */}
               <ResizablePanel
+                ref={layout.leftPanelRef}
                 defaultSize={40}
                 minSize={20}
                 collapsible={true}
-                onCollapse={() => setIsLeftCollapsed(true)}
-                onExpand={() => setIsLeftCollapsed(false)}
-                className={isLeftCollapsed ? 'min-w-[0px]' : ''}
+                className={layout.isLeftCollapsed ? 'min-w-[0px]' : ''}
               >
-                <ProblemDescriptionPanel
-                  algorithm={previewAlgorithm}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                  isMobile={isMobile}
-                  toggleLeftPanel={toggleLeftPanel}
-                  // Mock interactions
-                  isCompleted={false}
-                  likes={previewAlgorithm.metadata?.likes || 0}
-                  dislikes={previewAlgorithm.metadata?.dislikes || 0}
-                  userVote={null}
-                  isFavorite={false}
-                  handleVote={() => { }}
-                  toggleFavorite={() => { }}
-                  setIsVisualizationMaximized={setIsVisualizationMaximized}
-                  isVisualizationMaximized={isVisualizationMaximized}
-                  handleRichTextClick={() => { }}
-                  isPlatformPreview={isPlatformPreview}
-                />
+                {renderWorkspacePanel("left")}
               </ResizablePanel>
 
               <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
 
               {/* Right Panel */}
               <ResizablePanel
+                ref={layout.rightPanelRef}
                 defaultSize={60}
                 minSize={20}
                 collapsible={true}
-                onCollapse={() => setIsRightCollapsed(true)}
-                onExpand={() => setIsRightCollapsed(false)}
-                className={isRightCollapsed ? 'min-w-[0px]' : ''}
+                className={layout.isRightCollapsed ? 'min-w-[0px]' : ''}
               >
-                <CodeWorkspacePanel
-                  algorithm={previewAlgorithm}
-                  algorithmId="preview-mode"
-                  isMobile={isMobile}
-                  toggleRightPanel={toggleRightPanel}
-                  savedCode=""
-                  handleCodeChange={() => { }}
-                  handleCodeSuccess={() => { }}
-                  selectedLanguage={selectedLanguage}
-                  setSelectedLanguage={setSelectedLanguage}
-                  isCodeRunnerMaximized={isCodeRunnerMaximized}
-                  setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
-                  submissions={[]}
-                  isPlatformPreview={isPlatformPreview}
-                />
+                {renderWorkspacePanel("right")}
               </ResizablePanel>
             </ResizablePanelGroup>
           </div>

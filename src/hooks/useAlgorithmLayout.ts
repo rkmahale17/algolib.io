@@ -41,7 +41,7 @@ interface UseAlgorithmLayoutReturn {
 
 const BASE_LEFT_TABS = ["description"];
 const BASE_RIGHT_TABS = ["editor"];
-const DEFAULT_LEFT_TABS = ["description", "visualizations", "solutions", "submissions", "rulo"];
+const DEFAULT_LEFT_TABS = ["description", "visualizations", "rulo", "solutions", "submissions"];
 const DEFAULT_RIGHT_TABS = ["editor", "thinkpad"];
 
 export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
@@ -240,9 +240,13 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Migration: Move thinkpad to right panel and remove from left panel for existing users
+    // Migrations: Run only AFTER localStorage values have been loaded into state.
+    // Without the isLoaded gate, migrations see the default (full) tab arrays on
+    // the first render, mark themselves as done, and never fix the stale values
+    // that arrive from localStorage on the second render.
     useEffect(() => {
-        if (typeof window !== "undefined") {
+        if (!isLoaded || typeof window === "undefined") return;
+
             const migrated = localStorage.getItem("dsa-layout-migrated-thinkpad-v4");
             if (!migrated) {
                 let leftChanged = false;
@@ -291,8 +295,86 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
                 }
                 localStorage.setItem("dsa-layout-migrated-rulo-v5", "true");
             }
-        }
-    }, [leftTabs, rightTabs, activeLeftTab, setActiveLeftTab]);
+
+            // Migration v6: Ensure all default tabs are present in both panels.
+            // Fixes stale localStorage where users lost tabs (e.g. only "description" left, only "editor" right).
+            const migratedEnsureDefaults = localStorage.getItem("dsa-layout-migrated-ensure-defaults-v7");
+            if (!migratedEnsureDefaults) {
+                let currentLeft = [...leftTabs];
+                let currentRight = [...rightTabs];
+                let leftChanged = false;
+                let rightChanged = false;
+
+                for (const tab of DEFAULT_LEFT_TABS) {
+                    if (!currentLeft.includes(tab) && !currentRight.includes(tab)) {
+                        currentLeft.push(tab);
+                        leftChanged = true;
+                    }
+                }
+                for (const tab of DEFAULT_RIGHT_TABS) {
+                    if (!currentRight.includes(tab) && !currentLeft.includes(tab)) {
+                        currentRight.push(tab);
+                        rightChanged = true;
+                    }
+                }
+
+                if (leftChanged) {
+                    setLeftTabs(currentLeft);
+                    localStorage.setItem("dsa-layout-left-tabs", JSON.stringify(currentLeft));
+                }
+                if (rightChanged) {
+                    setRightTabs(currentRight);
+                    localStorage.setItem("dsa-layout-right-tabs", JSON.stringify(currentRight));
+                }
+                localStorage.setItem("dsa-layout-migrated-ensure-defaults-v7", "true");
+            }
+
+            // Migration v8: Enforce the order of default left panel tabs to:
+            // Description, Visualizations, Rulo, Solutions, Submissions.
+            const migratedOrderV8 = localStorage.getItem("dsa-layout-migrated-ensure-defaults-v8");
+            if (!migratedOrderV8) {
+                let currentLeft = [...leftTabs];
+                let currentRight = [...rightTabs];
+                let leftChanged = false;
+                let rightChanged = false;
+
+                for (const tab of DEFAULT_LEFT_TABS) {
+                    if (!currentLeft.includes(tab) && !currentRight.includes(tab)) {
+                        currentLeft.push(tab);
+                        leftChanged = true;
+                    }
+                }
+                for (const tab of DEFAULT_RIGHT_TABS) {
+                    if (!currentRight.includes(tab) && !currentLeft.includes(tab)) {
+                        currentRight.push(tab);
+                        rightChanged = true;
+                    }
+                }
+
+                const sortedLeft = [...currentLeft].sort((a, b) => {
+                    const idxA = DEFAULT_LEFT_TABS.indexOf(a);
+                    const idxB = DEFAULT_LEFT_TABS.indexOf(b);
+                    if (idxA === -1) return 1;
+                    if (idxB === -1) return -1;
+                    return idxA - idxB;
+                });
+
+                if (JSON.stringify(sortedLeft) !== JSON.stringify(currentLeft)) {
+                    currentLeft = sortedLeft;
+                    leftChanged = true;
+                }
+
+                if (leftChanged) {
+                    setLeftTabs(currentLeft);
+                    localStorage.setItem("dsa-layout-left-tabs", JSON.stringify(currentLeft));
+                }
+                if (rightChanged) {
+                    setRightTabs(currentRight);
+                    localStorage.setItem("dsa-layout-right-tabs", JSON.stringify(currentRight));
+                }
+                localStorage.setItem("dsa-layout-migrated-ensure-defaults-v8", "true");
+            }
+    }, [isLoaded, leftTabs, rightTabs, activeLeftTab, setActiveLeftTab]);
 
 
     const [isCodeRunnerMaximized, setIsCodeRunnerMaximized] = useState(false);
