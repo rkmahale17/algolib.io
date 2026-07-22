@@ -9,12 +9,15 @@ import dynamic from 'next/dynamic';
 export const visualizationMap: Record<string, any> = {
   // Arrays
   'concatenation-of-array': dynamic(() => import('@/components/visualizations/algorithms/ConcatenationOfArrayVisualization').then(m => m.ConcatenationOfArrayVisualization), { ssr: false }),
+  'remove-element': dynamic(() => import('@/components/visualizations/algorithms/RemoveElementVisualization').then(m => m.RemoveElementVisualization), { ssr: false }),
+  'majority-element': dynamic(() => import('@/components/visualizations/algorithms/MajorityElementVisualization').then(m => m.MajorityElementVisualization), { ssr: false }),
 
   // Core Patterns
   'two-pointers': dynamic(() => import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => m.TwoPointersVisualization), { ssr: false }),
   'sliding-window': dynamic(() => import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => m.SlidingWindowVisualization), { ssr: false }),
   'permutation-in-string': dynamic(() => import('@/components/visualizations/algorithms/PermutationInStringVisualization').then(m => m.PermutationInStringVisualization), { ssr: false }),
   'prefix-sum': dynamic(() => import('@/components/visualizations/algorithms/PrefixSumVisualization').then(m => m.PrefixSumVisualization), { ssr: false }),
+  'range-sum-query-2d-immutable': dynamic(() => import('@/components/visualizations/algorithms/RangeSumQuery2DImmutableVisualization').then(m => m.RangeSumQuery2DImmutableVisualization), { ssr: false }),
   'find-the-highest-altitude': dynamic(() => import('@/components/visualizations/algorithms/FindTheHighestAltitudeVisualization').then(m => m.FindTheHighestAltitudeVisualization), { ssr: false }),
   'binary-search': dynamic(() => import('@/components/visualizations/algorithms/BinarySearchVisualization').then(m => m.BinarySearchVisualization), { ssr: false }),
   'koko-eating-bananas': dynamic(() => import('@/components/visualizations/algorithms/KokoEatingBananasVisualization').then(m => m.KokoEatingBananasVisualization), { ssr: false }),
@@ -218,6 +221,14 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Concatenation of Array',
     description: 'Visualize creating an array that is a concatenation of two copies of the input array.'
   },
+  'remove-element': {
+    title: 'Remove Element',
+    description: 'Visualize shifting non-target elements to the front of the array using a fast-read/slow-write pointer approach.'
+  },
+  'majority-element': {
+    title: 'Majority Element',
+    description: 'Visualize Boyer-Moore Voting Algorithm tracking elements and counts to find the majority element in O(n) time and O(1) space.'
+  },
   'two-pointers': {
     title: 'Two Pointers Technique',
     description: 'Visualize how two pointers starting at opposite ends of a sorted array converge inward to find a pair that meets a target condition in O(n) time.'
@@ -233,6 +244,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'prefix-sum': {
     title: 'Prefix Sum Array',
     description: 'Visualize how cumulative sums are precomputed to allow any subarray range sum query in constant O(1) time.'
+  },
+  'range-sum-query-2d-immutable': {
+    title: 'Range Sum Query 2D - Immutable',
+    description: 'Visualize the 2D prefix sum grid construction and query region calculations using the inclusion-exclusion principle.'
   },
   'binary-search': {
     title: 'Binary Search',
