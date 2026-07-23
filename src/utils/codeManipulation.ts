@@ -1,4 +1,4 @@
-import { Language } from '@/components/CodeRunner/LanguageSelector';
+import { Language } from '@/types/algorithm';
 
 /**
  * Splits C++ code into headers (includes, usings, defines) and the rest of the body.

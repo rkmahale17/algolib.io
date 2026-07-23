@@ -1,7 +1,7 @@
 import { DSName, SUPPORTED_DS, getDSDetails } from '@/lib/dsa-registry';
 import { ensureStaticMethods, extractCppSignatures, extractType, findEntryFunction, splitCppCode, stripComments } from './codeManipulation';
 
-import { Language } from '@/components/CodeRunner/LanguageSelector';
+import { Language } from '@/types/algorithm';
 import { convertTreeNodeToArray } from './treeUtils';
 
 export const getRegistryCode = (inputSchema: any[], language: Language, userCode: string) => {
@@ -66,7 +66,7 @@ export const getRegistryCode = (inputSchema: any[], language: Language, userCode
     let serializers = "";
 
     required.forEach(ds => {
-        const details = getDSDetails(ds, language);
+        const details = getDSDetails(ds, language as any);
         if (details) {
             // Check if user code already defines it (robust check ignoring comments)
             // Regex explanations:
@@ -1595,6 +1595,21 @@ const toCppLiteralValue = (val: any): string => {
     return String(val);
 };
 
+const inferCppType = (val: any): string => {
+    if (typeof val === 'string') return 'string';
+    if (typeof val === 'boolean') return 'bool';
+    if (typeof val === 'number') {
+        if (Number.isInteger(val)) return 'int';
+        return 'double';
+    }
+    if (Array.isArray(val)) {
+        if (val.length === 0) return 'vector<int>';
+        const inner = inferCppType(val[0]);
+        return `vector<${inner}>`;
+    }
+    return 'int';
+};
+
 /** Infers C++ types and signatures from test cases */
 const inferCppSignatures = (testCases: ClassTestCase[]) => {
     const methods: Record<string, { argTypes: string[], returnType: string }> = {};
@@ -1607,23 +1622,11 @@ const inferCppSignatures = (testCases: ClassTestCase[]) => {
             const ret = expected[i];
             if (!methods[name]) methods[name] = { argTypes: [], returnType: 'void' };
             args.forEach((arg, j) => {
-                let type = 'int';
-                if (typeof arg === 'string') type = 'string';
-                else if (typeof arg === 'boolean') type = 'bool';
-                else if (Array.isArray(arg)) {
-                    if (arg.length > 0 && typeof arg[0] === 'string') type = 'vector<string>';
-                    else type = 'vector<int>';
-                }
+                const type = inferCppType(arg);
                 if (!methods[name].argTypes[j]) methods[name].argTypes[j] = type;
             });
             if (ret !== null && ret !== undefined) {
-                let type = 'int';
-                if (typeof ret === 'string') type = 'string';
-                else if (typeof ret === 'boolean') type = 'bool';
-                else if (Array.isArray(ret)) {
-                    if (ret.length > 0 && typeof ret[0] === 'string') type = 'vector<string>';
-                    else type = 'vector<int>';
-                }
+                const type = inferCppType(ret);
                 methods[name].returnType = type;
             }
         });
@@ -1647,24 +1650,32 @@ const generateCppClassRunner = (
 
         const calls = methods.map((name, i) => {
             const methodArgs = args[i] || [];
+            const sig = signatures[name];
+            
+            const decls: string[] = [];
+            const varNames: string[] = [];
+            methodArgs.forEach((a, j) => {
+                const type = sig?.argTypes[j] || inferCppType(a);
+                const varName = `const_arg_${tcIndex}_${i}_${j}`;
+                decls.push(`${type} ${varName} = ${toCppLiteralValue(a)};`);
+                varNames.push(varName);
+            });
+            const callArgs = varNames.join(', ');
+
             if (i === 0) {
                 return `
-                    ${className}* obj = new ${className}(${methodArgs.map(a => toCppLiteralValue(a)).join(', ')});
+                    ${decls.join('\n')}
+                    ${className}* obj = new ${className}(${callArgs});
                     results.push_back("null");`;
             } else {
-                const sig = signatures[name];
-                const callArgs = methodArgs.map((a, j) => {
-                    const type = sig.argTypes[j] || 'int';
-                    if (type === 'string') return `std::string(${toCppLiteralValue(a)})`;
-                    return toCppLiteralValue(a);
-                }).join(', ');
-
-                if (sig.returnType === 'void') {
+                if (sig && sig.returnType === 'void') {
                     return `
+                    ${decls.join('\n')}
                     obj->${name}(${callArgs});
                     results.push_back("null");`;
                 } else {
                     return `
+                    ${decls.join('\n')}
                     results.push_back(toJson(obj->${name}(${callArgs})));`;
                 }
             }
@@ -1829,7 +1840,7 @@ const toJavaLiteralValue = (val: any): string => {
 };
 
 /** Converts a JS value to a Java boxed value (Integer instead of int, etc.) */
-const toJavaBoxedValue = (val: any): string => {
+const toJavaBoxedValue = (val: any, targetType?: string): string => {
     if (val === null || val === undefined) return "(Object) null";
     if (typeof val === 'boolean') return val ? "Boolean.TRUE" : "Boolean.FALSE";
     if (typeof val === 'number') {
@@ -1837,7 +1848,12 @@ const toJavaBoxedValue = (val: any): string => {
         return `Double.valueOf(${val})`;
     }
     if (typeof val === 'string') return JSON.stringify(val);
-    if (Array.isArray(val)) return toJavaLiteralValue(val);
+    if (Array.isArray(val)) {
+        if (targetType) {
+            return formatValue(val, 'any', 'java', targetType);
+        }
+        return toJavaLiteralValue(val);
+    }
     return String(val);
 };
 
@@ -1847,6 +1863,40 @@ const generateJavaClassRunner = (
     userCode: string,
     testCases: ClassTestCase[]
 ): string => {
+    const cleanCode = stripComments(userCode, 'java');
+    const methodParamTypesMap: Record<string, string[]> = {};
+
+    // Helper to parse parameter types of constructor/method from userCode
+    const parseJavaParameterTypes = (methodName: string): string[] | null => {
+        const escapedName = methodName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(`\\b${escapedName}\\s*\\(([^)]*)\\)\\s*(?:throws\\b[^{]*)?\\{`, 'm');
+        const match = regex.exec(cleanCode);
+        if (!match) return null;
+        
+        const paramsStr = match[1].trim();
+        if (!paramsStr) return [];
+        
+        const rawArgs = splitJavaArgs(paramsStr);
+        return rawArgs.map(arg => extractType(arg, 'java'));
+    };
+
+    // Find all unique method names in testCases and parse their signatures
+    const uniqueMethods = new Set<string>();
+    testCases.forEach(tc => {
+        if (tc.input && tc.input[0]) {
+            tc.input[0].forEach(m => {
+                if (m) uniqueMethods.add(m);
+            });
+        }
+    });
+
+    uniqueMethods.forEach(methodName => {
+        const types = parseJavaParameterTypes(methodName);
+        if (types) {
+            methodParamTypesMap[methodName] = types;
+        }
+    });
+
     const testCalls = testCases.map((tc, tcIndex) => {
         const methods = tc.input[0];
         const args = tc.input[1];
@@ -1854,18 +1904,28 @@ const generateJavaClassRunner = (
         const className = methods[0];
         const methodCalls = methods.map((methodName, i) => {
             const methodArgs = args[i] || [];
+            const paramTypes = methodParamTypesMap[methodName] || [];
             if (i === 0) {
-                const constructorArgs = methodArgs.map(a => toJavaLiteralValue(a)).join(', ');
+                const constructorArgs = methodArgs.map((a, argIdx) => {
+                    const targetType = paramTypes[argIdx];
+                    if (targetType) {
+                        return formatValue(a, 'any', 'java', targetType);
+                    }
+                    return toJavaLiteralValue(a);
+                }).join(', ');
                 return `
                     ${className} instance = new ${className}(${constructorArgs});
                     actualOutputs.add(null);`;
             } else {
-                const callArgs = methodArgs.map(a => toJavaLiteralValue(a)).join(', ');
+                const boxedArgs = methodArgs.map((a, argIdx) => {
+                    const targetType = paramTypes[argIdx];
+                    return toJavaBoxedValue(a, targetType);
+                }).join(', ');
                 return `
                     {
                         Object __r = null;
                         try {
-                            __r = callMethod(instance, "${methodName}", new Object[]{${methodArgs.map(a => toJavaBoxedValue(a)).join(', ')}});
+                            __r = callMethod(instance, "${methodName}", new Object[]{${boxedArgs}});
                         } catch (Exception methodEx) {
                             errMsg = methodEx.toString();
                             break;
@@ -1917,28 +1977,59 @@ public class Main {
     }
     private static String toJson(Object obj) {
         if (obj == null) return "null";
-        if (obj instanceof String) return "\\"" + ((String) obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\"";
-        if (obj instanceof Character) return "\\"" + obj + "\\"";
+        if (obj instanceof String) return "\\"" + ((String) obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\\"";
+        if (obj instanceof Character) return "\\"" + obj + "\\\"";
         if (obj instanceof Boolean || obj instanceof Number) return String.valueOf(obj);
+        
         if (obj instanceof int[]) {
             int[] arr = (int[]) obj;
             StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < arr.length; i++) { sb.append(arr[i]); if (i < arr.length - 1) sb.append(","); }
+            for (int i = 0; i < arr.length; i++) sb.append(arr[i]).append(i == arr.length - 1 ? "" : ",");
+            return sb.append("]").toString();
+        }
+        if (obj instanceof long[]) {
+            long[] arr = (long[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) sb.append(arr[i]).append(i == arr.length - 1 ? "" : ",");
+            return sb.append("]").toString();
+        }
+        if (obj instanceof double[]) {
+            double[] arr = (double[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) sb.append(arr[i]).append(i == arr.length - 1 ? "" : ",");
+            return sb.append("]").toString();
+        }
+        if (obj instanceof boolean[]) {
+            boolean[] arr = (boolean[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) sb.append(arr[i]).append(i == arr.length - 1 ? "" : ",");
+            return sb.append("]").toString();
+        }
+        if (obj instanceof char[]) {
+            char[] arr = (char[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) {
+                sb.append("\\"").append(arr[i]).append("\\"").append(i == arr.length - 1 ? "" : ",");
+            }
             return sb.append("]").toString();
         }
         if (obj instanceof Object[]) {
             Object[] arr = (Object[]) obj;
             StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < arr.length; i++) { sb.append(toJson(arr[i])); if (i < arr.length - 1) sb.append(","); }
+            for (int i = 0; i < arr.length; i++) {
+                sb.append(toJson(arr[i])).append(i == arr.length - 1 ? "" : ",");
+            }
             return sb.append("]").toString();
         }
         if (obj instanceof List) {
             List<?> list = (List<?>) obj;
             StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < list.size(); i++) { sb.append(toJson(list.get(i))); if (i < list.size() - 1) sb.append(","); }
+            for (int i = 0; i < list.size(); i++) {
+                sb.append(toJson(list.get(i))).append(i == list.size() - 1 ? "" : ",");
+            }
             return sb.append("]").toString();
         }
-        return "\\"" + String.valueOf(obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\"";
+        return "\\"" + String.valueOf(obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\\"";
     }
     public static void main(String[] args) {
         System.out.println("___TEST_RESULTS_START___");
