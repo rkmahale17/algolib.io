@@ -12,6 +12,7 @@ export const visualizationMap: Record<string, any> = {
   'remove-element': dynamic(() => import('@/components/visualizations/algorithms/RemoveElementVisualization').then(m => m.RemoveElementVisualization), { ssr: false }),
   'majority-element': dynamic(() => import('@/components/visualizations/algorithms/MajorityElementVisualization').then(m => m.MajorityElementVisualization), { ssr: false }),
   'majority-element-ii': dynamic(() => import('@/components/visualizations/algorithms/MajorityElementIIVisualization').then(m => m.MajorityElementIIVisualization), { ssr: false }),
+  'merge-sorted-array': dynamic(() => import('@/components/visualizations/algorithms/MergeSortedArrayVisualization').then(m => m.MergeSortedArrayVisualization), { ssr: false }),
 
   // Core Patterns
   'two-pointers': dynamic(() => import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => m.TwoPointersVisualization), { ssr: false }),
@@ -157,6 +158,9 @@ export const visualizationMap: Record<string, any> = {
 
   // String Algorithms
   'longest-common-prefix': dynamic(() => import('@/components/visualizations/algorithms/LongestCommonPrefixVisualization').then(m => m.LongestCommonPrefixVisualization), { ssr: false }),
+  'reverse-string': dynamic(() => import('@/components/visualizations/algorithms/ReverseStringVisualization').then(m => m.ReverseStringVisualization), { ssr: false }),
+  'valid-palindrome-ii': dynamic(() => import('@/components/visualizations/algorithms/ValidPalindromeIIVisualization').then(m => m.ValidPalindromeIIVisualization), { ssr: false }),
+  'merge-strings-alternately': dynamic(() => import('@/components/visualizations/algorithms/MergeStringsAlternatelyVisualization').then(m => m.MergeStringsAlternatelyVisualization), { ssr: false }),
   'kmp': dynamic(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => m.KMPVisualization), { ssr: false }),
   'kmp-string-matching': dynamic(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => m.KMPVisualization), { ssr: false }),
   'manachers': dynamic(() => import('@/components/visualizations/algorithms/ManachersVisualization').then(m => m.ManachersVisualization), { ssr: false }),
@@ -221,9 +225,25 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Longest Common Prefix',
     description: 'Visualize finding the longest common prefix string amongst an array of strings by matching characters index by index.'
   },
+  'reverse-string': {
+    title: 'Reverse String',
+    description: 'Visualize reversing a character array in-place recursively using a two-pointer approach, demonstrating call stack execution frames.'
+  },
+  'valid-palindrome-ii': {
+    title: 'Valid Palindrome II',
+    description: 'Visualize verifying if a string can form a palindrome by deleting at most one character, illustrating branching fallback substring validations.'
+  },
+  'merge-strings-alternately': {
+    title: 'Merge Strings Alternately',
+    description: 'Visualize merging two strings alternately character-by-character using two pointers, appending the remainder of the longer string at the end.'
+  },
   'concatenation-of-array': {
     title: 'Concatenation of Array',
     description: 'Visualize creating an array that is a concatenation of two copies of the input array.'
+  },
+  'merge-sorted-array': {
+    title: 'Merge Sorted Array',
+    description: 'Visualize merging two sorted arrays in-place from right to left using three pointers to prevent overwriting elements in the destination array.'
   },
   'remove-element': {
     title: 'Remove Element',

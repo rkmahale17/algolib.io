@@ -9,7 +9,7 @@ export type XPEventType =
   | 'problem_solved_hard';
 
 export const XP_VALUES: Record<XPEventType, number> = {
-  daily_login: 5,
+  daily_login: 1,
   problem_read: 10,
   problem_visualized: 15,
   problem_thinkpad: 20,
