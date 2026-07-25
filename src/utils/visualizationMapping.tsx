@@ -6,10 +6,12 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 
 // Lazy load all visualization components
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const visualizationMap: Record<string, any> = {
   // Arrays
   'concatenation-of-array': dynamic(() => import('@/components/visualizations/algorithms/ConcatenationOfArrayVisualization').then(m => m.ConcatenationOfArrayVisualization), { ssr: false }),
   'remove-element': dynamic(() => import('@/components/visualizations/algorithms/RemoveElementVisualization').then(m => m.RemoveElementVisualization), { ssr: false }),
+  'remove-duplicates-from-sorted-array': dynamic(() => import('@/components/visualizations/algorithms/RemoveDuplicatesFromSortedArrayVisualization').then(m => m.RemoveDuplicatesFromSortedArrayVisualization), { ssr: false }),
   'majority-element': dynamic(() => import('@/components/visualizations/algorithms/MajorityElementVisualization').then(m => m.MajorityElementVisualization), { ssr: false }),
   'majority-element-ii': dynamic(() => import('@/components/visualizations/algorithms/MajorityElementIIVisualization').then(m => m.MajorityElementIIVisualization), { ssr: false }),
   'merge-sorted-array': dynamic(() => import('@/components/visualizations/algorithms/MergeSortedArrayVisualization').then(m => m.MergeSortedArrayVisualization), { ssr: false }),
@@ -36,6 +38,10 @@ export const visualizationMap: Record<string, any> = {
   'evaluate-reverse-polish-notation': dynamic(() => import('@/components/visualizations/algorithms/EvaluateRPNVisualization').then(m => m.EvaluateRPNVisualization), { ssr: false }),
   'min-stack': dynamic(() => import('@/components/visualizations/algorithms/MinStackVisualization').then(m => m.MinStackVisualization), { ssr: false }),
   'two-sum': dynamic(() => import('@/components/visualizations/algorithms/TwoSumVisualization').then(m => m.TwoSumVisualization), { ssr: false }),
+  'two-sum-ii-input-array-is-sorted': dynamic(() => import('@/components/visualizations/algorithms/TwoSumIIVisualization').then(m => m.TwoSumIIVisualization), { ssr: false }),
+  '4sum': dynamic(() => import('@/components/visualizations/algorithms/FourSumVisualization').then(m => m.FourSumVisualization), { ssr: false }),
+  '4Sum': dynamic(() => import('@/components/visualizations/algorithms/FourSumVisualization').then(m => m.FourSumVisualization), { ssr: false }),
+  'boats-to-save-people': dynamic(() => import('@/components/visualizations/algorithms/BoatsToSavePeopleVisualization').then(m => m.BoatsToSavePeopleVisualization), { ssr: false }),
   'quick-select': dynamic(() => import('@/components/visualizations/algorithms/QuickSelectVisualization').then(m => m.QuickSelectVisualization), { ssr: false }),
   'median-of-two-sorted-arrays': dynamic(() => import('@/components/visualizations/algorithms/MedianOfTwoSortedArraysVisualization').then(m => m.MedianOfTwoSortedArraysVisualization), { ssr: false }),
   'container-with-most-water': dynamic(() => import('@/components/visualizations/algorithms/ContainerWithMostWaterVisualization').then(m => m.ContainerWithMostWaterVisualization), { ssr: false }),
@@ -249,6 +255,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Remove Element',
     description: 'Visualize shifting non-target elements to the front of the array using a fast-read/slow-write pointer approach.'
   },
+  'remove-duplicates-from-sorted-array': {
+    title: 'Remove Duplicates from Sorted Array',
+    description: 'Visualize removing duplicates from a sorted array in-place using slow and fast pointers to track unique placements.'
+  },
   'majority-element': {
     title: 'Majority Element',
     description: 'Visualize Boyer-Moore Voting Algorithm tracking elements and counts to find the majority element in O(n) time and O(1) space.'
@@ -320,6 +330,22 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'two-sum': {
     title: 'Two Sum',
     description: 'Visualize using a hash map to find two numbers that add up to a target value in O(n) time.'
+  },
+  'two-sum-ii-input-array-is-sorted': {
+    title: 'Two Sum II - Input Array Is Sorted',
+    description: 'Visualize how to find two numbers that sum up to a target in a sorted array using two converging pointers in O(n) time and O(1) space.'
+  },
+  '4sum': {
+    title: '4Sum',
+    description: 'Visualize the recursive K-Sum algorithm using backtracking to reduce the problem to Two Sum II with two converging pointers.'
+  },
+  '4Sum': {
+    title: '4Sum',
+    description: 'Visualize the recursive K-Sum algorithm using backtracking to reduce the problem to Two Sum II with two converging pointers.'
+  },
+  'boats-to-save-people': {
+    title: 'Boats to Save People',
+    description: 'Visualize the greedy allocation of rescue boats to save people of varying weights using a two-pointer sorted array strategy.'
   },
   'missing-number': {
     title: 'Missing Number',
@@ -624,6 +650,7 @@ export function getVisualizationMetadata(algorithmId: string): { title: string; 
  * @param algorithmId - The algorithm ID or slug
  * @returns React component or null if not found
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getVisualizationComponent(algorithmId: string): React.LazyExoticComponent<React.ComponentType<any>> | null {
   return visualizationMap[algorithmId] || null;
 }
