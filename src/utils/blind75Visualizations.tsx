@@ -10,6 +10,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "two-sum": React.lazy(() => import("@/components/visualizations/algorithms/TwoSumVisualization").then(m => ({ default: m.TwoSumVisualization }))),
   "two-pointers": React.lazy(() => import("@/components/visualizations/algorithms/TwoPointersVisualization").then(m => ({ default: m.TwoPointersVisualization }))),
   "sliding-window": React.lazy(() => import("@/components/visualizations/algorithms/SlidingWindowVisualization").then(m => ({ default: m.SlidingWindowVisualization }))),
+  "minimum-size-subarray-sum": React.lazy(() => import("@/components/visualizations/algorithms/MinSizeSubarraySumVisualization").then(m => ({ default: m.MinSizeSubarraySumVisualization }))),
   "product-of-array-except-self": React.lazy(() => import("@/components/visualizations/algorithms/ProductOfArrayExceptSelfVisualization").then(m => ({ default: m.ProductOfArrayExceptSelfVisualization }))),
   "prefix-sum": React.lazy(() => import("@/components/visualizations/algorithms/PrefixSumVisualization").then(m => ({ default: m.PrefixSumVisualization }))),
   "binary-search": React.lazy(() => import("@/components/visualizations/algorithms/BinarySearchVisualization").then(m => ({ default: m.BinarySearchVisualization }))),
@@ -24,6 +25,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "container-with-most-water": React.lazy(() => import("@/components/visualizations/algorithms/ContainerWithMostWaterVisualization").then(m => ({ default: m.ContainerWithMostWaterVisualization }))),
   "best-time-to-buy-and-sell-stock": React.lazy(() => import("@/components/visualizations/algorithms/BestTimeToBuyAndSellStockVisualization").then(m => ({ default: m.BestTimeToBuyAndSellStockVisualization }))),
   "contains-duplicate": React.lazy(() => import("@/components/visualizations/algorithms/ContainsDuplicateVisualization").then(m => ({ default: m.ContainsDuplicateVisualization }))),
+  "contains-duplicate-ii": React.lazy(() => import("@/components/visualizations/algorithms/ContainsDuplicateIIVisualization").then(m => ({ default: m.ContainsDuplicateIIVisualization }))),
   "find-the-duplicate-number": React.lazy(() => import("@/components/visualizations/algorithms/FindTheDuplicateNumberVisualization").then(m => ({ default: m.FindTheDuplicateNumberVisualization }))),
   "maximum-product-subarray": React.lazy(() => import("@/components/visualizations/algorithms/MaximumProductSubarrayVisualization").then(m => ({ default: m.MaximumProductSubarrayVisualization }))),
   "sum-of-two-integers": React.lazy(() => import("@/components/visualizations/algorithms/SumOfTwoIntegersVisualization").then(m => ({ default: m.SumOfTwoIntegersVisualization }))),
@@ -87,6 +89,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "top-k-frequent-elements": React.lazy(() => import("@/components/visualizations/algorithms/TopKFrequentElementsVisualization").then(m => ({ default: m.TopKFrequentElementsVisualization }))),
   "valid-palindrome": React.lazy(() => import("@/components/visualizations/algorithms/ValidPalindromeVisualization").then(m => ({ default: m.ValidPalindromeVisualization }))),
   "implement-trie": React.lazy(() => import('@/components/visualizations/algorithms/TrieVisualization').then(m => ({ default: m.TrieVisualization }))),
+  "implement-stack-using-queues": React.lazy(() => import("@/components/visualizations/algorithms/ImplementStackUsingQueuesVisualization").then(m => ({ default: m.ImplementStackUsingQueuesVisualization }))),
   "same-tree": React.lazy(() => import("@/components/visualizations/algorithms/SameTreeVisualization").then(m => ({ default: m.SameTreeVisualization }))),
   "invert-binary-tree": React.lazy(() => import("@/components/visualizations/algorithms/InvertBinaryTreeVisualization").then(m => ({ default: m.InvertBinaryTreeVisualization }))),
   "binary-tree-maximum-path-sum": React.lazy(() => import("@/components/visualizations/algorithms/BinaryTreeMaximumPathSumVisualization").then(m => ({ default: m.BinaryTreeMaximumPathSumVisualization }))),
@@ -107,6 +110,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "happy-number": React.lazy(() => import("@/components/visualizations/algorithms/HappyNumberVisualization").then(m => ({ default: m.HappyNumberVisualization }))),
   "plus-one": React.lazy(() => import("@/components/visualizations/algorithms/PlusOneVisualization").then(m => ({ default: m.PlusOneVisualization }))),
   "car-fleet": React.lazy(() => import("@/components/visualizations/algorithms/CarFleetVisualization").then(m => ({ default: m.CarFleetVisualization }))),
+  "baseball-game": React.lazy(() => import("@/components/visualizations/algorithms/BaseballGameVisualization").then(m => ({ default: m.BaseballGameVisualization }))),
 };
 
 export const renderBlind75Visualization = (algoId: string): React.ReactNode | null => {
