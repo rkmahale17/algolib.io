@@ -90,6 +90,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "valid-palindrome": React.lazy(() => import("@/components/visualizations/algorithms/ValidPalindromeVisualization").then(m => ({ default: m.ValidPalindromeVisualization }))),
   "implement-trie": React.lazy(() => import('@/components/visualizations/algorithms/TrieVisualization').then(m => ({ default: m.TrieVisualization }))),
   "implement-stack-using-queues": React.lazy(() => import("@/components/visualizations/algorithms/ImplementStackUsingQueuesVisualization").then(m => ({ default: m.ImplementStackUsingQueuesVisualization }))),
+  "implement-queue-using-stacks": React.lazy(() => import("@/components/visualizations/algorithms/ImplementQueueUsingStacksVisualization").then(m => ({ default: m.ImplementQueueUsingStacksVisualization }))),
   "same-tree": React.lazy(() => import("@/components/visualizations/algorithms/SameTreeVisualization").then(m => ({ default: m.SameTreeVisualization }))),
   "invert-binary-tree": React.lazy(() => import("@/components/visualizations/algorithms/InvertBinaryTreeVisualization").then(m => ({ default: m.InvertBinaryTreeVisualization }))),
   "binary-tree-maximum-path-sum": React.lazy(() => import("@/components/visualizations/algorithms/BinaryTreeMaximumPathSumVisualization").then(m => ({ default: m.BinaryTreeMaximumPathSumVisualization }))),
@@ -111,6 +112,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "plus-one": React.lazy(() => import("@/components/visualizations/algorithms/PlusOneVisualization").then(m => ({ default: m.PlusOneVisualization }))),
   "car-fleet": React.lazy(() => import("@/components/visualizations/algorithms/CarFleetVisualization").then(m => ({ default: m.CarFleetVisualization }))),
   "baseball-game": React.lazy(() => import("@/components/visualizations/algorithms/BaseballGameVisualization").then(m => ({ default: m.BaseballGameVisualization }))),
+  "asteroid-collision": React.lazy(() => import("@/components/visualizations/algorithms/AsteroidCollisionVisualization").then(m => ({ default: m.AsteroidCollisionVisualization }))),
 };
 
 export const renderBlind75Visualization = (algoId: string): React.ReactNode | null => {
