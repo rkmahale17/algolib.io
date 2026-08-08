@@ -11,7 +11,6 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import PostHogPageView from "./PostHogPageView";
 import AdminViewToggle from "@/admin/components/AdminViewToggle";
 import { AnnouncementStack } from "@/components/AnnouncementStack";
-import { PromoBanner } from "@/components/PromoBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -61,7 +60,6 @@ export default function RootLayout({
             <AppSidebar />
           </Suspense>
           <SidebarInset>
-            <PromoBanner />
             <Navbar className="global-nav" />
             {children}
           </SidebarInset>
