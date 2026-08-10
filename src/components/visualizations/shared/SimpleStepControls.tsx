@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { useApp } from '@/contexts/AppContext';
-import { toast } from 'sonner';
 
 interface SimpleStepControlsProps {
   currentStep: number;
@@ -16,7 +14,6 @@ export const SimpleStepControls = ({
   totalSteps,
   onStepChange
 }: SimpleStepControlsProps) => {
-  const { user } = useApp();
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
 
@@ -34,18 +31,7 @@ export const SimpleStepControls = ({
     return () => clearInterval(interval);
   }, [isPlaying, speed, totalSteps, onStepChange, currentStep]);
 
-  const requireAuth = (): boolean => {
-    if (!user) {
-      toast.error("Sign in required", {
-        description: "Please sign in to interact with visualizations."
-      });
-      return true;
-    }
-    return false;
-  };
-
   const handlePlay = () => {
-    if (requireAuth()) return;
     if (currentStep >= totalSteps - 1) {
       onStepChange(0);
     }
@@ -53,23 +39,19 @@ export const SimpleStepControls = ({
   };
 
   const handleStepBack = () => {
-    if (requireAuth()) return;
     onStepChange(Math.max(0, currentStep - 1));
   };
 
   const handleStepForward = () => {
-    if (requireAuth()) return;
     onStepChange(Math.min(totalSteps - 1, currentStep + 1));
   };
 
   const handleReset = () => {
-    if (requireAuth()) return;
     onStepChange(0);
     setIsPlaying(false);
   };
 
   const handlePause = () => {
-    if (requireAuth()) return;
     setIsPlaying(false);
   };
 
@@ -124,12 +106,6 @@ export const SimpleStepControls = ({
         <Slider
           value={[speed]}
           onValueChange={(values) => {
-            if (!user) {
-              toast.error("Sign in required", {
-                description: "Please sign in to interact with visualizations."
-              });
-              return;
-            }
             setSpeed(values[0]);
           }}
           min={0.5}
