@@ -1,8 +1,6 @@
 import { Play, Pause, SkipForward, SkipBack, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { useApp } from '@/contexts/AppContext';
-import { toast } from 'sonner';
 
 interface StepControlsProps {
   isPlaying: boolean;
@@ -31,16 +29,9 @@ export const StepControls = ({
   totalSteps,
   disabled: propDisabled = false
 }: StepControlsProps) => {
-  const { user } = useApp();
   const isDisabled = propDisabled;
 
   const handleAction = (callback: () => void, label: string) => {
-    if (!user) {
-      toast.error("Sign in required", {
-        description: "Please sign in to interact with visualizations."
-      });
-      return;
-    }
     callback();
   };
 
@@ -113,12 +104,6 @@ export const StepControls = ({
         <Slider
           value={[speed]}
           onValueChange={(values) => {
-            if (!user) {
-              toast.error("Sign in required", {
-                description: "Please sign in to interact with visualizations."
-              });
-              return;
-            }
             onSpeedChange(values[0]);
           }}
           min={0.5}
