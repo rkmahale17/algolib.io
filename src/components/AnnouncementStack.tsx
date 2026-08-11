@@ -33,7 +33,9 @@ export const AnnouncementStack: React.FC = () => {
       }
 
       if (data) {
-        setActiveAnnouncements(data);
+        // Filter out header announcements
+        const toastAnnouncements = data.filter((ann) => ann.type !== "header");
+        setActiveAnnouncements(toastAnnouncements);
       }
     };
 
