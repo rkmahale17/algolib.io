@@ -18,6 +18,7 @@ import {
 import { Plus, Trash2, Edit, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { GlobalPromoBanner } from "@/components/GlobalPromoBanner";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ type Announcement = {
   image_url?: string;
   is_active: boolean;
   created_at: string;
+  type?: string;
 };
 
 export default function AdminAnnouncements() {
@@ -47,6 +49,11 @@ export default function AdminAnnouncements() {
     body: "",
     image_url: "",
     is_active: false,
+    type: "toast", // default
+    hasCopyCode: false,
+    discountCode: "",
+    hasTimer: false,
+    endDate: "",
   });
 
   useEffect(() => {
@@ -70,26 +77,76 @@ export default function AdminAnnouncements() {
 
   const handleOpenDialog = (announcement?: Announcement) => {
     if (announcement) {
+      let hasCopyCode = false;
+      let discountCode = "";
+      let hasTimer = false;
+      let endDate = "";
+      let image_url = announcement.image_url || "";
+
+      if (announcement.type === "header" && image_url.startsWith("{")) {
+        try {
+          const meta = JSON.parse(image_url);
+          hasCopyCode = meta.hasCopyCode || false;
+          discountCode = meta.discountCode || "";
+          hasTimer = meta.hasTimer || false;
+          endDate = meta.endDate || "";
+        } catch (e) {}
+      }
+
       setEditingId(announcement.id);
       setFormData({
         title: announcement.title,
         body: announcement.body,
-        image_url: announcement.image_url || "",
+        image_url: announcement.type === "toast" ? image_url : "",
         is_active: announcement.is_active,
+        type: announcement.type || "toast",
+        hasCopyCode,
+        discountCode,
+        hasTimer,
+        endDate,
       });
     } else {
       setEditingId(null);
-      setFormData({ title: "", body: "", image_url: "", is_active: false });
+      setFormData({ 
+        title: "", 
+        body: "", 
+        image_url: "", 
+        is_active: false, 
+        type: "toast",
+        hasCopyCode: false,
+        discountCode: "",
+        hasTimer: false,
+        endDate: "", 
+      });
     }
     setIsDialogOpen(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    let finalImageUrl = formData.image_url;
+    if (formData.type === "header") {
+      finalImageUrl = JSON.stringify({
+        hasCopyCode: formData.hasCopyCode,
+        discountCode: formData.discountCode,
+        hasTimer: formData.hasTimer,
+        endDate: formData.endDate,
+      });
+    }
+
+    const payload = {
+      title: formData.title,
+      body: formData.body,
+      is_active: formData.is_active,
+      type: formData.type,
+      image_url: finalImageUrl,
+    };
+
     if (editingId) {
       const { error } = await supabase
         .from("announcements")
-        .update(formData)
+        .update(payload)
         .eq("id", editingId);
       if (error) {
         toast.error("Failed to update announcement");
@@ -101,7 +158,7 @@ export default function AdminAnnouncements() {
     } else {
       const { error } = await supabase
         .from("announcements")
-        .insert([formData]);
+        .insert([payload]);
       if (error) {
         toast.error("Failed to create announcement");
       } else {
@@ -160,6 +217,18 @@ export default function AdminAnnouncements() {
             </DialogHeader>
             <form onSubmit={handleSave} className="space-y-4 pt-4">
               <div className="space-y-2">
+                <Label htmlFor="type">Type</Label>
+                <select
+                  id="type"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                >
+                  <option value="toast">Toast Notification (Bottom Left)</option>
+                  <option value="header">Global Header Banner (Top)</option>
+                </select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="title">Title (HTML/Text)</Label>
                 <Input
                   id="title"
@@ -178,15 +247,66 @@ export default function AdminAnnouncements() {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL (Optional)</Label>
-                <Input
-                  id="image_url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://example.com/image.png"
-                />
-              </div>
+              {formData.type === "header" && (
+                <>
+                  <div className="flex items-center space-x-2 pt-2">
+                    <Switch
+                      id="hasCopyCode"
+                      checked={formData.hasCopyCode}
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, hasCopyCode: checked })
+                      }
+                    />
+                    <Label htmlFor="hasCopyCode">Show Copy Code Button</Label>
+                  </div>
+                  {formData.hasCopyCode && (
+                    <div className="space-y-2 pl-6">
+                      <Label htmlFor="discountCode">Discount Code</Label>
+                      <Input
+                        id="discountCode"
+                        value={formData.discountCode}
+                        onChange={(e) => setFormData({ ...formData, discountCode: e.target.value })}
+                        placeholder="e.g. INDEPENDENCE"
+                        required={formData.hasCopyCode}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-center space-x-2 pt-2">
+                    <Switch
+                      id="hasTimer"
+                      checked={formData.hasTimer}
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, hasTimer: checked })
+                      }
+                    />
+                    <Label htmlFor="hasTimer">Show Countdown Timer</Label>
+                  </div>
+                  {formData.hasTimer && (
+                    <div className="space-y-2 pl-6">
+                      <Label htmlFor="endDate">End Date & Time</Label>
+                      <Input
+                        id="endDate"
+                        type="datetime-local"
+                        value={formData.endDate}
+                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                        required={formData.hasTimer}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+              {formData.type === "toast" && (
+                <div className="space-y-2">
+                  <Label htmlFor="image_url">Image URL (Optional)</Label>
+                  <Input
+                    id="image_url"
+                    value={formData.image_url}
+                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    placeholder="https://example.com/image.png"
+                  />
+                </div>
+              )}
               <div className="flex items-center space-x-2">
                 <Switch
                   id="active"
@@ -275,19 +395,26 @@ export default function AdminAnnouncements() {
 
       {/* Preview Dialog */}
       <Dialog open={!!previewAnnouncement} onOpenChange={(open) => !open && setPreviewAnnouncement(null)}>
-        <DialogContent className="sm:max-w-md flex flex-col items-center justify-center p-8 bg-transparent border-none shadow-none [&>button]:hidden">
+        <DialogContent className={previewAnnouncement?.type === 'header' ? "max-w-full p-0 bg-transparent border-none shadow-none mt-20" : "sm:max-w-md flex flex-col items-center justify-center p-8 bg-transparent border-none shadow-none [&>button]:hidden"}>
           <DialogHeader className="sr-only">
             <DialogTitle>Preview Announcement</DialogTitle>
           </DialogHeader>
           {previewAnnouncement && (
-            <div className="relative">
-              <AnnouncementBanner
-                announcement={{
-                  ...previewAnnouncement,
-                  updated_at: new Date().toISOString()
-                }}
-                onDismiss={() => setPreviewAnnouncement(null)}
-              />
+            <div className="relative w-full flex justify-center">
+              {previewAnnouncement.type === 'header' ? (
+                <div className="w-full relative">
+                  {/* Import GlobalPromoBanner at the top of the file if not already imported */}
+                  <GlobalPromoBanner announcement={previewAnnouncement} />
+                </div>
+              ) : (
+                <AnnouncementBanner
+                  announcement={{
+                    ...previewAnnouncement,
+                    updated_at: new Date().toISOString()
+                  }}
+                  onDismiss={() => setPreviewAnnouncement(null)}
+                />
+              )}
             </div>
           )}
         </DialogContent>
