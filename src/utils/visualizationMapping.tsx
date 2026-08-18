@@ -33,6 +33,7 @@ export const visualizationMap: Record<string, any> = {
   'merge-intervals': dynamic(() => import('@/components/visualizations/algorithms/MergeIntervalsVisualization').then(m => m.MergeIntervalsVisualization), { ssr: false }),
   'interval-scheduling': dynamic(() => import('@/components/visualizations/algorithms/InsertIntervalVisualization').then(m => m.InsertIntervalVisualization), { ssr: false }),
   'monotonic-stack': dynamic(() => import('@/components/visualizations/algorithms/MonotonicStackVisualization').then(m => m.MonotonicStackVisualization), { ssr: false }),
+  'online-stock-span': dynamic(() => import('@/components/visualizations/algorithms/OnlineStockSpanVisualization').then(m => m.OnlineStockSpanVisualization), { ssr: false }),
   'daily-temperatures': dynamic(() => import('@/components/visualizations/algorithms/DailyTemperaturesVisualization').then(m => m.DailyTemperaturesVisualization), { ssr: false }),
   'valid-parentheses': dynamic(() => import('@/components/visualizations/algorithms/ValidParenthesesVisualization').then(m => m.ValidParenthesesVisualization), { ssr: false }),
   'evaluate-reverse-polish-notation': dynamic(() => import('@/components/visualizations/algorithms/EvaluateRPNVisualization').then(m => m.EvaluateRPNVisualization), { ssr: false }),
@@ -310,6 +311,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'monotonic-stack': {
     title: 'Monotonic Stack',
     description: 'Visualize how elements are pushed and popped to maintain a strict increasing/decreasing order, solving next greater element problems in O(n).'
+  },
+  'online-stock-span': {
+    title: 'Online Stock Span',
+    description: 'Visualize how a monotonic stack processes consecutive stock prices to efficiently compute spans in amortized O(1) time.'
   },
   'daily-temperatures': {
     title: 'Daily Temperatures',
