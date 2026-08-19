@@ -29,6 +29,9 @@ export const PATTERN_IDS = [
   "backtracking",
   "merge-intervals",
   "dynamic-programming",
+  "fast-and-slow-pointers",
+  "greedy",
+  "bfs-dfs",
 ] as const;
 
 export function getGuideUrl(categoryId: string, slug: string): string {

@@ -38,6 +38,7 @@ export const visualizationMap: Record<string, any> = {
   'valid-parentheses': dynamic(() => import('@/components/visualizations/algorithms/ValidParenthesesVisualization').then(m => m.ValidParenthesesVisualization), { ssr: false }),
   'evaluate-reverse-polish-notation': dynamic(() => import('@/components/visualizations/algorithms/EvaluateRPNVisualization').then(m => m.EvaluateRPNVisualization), { ssr: false }),
   'min-stack': dynamic(() => import('@/components/visualizations/algorithms/MinStackVisualization').then(m => m.MinStackVisualization), { ssr: false }),
+  'maximum-frequency-stack': dynamic(() => import('@/components/visualizations/algorithms/MaximumFrequencyStackVisualization').then(m => m.MaximumFrequencyStackVisualization), { ssr: false }),
   'two-sum': dynamic(() => import('@/components/visualizations/algorithms/TwoSumVisualization').then(m => m.TwoSumVisualization), { ssr: false }),
   'two-sum-ii-input-array-is-sorted': dynamic(() => import('@/components/visualizations/algorithms/TwoSumIIVisualization').then(m => m.TwoSumIIVisualization), { ssr: false }),
   '4sum': dynamic(() => import('@/components/visualizations/algorithms/FourSumVisualization').then(m => m.FourSumVisualization), { ssr: false }),
@@ -332,6 +333,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'min-stack': {
     title: 'Min Stack',
     description: 'Visualize how a dual-stack configuration is used to retrieve the minimum element in constant O(1) time while supporting standard stack operations.'
+  },
+  'maximum-frequency-stack': {
+    title: 'Maximum Frequency Stack',
+    description: 'Visualize how frequency maps and a stack of stacks are used to design a stack-like data structure that retrieves the most frequent element.'
   },
   'two-sum': {
     title: 'Two Sum',
