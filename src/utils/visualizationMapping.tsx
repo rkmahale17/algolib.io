@@ -178,6 +178,7 @@ export const visualizationMap: Record<string, any> = {
   'huffman-algorithm': dynamic(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => m.HuffmanCodingVisualization), { ssr: false }),
   'huffman': dynamic(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => m.HuffmanCodingVisualization), { ssr: false }),
   'huffman-tree': dynamic(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => m.HuffmanCodingVisualization), { ssr: false }),
+  'simplify-path': dynamic(() => import('@/components/visualizations/algorithms/SimplifyPathVisualization').then(m => m.SimplifyPathVisualization), { ssr: false }),
 
   // Greedy Algorithms
   'activity-selection': dynamic(() => import('@/components/visualizations/algorithms/ActivitySelectionVisualization').then(m => m.ActivitySelectionVisualization), { ssr: false }),
@@ -623,6 +624,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'word-ladder': {
     title: 'Word Ladder',
     description: 'Visualize how Breadth-First Search (BFS) is used to find the shortest transformation sequence from a start word to an end word by changing one letter at a time.'
+  },
+  'simplify-path': {
+    title: 'Simplify Path',
+    description: 'Visualize using a stack to convert an absolute file path into its simplified canonical form, handling directories and parent navigation.'
   }
 };
 
