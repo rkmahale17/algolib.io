@@ -21,7 +21,7 @@ export function InteractiveSandboxTeaser() {
   };
 
   return (
-    <section id="visualization" className="pt-32 lg:pt-48 pb-20 lg:pb-28 bg-[#FAFAFA] dark:bg-[#050505] text-zinc-900 dark:text-white relative overflow-hidden">
+    <section id="visualization" className="pt-16 lg:pt-20 pb-20 lg:pb-28 bg-[#FAFAFA] dark:bg-[#050505] text-zinc-900 dark:text-white relative overflow-hidden">
       {/* Background Glow Orb */}
       <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/3 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 

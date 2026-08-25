@@ -136,7 +136,7 @@ export const DashboardWidgets = () => {
   };
   const nextMilestone = getNextMilestone(overallStats.totalSolved);
 
-  if (isAlgosLoading || algorithms.length === 0) {
+  if (isAlgosLoading || algorithms.length === 0 || !user) {
     return null;
   }
 
@@ -144,7 +144,18 @@ export const DashboardWidgets = () => {
     potd?.problem && progressMap?.[potd.problem.id] !== "solved";
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto space-y-4 mb-8 mt-2 px-2 sm:px-0">
+    <section className="relative overflow-hidden w-full py-12">
+      {/* faint grid pattern background */}
+      <div
+        className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      ></div>
+      <div className="m-auto p-4 pt-6 block relative z-10 max-w-[1200px]">
+        <div className="w-full max-w-[1200px] mx-auto space-y-4 mb-8 mt-2 px-2 sm:px-0">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
         {/* Left Column */}
         <div className="space-y-6 min-w-0">
@@ -197,7 +208,9 @@ export const DashboardWidgets = () => {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+      </div>
+    </section>
   );
 };
