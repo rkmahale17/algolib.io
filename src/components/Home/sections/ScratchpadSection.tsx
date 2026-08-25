@@ -79,7 +79,7 @@ export function ScratchpadSection() {
     const posthog = usePostHog();
 
     return (
-        <section className="py-36 lg:py-48 bg-white dark:bg-black">
+        <section className="py-16 lg:py-24 bg-white dark:bg-black">
             <div className="w-full max-w-[1200px] mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
                     <div className="order-2 lg:order-1">

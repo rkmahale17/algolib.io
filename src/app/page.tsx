@@ -141,20 +141,7 @@ export default function Page() {
       />
       <div className="min-h-screen bg-white dark:bg-black text-[#1A1A1A] dark:text-white overflow-x-hidden relative w-full">
         <HeroSection />
-        <section className="relative overflow-hidden w-full py-12">
-          {/* faint grid pattern background */}
-          <div
-            className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          ></div>
-          <div className="m-auto p-4 pt-6 block relative z-10 max-w-[1200px]">
-            <DashboardWidgets />
-          </div>
-        </section>
+        <DashboardWidgets />
 
         <div id="visualize">
           <InteractiveSandboxTeaser />
