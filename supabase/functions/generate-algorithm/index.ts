@@ -192,16 +192,20 @@ Deno.serve(async (req) => {
         Use the provided INPUT SCHEMA (from previous step/context).
 
         JSON Structure:
-        {
+        ${problemType === 'frontend' ? `{
+          "test_cases": [
+            { "name": "Test case description", "testCode": "assert(fn(1) === 2);", "isSubmission": false }
+          ]
+        }` : `{
           "test_cases": [
             { "input": [1, 2], "output": 3, "description": "...", "isSubmission": false }
           ]
-        }
+        }`}
 
         REQUIREMENTS:
-        1. **Input Format**: ${problemType === 'sql' ? '\'input\' MUST be an **ARRAY of values** in order of input_schema. For SQL problems, the input array should contain the actual JSON data representing the rows of the tables defined in the schema (e.g. `[{"Person": [{"personId": 1, ...}]}]` or `[[["John", "Doe"], ...]]`). Expected output should be the expected rows/result of the query.' : '\'input\' MUST be an **ARRAY of values** in order of input_schema.'}
-        2. **Quality**: ${problemType === 'sql' ? 'Exactly 3 Total Cases (1 Basic, 1 Edge, 1 Complex). Mark the last one as isSubmission: true.' : '12 Total Cases.\n           - 2 Basic\n           - 3 Edge (Min/Max/Empty)\n           - 2 Boundary\n           - 3 Complex\n           - 2 Submission (Mark isSubmission: true)'}
-        3. **2D Arrays**: [[1,2], [3,4]] -> Input array wrapping it: [[[1,2], [3,4]]]
+        1. **Input Format**: ${problemType === 'sql' ? '\'input\' MUST be an **ARRAY of values** in order of input_schema. For SQL problems, the input array should contain the actual JSON data representing the rows of the tables defined in the schema (e.g. `[{"Person": [{"personId": 1, ...}]}]` or `[[["John", "Doe"], ...]]`). Expected output should be the expected rows/result of the query.' : problemType === 'frontend' ? 'Frontend problems use unit test assertions. Each test case MUST have a `name` and `testCode`. The `testCode` contains executable JavaScript test assertions using helpers like `assert`, `assertEquals`, `assertThrows`, `createMockFn`.' : '\'input\' MUST be an **ARRAY of values** in order of input_schema.'}
+        2. **Quality**: ${problemType === 'sql' ? 'Exactly 3 Total Cases (1 Basic, 1 Edge, 1 Complex). Mark the last one as isSubmission: true.' : problemType === 'frontend' ? 'Exactly 5 Total Cases. Mark the last 2 as isSubmission: true.' : '12 Total Cases.\n           - 2 Basic\n           - 3 Edge (Min/Max/Empty)\n           - 2 Boundary\n           - 3 Complex\n           - 2 Submission (Mark isSubmission: true)'}
+        3. **2D Arrays**: [[1,2], [3,4]] -> Input array wrapping it: [[[1,2], [3,4]]] (only for DSA)
         `;
 
     // 3. SOLUTIONS PROMPT
@@ -404,8 +408,13 @@ Deno.serve(async (req) => {
       // But passing it is good context.
 
       const sqlOnly = problemType === 'sql';
+      const frontendOnly = problemType === 'frontend';
+      
       const generationPromises = sqlOnly ? [
         generateChunk(implsPrompt(["sql"]))
+      ] : frontendOnly ? [
+        generateChunk(implsPrompt(["JavaScript"])),
+        generateChunk(implsPrompt(["TypeScript"]))
       ] : [
         generateChunk(implsPrompt(["TypeScript"])),
         generateChunk(implsPrompt(["python"])),
@@ -428,6 +437,8 @@ Deno.serve(async (req) => {
           normalizedLang = 'cpp';
         } else if (lower === 'typescript') {
           normalizedLang = 'TypeScript';
+        } else if (lower === 'javascript') {
+          normalizedLang = 'javascript';
         } else if (lower === 'python') {
           normalizedLang = 'python';
         } else if (lower === 'java') {
@@ -486,19 +497,34 @@ Deno.serve(async (req) => {
       const testData = await generateChunk(testCasesPromptWithSchema);
 
       // C. Solutions
-      const [tsData, pyData, javaData, cppData] = await Promise.all([
-        generateChunk(implsPrompt(["typescript"])),
-        generateChunk(implsPrompt(["python"])),
-        generateChunk(implsPrompt(["java"])),
-        generateChunk(implsPrompt(["cpp"])),
-      ]);
-
-      const allImplsLegacy = [
-        ...(tsData.implementations || []),
-        ...(pyData.implementations || []),
-        ...(javaData.implementations || []),
-        ...(cppData.implementations || [])
-      ];
+      let allImplsLegacy: any[] = [];
+      
+      if (problemType === 'sql') {
+        const sqlData = await generateChunk(implsPrompt(["sql"]));
+        allImplsLegacy = [...(sqlData.implementations || [])];
+      } else if (problemType === 'frontend') {
+        const [jsData, tsData] = await Promise.all([
+          generateChunk(implsPrompt(["javascript"])),
+          generateChunk(implsPrompt(["typescript"])),
+        ]);
+        allImplsLegacy = [
+          ...(jsData.implementations || []),
+          ...(tsData.implementations || []),
+        ];
+      } else {
+        const [tsData, pyData, javaData, cppData] = await Promise.all([
+          generateChunk(implsPrompt(["typescript"])),
+          generateChunk(implsPrompt(["python"])),
+          generateChunk(implsPrompt(["java"])),
+          generateChunk(implsPrompt(["cpp"])),
+        ]);
+        allImplsLegacy = [
+          ...(tsData.implementations || []),
+          ...(pyData.implementations || []),
+          ...(javaData.implementations || []),
+          ...(cppData.implementations || [])
+        ];
+      }
 
       // Normalize languages to match frontend expected IDs
       const normalizedImplsLegacy = allImplsLegacy.map((impl: any) => {
@@ -509,6 +535,8 @@ Deno.serve(async (req) => {
           normalizedLang = 'cpp';
         } else if (lower === 'typescript') {
           normalizedLang = 'TypeScript';
+        } else if (lower === 'javascript') {
+          normalizedLang = 'javascript';
         } else if (lower === 'python') {
           normalizedLang = 'python';
         } else if (lower === 'java') {
