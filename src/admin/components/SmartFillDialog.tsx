@@ -36,7 +36,7 @@ interface SmartFillDialogProps {
 }
 
 const FIELD_GROUPS = [
-  { id: "basic", label: "Basic Info (Title, Category, Difficulty, etc.)", keys: ["title", "name", "category", "difficulty", "description", "serial_no", "list_type", "list_types", "published", "id"] },
+  { id: "basic", label: "Basic Info (Title, Category, Difficulty, etc.)", keys: ["title", "name", "category", "difficulty", "description", "serial_no", "list_type", "list_types", "published", "id", "problemType"] },
   { id: "problem", label: "Problem Details (Statement, Steps, Use Cases, Tips, Table)", keys: ["explanation"] },
   { id: "code", label: "Code Implementations", keys: ["implementations"] },
   { id: "tests", label: "Test Cases & Schema", keys: ["test_cases", "input_schema"] },
@@ -53,11 +53,13 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
 
   // Generate Tab State
   const [topic, setTopic] = useState(initialTopic);
+  const [localProblemType, setLocalProblemType] = useState(problemType);
 
-  // Sync initialTopic to topic when it changes or dialog opens
+  // Sync initialTopic and problemType when it changes or dialog opens
   useEffect(() => {
     if (initialTopic) setTopic(initialTopic);
-  }, [initialTopic, open]);
+    if (problemType) setLocalProblemType(problemType);
+  }, [initialTopic, problemType, open]);
 
   const [referenceCode, setReferenceCode] = useState("");
   const [userPrompt, setUserPrompt] = useState("");
@@ -153,7 +155,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
             referenceCode,
             userPrompt,
             mode: generatorMode,
-            problemType,
+            problemType: localProblemType,
             target: "info"
           },
         });
@@ -164,9 +166,9 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
         setLoadingStage("tests");
         const { data: testData, error: testError } = await supabase.functions.invoke("generate-algorithm", {
           body: {
-            topic, // Context
+            topic,
             mode: generatorMode,
-            problemType,
+            problemType: localProblemType,
             target: "test_cases",
             input_schema: finalData.input_schema // Pass schema from step 1
           },
@@ -182,7 +184,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
             referenceCode,
             userPrompt,
             mode: generatorMode,
-            problemType,
+            problemType: localProblemType,
             target: target === "optimized" ? "optimized" : "solutions",
             input_schema: finalData.input_schema // Pass schema from step 1
           },
@@ -195,14 +197,14 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
         };
 
       } else {
-        // target === 'add_approaches' (Legacy / Single Shot)
+        // add_approaches mode
         const { data, error } = await supabase.functions.invoke("generate-algorithm", {
           body: {
             topic,
             referenceCode,
             userPrompt,
             mode: generatorMode,
-            problemType,
+            problemType: localProblemType,
             target,
             approachCount: target === 'add_approaches' ? approachCount : undefined,
             existingApproaches: target === 'add_approaches' ? existingApproaches : []
@@ -211,6 +213,8 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
         if (error) throw error;
         finalData = data;
       }
+
+      finalData.problemType = localProblemType;
 
       console.log("Generated Data:", finalData);
       setGeneratedData(finalData);
@@ -306,7 +310,24 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
               </div>
 
               {/* 2. Configuration Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-muted/20 border rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-muted/20 border rounded-lg">
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-2 text-muted-foreground">
+                    <CheckSquare className="w-4 h-4" />
+                    Problem Type
+                  </Label>
+                  <Select value={localProblemType} onValueChange={(val: any) => setLocalProblemType(val)}>
+                    <SelectTrigger className="w-full h-9 bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dsa">DSA (Data Structures & Algorithms)</SelectItem>
+                      <SelectItem value="sql">SQL (Database)</SelectItem>
+                      <SelectItem value="frontend">Frontend (JS/TS)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="space-y-3">
                   <Label className="flex items-center gap-2 text-muted-foreground">
                     <FileCode className="w-4 h-4" />
