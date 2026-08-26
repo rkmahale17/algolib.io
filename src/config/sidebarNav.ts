@@ -110,7 +110,6 @@ function buildGuideGroups() {
       icon: Database,
       isSingleLink: false,
       guides: databaseCat?.guides ?? [],
-    },
     }
   ];
 }
