@@ -25,7 +25,7 @@ An array is a row of toy cubbies glued together in a single straight line.
 \`\`\`
 Memory Address:  [ 1000 ]   [ 1004 ]   [ 1008 ]   [ 1012 ]   [ 1016 ]
 Array Index:         0          1          2          3          4
-Toy Value:         [ 🤖 ]     [ 🧸 ]     [ 🎨 ]     [ 🦖 ]     [  🚗 ]
+Toy Value:         [  ]     [  ]     [  ]     [  ]     [   ]
 \`\`\`
 
 ### 1. Static Arrays (The Glued Wood Cubbies)
@@ -65,7 +65,7 @@ We have two clever ways to solve collisions:
 * **Separate Chaining (Open Hashing)**: Each drawer has a hanging chain of little plastic baggies. If "apple" and "orange" both land in Drawer #4, we put them both in baggies and chain them together inside Drawer #4:
   \`\`\`
   Drawer 0: empty
-  Drawer 1: [ "apple": 🍎 ] -> [ "orange": 🍊 ] -> empty
+  Drawer 1: [ "apple":  ] -> [ "orange":  ] -> empty
   Drawer 2: empty
   \`\`\`
 * **Open Addressing (Closed Hashing)**: All elements must go directly into their own drawer. If Drawer #4 is already taken by the "apple", the "orange" goes looking for another empty drawer using a specific path:

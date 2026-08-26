@@ -1,7 +1,7 @@
 export const content = `
-# Greedy Approach: Grab the Best Thing Now! 🍩
+# Greedy Approach: Grab the Best Thing Now! 
 
-## 🍰 Introduction: The Dessert Buffet
+##  Introduction: The Dessert Buffet
 
 Imagine you are at a massive dessert buffet, and you have a plate that can only hold 3 items. You want to get the most delicious plate of desserts possible. 
 
@@ -15,7 +15,7 @@ By just picking the best option right in front of you at each step, you end up w
 
 ---
 
-## 🤔 What is the Greedy Pattern?
+##  What is the Greedy Pattern?
 
 In programming, a **Greedy Algorithm** is a problem-solving strategy that makes the optimal (best) choice at each small step, hoping that these small best choices lead to the global best solution.
 
@@ -25,7 +25,7 @@ Sometimes, being greedy is perfect (like giving change for a dollar). Sometimes,
 
 ---
 
-## ✨ The Core Strategy
+##  The Core Strategy
 
 1. **Sort or Organize**: Greedy algorithms almost always require you to sort the data first (e.g., sort from biggest to smallest, or by ending time).
 2. **Iterate**: Go through the items one by one.
@@ -34,7 +34,7 @@ Sometimes, being greedy is perfect (like giving change for a dollar). Sometimes,
 
 ---
 
-## 🎟️ Real-World Example: Giving Change
+## ️ Real-World Example: Giving Change
 
 If you buy a toy for $3 and give the cashier a $10 bill, they need to give you $7 in change.
 
@@ -47,7 +47,7 @@ They didn't have to calculate every combination of pennies and nickels. They jus
 
 ---
 
-## 🧩 Problem Walkthrough: Assign Cookies
+##  Problem Walkthrough: Assign Cookies
 
 Imagine you have some children, and each child has a "greed factor" (how big of a cookie they want). You also have a pile of cookies of different sizes. You want to make as many children happy as possible.
 
@@ -163,14 +163,14 @@ function findContentChildren(g: number[], s: number[]): number {
 
 ---
 
-## 🚫 Common Mistakes 
+##  Common Mistakes 
 
 1. **Forgetting to Sort**: A greedy algorithm almost never works on unsorted data. If you just grab the first thing you see without organizing it first, you will make a bad choice.
 2. **When Greedy is Wrong**: Greedy doesn't always work! If a problem requires you to look ahead or test multiple overlapping combinations (like the famous Knapsack problem), you might need **Dynamic Programming** instead. 
 
 ---
 
-## 🎮 Practice Problems
+##  Practice Problems
 
 * [Assign Cookies](/problem/assign-cookies) — The classic introductory greedy problem.
 * [Jump Game](/problem/jump-game) — Be greedy about how far you can jump!

@@ -23,8 +23,6 @@ import { content as fastSlowPointersContent } from "./guides/fast-slow-pointers"
 import { content as greedyContent } from "./guides/greedy";
 import { content as bfsDfsContent } from "./guides/bfs-dfs";
 
-
-
 export interface RelatedQuestion {
   id: string;
   name: string;

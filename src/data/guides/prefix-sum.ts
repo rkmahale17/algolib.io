@@ -1,7 +1,7 @@
 export const content = `
 # Prefix Sum: The Magic Diary of Totals!
 
-## 🐷 Introduction: The Piggy Bank Problem
+##  Introduction: The Piggy Bank Problem
 
 Imagine you have a piggy bank, and every day you put some coins in it. 
 
@@ -19,7 +19,7 @@ If your piggy bank had 100 days of coins, adding them up over and over again for
 
 What if there was a magic trick to find the answer instantly without doing all that adding?
 
-## 📝 The Magic Diary (Prefix Sum)
+##  The Magic Diary (Prefix Sum)
 
 Instead of just writing down how many coins you added each day, what if you kept a special diary? In this diary, you write down the **TOTAL** number of coins currently in the piggy bank at the end of each day!
 
@@ -32,7 +32,7 @@ Let's make our special diary:
 
 This special "Total Diary" is what programmers call a **Prefix Sum** array! 
 
-## ✨ How to Use the Magic Diary
+##  How to Use the Magic Diary
 
 Now, if your friend asks, *"How many coins did you add from Day 2 to Day 4?"*
 
@@ -47,7 +47,7 @@ You found the answer instantly!
 
 ---
 
-## 🦸 Why Do We Need To Learn It?
+##  Why Do We Need To Learn It?
 
 In computer programming, we often have huge lists (arrays) with millions of numbers. Sometimes, the computer gets asked thousands of questions like *"What is the sum of numbers from index 100 to index 5000?"*
 
@@ -57,7 +57,7 @@ But if we spend a little time at the beginning to build our "Magic Diary" (Prefi
 
 ---
 
-## 🧮 Let's Look at Some Code! (Building the Diary)
+##  Let's Look at Some Code! (Building the Diary)
 
 Let's write code to take a normal array of numbers and turn it into a Prefix Sum array.
 
@@ -149,7 +149,7 @@ function buildPrefixSum(nums: number[]): number[] {
 
 ---
 
-## 🧩 Problem 1: Range Sum Query
+##  Problem 1: Range Sum Query
 
 This is exactly like the piggy bank problem! You are given an array of numbers. Then, you will be asked many times to find the sum of numbers between two indices \`left\` and \`right\`.
 
@@ -269,21 +269,21 @@ class NumArray {
 
 ---
 
-## 🚫 Common Mistakes
+##  Common Mistakes
 
 1. **Off-by-One Errors**: When subtracting, remember to subtract \`prefix[left - 1]\`, NOT \`prefix[left]\`. If you subtract \`prefix[left]\`, you accidentally throw away the starting number too!
 2. **Left is Zero**: If \`left\` is 0, \`left - 1\` is -1, which will crash your program. Always handle the \`left == 0\` case separately!
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Prefix Sum** is like a magic diary that keeps track of a running total.
 * It changes slow O(N) addition into lightning-fast O(1) subtraction.
 * Formula: \`Sum(left, right) = Prefix[right] - Prefix[left - 1]\`.
 
 ---
 
-## 🎮 Practice Problems & Website Verifications
+##  Practice Problems & Website Verifications
 
 Verify your prefix sum logic by solving these interactive problems on our platform:
 * [Product of Array Except Self](/problem/product-of-array-except-self) — Learn to use prefix and suffix arrays together!

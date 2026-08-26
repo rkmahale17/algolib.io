@@ -1,13 +1,13 @@
 export const content = `
-# What is a Database? The Ultimate Toy Organizer! 🧸
+# What is a Database? The Ultimate Toy Organizer! 
 
-## 🧸 Introduction: The Messy Toy Closet Problem
+##  Introduction: The Messy Toy Closet Problem
 
 Imagine you have a giant closet full of toys. You have action figures, lego bricks, board games, and crayons. 
 
 At first, you only have 5 toys. It's super easy to find what you want! You just look in the closet and grab it.
 
-But as time goes on, you get more and more toys. Soon, you have **one million toys**! 😲 You just throw them all into the closet in one big, messy pile. 
+But as time goes on, you get more and more toys. Soon, you have **one million toys**!  You just throw them all into the closet in one big, messy pile. 
 
 One afternoon, you want to find **one specific tiny green Lego brick**. 
 * You open the closet door, and a huge mountain of toys falls on you. 
@@ -18,11 +18,11 @@ This is exactly what happens to computers when they try to store lots of informa
 
 What is the solution? **A Database!** 
 
-A database is like a **magical toy chest** with labeled drawers, dividers, and a smart robot assistant. When you want the green Lego brick, you don't dig. You just ask the robot helper: *"Please get me the green Lego brick from the Lego drawer."* and **BAM!** The helper gives it to you in less than a second! ⚡
+A database is like a **magical toy chest** with labeled drawers, dividers, and a smart robot assistant. When you want the green Lego brick, you don't dig. You just ask the robot helper: *"Please get me the green Lego brick from the Lego drawer."* and **BAM!** The helper gives it to you in less than a second! 
 
 ---
 
-## 🦸 Why Do Databases Exist?
+##  Why Do Databases Exist?
 
 You might ask: *"Why can't we just use a simple text file on our computer to save everything?"* 
 
@@ -34,11 +34,11 @@ Well, databases exist because they solve three major problems that normal files 
 
 ---
 
-## 📂 Files vs. Databases: The Ultimate Showdown
+##  Files vs. Databases: The Ultimate Showdown
 
 Let's compare a normal file to a database:
 
-| Feature | 📄 Simple Files (Text/CSV) | 🗄️ Databases |
+| Feature |  Simple Files (Text/CSV) | ️ Databases |
 | :--- | :--- | :--- |
 | **Organization** | Just lines of text, like a diary. | Neat tables, like a grid of folders. |
 | **Speed** | Gets slower and slower as it grows. | Stays lightning-fast even with millions of items! |
@@ -48,7 +48,7 @@ Let's compare a normal file to a database:
 
 ---
 
-## 💡 Core Database Concepts
+##  Core Database Concepts
 
 Inside our magical database toy chest, we have four main jobs we do. Developers call these **CRUD** operations:
 
@@ -61,28 +61,28 @@ Instead of using hands, we talk to databases using a special language. The most 
 
 ---
 
-## 🌍 Real-World Examples: How Your Favorite Apps Use Databases
+##  Real-World Examples: How Your Favorite Apps Use Databases
 
 Every app you use has a database running behind the scenes. Here is how they use them:
 
-### 📸 1. Instagram
+###  1. Instagram
 When you scroll through Instagram, how does the app know which pictures to show you?
 * **The Closet (Messy File Way):** Reading a giant text file containing every post ever uploaded in the world, filtering out yours. (The app would freeze!)
 * **The Toy Chest (Database Way):** Instagram asks its database: *"Give me the latest 20 photos where the user is 'Spiderman'."* The database finds them in milliseconds and displays them on your screen.
 
-### 🛒 2. Amazon
+###  2. Amazon
 When you add a toy to your shopping cart, how does Amazon remember it when you close the tab?
 * **The Closet (Messy File Way):** Saving your cart on a text document on Amazon's desktop. (It would get mixed up with other shoppers' carts!)
 * **The Toy Chest (Database Way):** Amazon's database has a table for carts. It updates your record: *"Set cart_items = ['Lego Star Wars'] where user_id = 9876."*
 
-### 🏆 3. LeetCode
+###  3. LeetCode
 When you solve a coding problem, how does your rank go up?
 * **The Closet (Messy File Way):** A spreadsheet where someone manually types your score. (Too slow!)
 * **The Toy Chest (Database Way):** LeetCode's database runs a command: *"Add 10 points to score where user_username = 'CodeNinja'."*
 
 ---
 
-## 💻 Let's Look at Some Code!
+##  Let's Look at Some Code!
 
 Let's see the difference in code between reading/writing to a simple file versus querying a database.
 
@@ -92,7 +92,7 @@ Let's see the difference in code between reading/writing to a simple file versus
 \`\`\`python
 import sqlite3
 
-# 📄 THE FILE WAY: Reading and searching a text file
+#  THE FILE WAY: Reading and searching a text file
 def find_user_in_file(filename: str, target_user: str) -> str:
     # We must open the file and read line by line (Slow!)
     with open(filename, 'r') as file:
@@ -102,7 +102,7 @@ def find_user_in_file(filename: str, target_user: str) -> str:
                 return email
     return "Not Found"
 
-# 🗄️ THE DATABASE WAY: Querying an SQLite database
+# ️ THE DATABASE WAY: Querying an SQLite database
 def find_user_in_database(db_path: str, target_user: str) -> str:
     # Connect to the database file
     conn = sqlite3.connect(db_path)
@@ -127,7 +127,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 class UserFinder {
-    // 📄 THE FILE WAY: Reading and searching a text file
+    //  THE FILE WAY: Reading and searching a text file
     public String findUserInFile(String filepath, String targetUser) throws Exception {
         // We open the file reader and loop through all rows
         try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
@@ -142,7 +142,7 @@ class UserFinder {
         return "Not Found";
     }
 
-    // 🗄️ THE DATABASE WAY: Querying a SQL Database
+    // ️ THE DATABASE WAY: Querying a SQL Database
     public String findUserInDatabase(String dbUrl, String targetUser) throws Exception {
         // Establish connection to our database
         try (Connection conn = DriverManager.getConnection(dbUrl)) {
@@ -173,7 +173,7 @@ class UserFinder {
 
 using namespace std;
 
-// 📄 THE FILE WAY: Reading and searching a text file
+//  THE FILE WAY: Reading and searching a text file
 string findUserInFile(const string& filename, const string& targetUser) {
     ifstream file(filename);
     string line;
@@ -199,7 +199,7 @@ int sqlCallback(void* data, int argc, char** argv, char** azColName) {
     return 0;
 }
 
-// 🗄️ THE DATABASE WAY: Querying SQLite Database
+// ️ THE DATABASE WAY: Querying SQLite Database
 string findUserInDatabase(sqlite3* db, const string& targetUser) {
     string email = "Not Found";
     string query = "SELECT email FROM users WHERE username = '" + targetUser + "';";
@@ -220,7 +220,7 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import { Database } from 'sqlite3';
 
-// 📄 THE FILE WAY: Reading and searching a text file
+//  THE FILE WAY: Reading and searching a text file
 async function findUserInFile(filepath: string, targetUser: string): Promise<string> {
     const fileStream = fs.createReadStream(filepath);
     const rl = readline.createInterface({
@@ -238,7 +238,7 @@ async function findUserInFile(filepath: string, targetUser: string): Promise<str
     return "Not Found";
 }
 
-// 🗄️ THE DATABASE WAY: Querying an SQLite database
+// ️ THE DATABASE WAY: Querying an SQLite database
 function findUserInDatabase(db: Database, targetUser: string): Promise<string> {
     return new Promise((resolve, reject) => {
         // Query the database to retrieve email for target user
@@ -255,7 +255,7 @@ function findUserInDatabase(db: Database, targetUser: string): Promise<string> {
 
 ---
 
-## 🚫 Common Mistakes
+##  Common Mistakes
 
 1. **Treating Databases Like Files:** Don't download a whole database table onto your computer just to search it! Always let the database do the searching (filtering) and only download the single result you need.
 2. **Forgetting to Backup:** Just because databases are super safe doesn't mean they can't break if a computer hardware melts. Always back up your database to another computer!
@@ -263,7 +263,7 @@ function findUserInDatabase(db: Database, targetUser: string): Promise<string> {
 
 ---
 
-## 📚 Summary
+##  Summary
 * A **database** is a highly organized electronic filing system for data.
 * It is **faster**, **safer**, and **better for teamwork** than simple files.
 * Apps like Instagram and LeetCode use databases to serve information instantly.

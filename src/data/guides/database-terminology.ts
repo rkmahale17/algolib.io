@@ -1,7 +1,7 @@
 export const content = `
-# Database Terminology: The Yearbook Spreadsheet! 📊
+# Database Terminology: The Yearbook Spreadsheet! 
 
-## 📊 Introduction: The High School Yearbook
+##  Introduction: The High School Yearbook
 
 Imagine you are in charge of making the High School Yearbook. To keep track of all the students, teachers, and club members, you create a giant spreadsheet document on your computer.
 
@@ -16,7 +16,7 @@ Let's look at how your spreadsheet matches up with standard database terms:
 
 ---
 
-## 🗄️ Core Database Terms Explained
+## ️ Core Database Terms Explained
 
 Let's examine these terms closely:
 
@@ -45,7 +45,7 @@ A **Primary Key** is the most important concept in database design! It is a colu
 
 ---
 
-## 💻 SQL in Action: Creating a Schema
+##  SQL in Action: Creating a Schema
 
 Here is the SQL query we write to set up our school database. Watch how we define our **Table**, **Columns**, **Data Types**, and **Primary Key**:
 
@@ -70,7 +70,7 @@ VALUES (102, 'Jack', 'Jones', 9, 'Tacos');
 
 ---
 
-## 💻 Complete Code Implementations: Connecting Terminology
+##  Complete Code Implementations: Connecting Terminology
 
 Let's see how we run code in multiple languages to build this schema and read columns/rows.
 
@@ -250,7 +250,7 @@ function manageSchoolDatabase() {
 
 ---
 
-## 🚫 Common Mistakes
+##  Common Mistakes
 
 1. **Forgetting a Primary Key:** Never build a table without a Primary Key! Without it, you cannot reliably update or delete a single row if two students happen to have the exact same name.
 2. **Confusing Rows and Columns:** Remember: **C**olumns go up and down (define *what* type of data we store, like "Age"). **R**ows go left to right (represent a *single student's card*, like "Jack, Age 9").
@@ -258,7 +258,7 @@ function manageSchoolDatabase() {
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Database:** The entire digital storage unit.
 * **Table:** The specific grid category list (like "Students").
 * **Column:** The vertical category label and type rules.

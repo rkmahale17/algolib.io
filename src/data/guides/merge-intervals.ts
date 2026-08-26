@@ -1,7 +1,7 @@
 export const content = `
 # Merge Intervals: The Art of Combining Overlaps!
 
-## 🚂 Introduction: The Colorful Train Tracks
+##  Introduction: The Colorful Train Tracks
 
 Imagine you are a seven-year-old playing with your favorite set of toy trains. You have a massive, long train track stretching all the way across your living room floor. You and your friends decide to decorate the track by placing colorful stickers on different sections. 
 
@@ -15,7 +15,7 @@ This exact situation happens in computer programming all the time, and the cleve
 
 ---
 
-## 🤔 What Exactly IS an Interval?
+##  What Exactly IS an Interval?
 
 Before we dive into the magic of merging, we need to understand what an "interval" is. In simple terms, an interval is just a chunk of time or space that has a specific **start** and a specific **end**. 
 
@@ -33,7 +33,7 @@ We use intervals to represent all sorts of real-world data:
 
 ---
 
-## 🦸 Why Do We Need To Merge Them?
+##  Why Do We Need To Merge Them?
 
 Let's go back to your daily schedule. You want to watch cartoons from 3:00 to 4:00, but you also scheduled homework from 3:30 to 5:00. These two activities overlap! If your mom asks you, "During what continuous block of time are you busy this afternoon?", you wouldn't say "I'm busy from 3 to 4, and also from 3:30 to 5." That sounds confusing!
 
@@ -45,7 +45,7 @@ If we tried to use simple, naive loops to check every single interval against ev
 
 ---
 
-## ✨ The Two Magic Steps of Merge Intervals
+##  The Two Magic Steps of Merge Intervals
 
 The Merge Intervals algorithm is brilliant because it relies on two very simple, logical steps. If you follow these two steps, you can solve almost any interval problem!
 
@@ -70,7 +70,7 @@ We keep doing this until we reach the end of the line. And just like that, we ha
 
 ---
 
-## 🔍 A Detailed Step-by-Step Example
+##  A Detailed Step-by-Step Example
 
 Let's watch the algorithm in action. Imagine we are given this messy, unsorted list of intervals: 
 \`[[1, 3], [8, 10], [2, 6], [15, 18]]\`
@@ -100,7 +100,7 @@ Wow! It worked perfectly, and we only had to walk through the list one single ti
 
 ---
 
-## 🧩 Problem 1: Merge Intervals (The Classic Template)
+##  Problem 1: Merge Intervals (The Classic Template)
 
 This is the most famous interval problem, and the exact implementation of the steps we just discussed. Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
 
@@ -254,7 +254,7 @@ function merge(intervals: number[][]): number[][] {
 
 ---
 
-## 🧩 Problem 2: Insert Interval (The Three-Phase Approach)
+##  Problem 2: Insert Interval (The Three-Phase Approach)
 
 What if you already have a perfectly sorted, non-overlapping list of intervals, and you just want to add a *single new interval* into the mix? 
 
@@ -423,7 +423,7 @@ function insert(intervals: number[][], newInterval: number[]): number[][] {
 
 ---
 
-## 🚫 Common Mistakes (The Sorting Trap)
+##  Common Mistakes (The Sorting Trap)
 
 The absolute most common mistake people make when trying to solve Merge Intervals problems is **forgetting to sort the input data**. 
 
@@ -435,7 +435,7 @@ Another tricky mistake is sorting by the *end* time instead of the *start* time.
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Intervals** represent a range with a start and an end.
 * **The Merge Intervals Pattern** is the ultimate tool for consolidating overlapping times, schedules, and ranges.
 * The golden two steps: **Sort by start time**, then iterate and merge by checking if the next start is less than or equal to the current end.
@@ -443,7 +443,7 @@ Another tricky mistake is sorting by the *end* time instead of the *start* time.
 
 ---
 
-## 🎮 Practice Problems & Website Verifications
+##  Practice Problems & Website Verifications
 
 Ready to test your interval merging skills? Try tackling these problems:
 * [Merge Intervals](/problem/merge-intervals) — The fundamental template. Master this first!

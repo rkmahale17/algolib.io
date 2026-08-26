@@ -1,11 +1,11 @@
 export const content = `
-# Types of Databases: The Binder vs. The Sticky Notes! 🗂️
+# Types of Databases: The Binder vs. The Sticky Notes! ️
 
-## 🗂️ Introduction: The Two Ways to Organize Recipes
+## ️ Introduction: The Two Ways to Organize Recipes
 
 Imagine you want to save your favorite cooking recipes. There are two different ways you could do this:
 
-### Option A: The Neat Recipe Binder 📖
+### Option A: The Neat Recipe Binder 
 You buy a binder with printed pages. Every page has the exact same layout:
 * A box for the **Recipe Name**
 * A list for **Ingredients**
@@ -15,7 +15,7 @@ If you try to write a recipe, you **must** follow the boxes. If you want to add 
 
 This neat binder is like a **Relational Database** (often called a **SQL Database**)!
 
-### Option B: The Sticky Note Wall 📝
+### Option B: The Sticky Note Wall 
 You have a blank wall and a pack of sticky notes. You write recipes on any note you find.
 * On one note, you write: *"Chocolate Cookies: Flour, Sugar, Bake at 350°F."*
 * On another note, you write: *"Spaghetti: Pasta, Tomatoes, my Grandma's secret tip: add sugar! Also, play jazz music."*
@@ -26,7 +26,7 @@ This sticky note wall is like a **Non-Relational Database** (often called a **No
 
 ---
 
-## 🏛️ Relational Databases (SQL): The Organized Binder
+## ️ Relational Databases (SQL): The Organized Binder
 
 Relational databases are the most popular kind. They organize data into grids called **Tables** (like a spreadsheet with columns and rows).
 
@@ -39,7 +39,7 @@ Relational databases are the most popular kind. They organize data into grids ca
 
 ---
 
-## 🚀 NoSQL Databases: The Flexible Sticky Notes
+##  NoSQL Databases: The Flexible Sticky Notes
 
 NoSQL databases don't use grids or tables. They can store data in different ways, but the most common way is using **Documents** (which look like JSON folders).
 
@@ -52,11 +52,11 @@ NoSQL databases don't use grids or tables. They can store data in different ways
 
 ---
 
-## 🆚 SQL vs. NoSQL: The Ultimate Comparison
+##  SQL vs. NoSQL: The Ultimate Comparison
 
 Let's look at how they match up:
 
-| Feature | 📖 SQL (Relational) | 📝 NoSQL (Non-Relational) |
+| Feature |  SQL (Relational) |  NoSQL (Non-Relational) |
 | :--- | :--- | :--- |
 | **Data Format** | Tables with rows and columns. | JSON documents, Key-Value pairs, or Graphs. |
 | **Rules (Schema)**| Rigid. Changing columns requires modifying the whole table. | Dynamic. Every record can have different keys. |
@@ -66,7 +66,7 @@ Let's look at how they match up:
 
 ---
 
-## 🎯 When to Use Which?
+##  When to Use Which?
 
 ### Use SQL (Relational) when:
 1. **You are dealing with money:** If you are building a banking app, you need absolute accuracy. You can't have a balance transfer partially complete. SQL databases ensure transactions are 100% complete or rolled back.
@@ -78,7 +78,7 @@ Let's look at how they match up:
 
 ---
 
-## 💻 Coding Examples: SQL vs. NoSQL Data Models
+##  Coding Examples: SQL vs. NoSQL Data Models
 
 Let's see how we represent a user profile with their phone numbers in SQL (tables) vs. NoSQL (JSON document).
 
@@ -280,7 +280,7 @@ function getNoSqlUserPhones(userDoc: UserDocument): string[] {
 
 ---
 
-## 🚫 Common Mistakes
+##  Common Mistakes
 
 1. **Forcing SQL into NoSQL:** Don't use a NoSQL database and then try to build lots of "links" between different documents in your code. That will make your app super slow! If you need links, use a SQL database.
 2. **Forgetting Scale Limits:** Don't think SQL databases can't handle big websites. Sites like Wikipedia and Instagram use SQL databases for massive workloads. Use NoSQL when your write speeds or flexible structures truly require it.
@@ -288,7 +288,7 @@ function getNoSqlUserPhones(userDoc: UserDocument): string[] {
 
 ---
 
-## 📚 Summary
+##  Summary
 * **SQL Databases** are like organized binders (neat tables, rigid structure, perfect for links/connected data).
 * **NoSQL Databases** are like sticky note boards (flexible, no schema rules, perfect for speed and scale).
 * Choose **SQL** for banking, user logins, and linked inventories.
