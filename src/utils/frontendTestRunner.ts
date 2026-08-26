@@ -99,9 +99,6 @@ export function generateFrontendTestRunner(options: FrontendTestRunnerOptions): 
   const tsDeclarations = language === 'typescript' ? `
 // --- TS Declarations ---
 declare var process: any;
-declare var console: any;
-declare var setTimeout: any;
-declare var Promise: any;
 // -----------------------
 ` : '';
 
