@@ -151,6 +151,8 @@ ${finalUserCode}
                            .replace(/arrayReduce\s*\(\s*callbackFn\s*,\s*array\s*\)/g, 'array.myReduce(callbackFn)')
                            .replace(/arrayReduce/g, 'array.myReduce');
     }
+    testCode = testCode.replace(/assert\s*\((.+?)\s*===\s*(.+?)\)\s*(;|$)/g, 'assertEquals($1, $2);');
+    testCode = testCode.replace(/assert\s*\(\s*deepEqual\s*\((.+?),\s*(.+?)\)\s*\)\s*(;|$)/g, 'assertEquals($1, $2);');
 
     runnerCode += `
         // Test: ${tc.name}
@@ -232,6 +234,10 @@ declare global {
                      .replace(/arrayReduce\s*\(\s*callbackFn\s*,\s*array\s*\)/g, 'array.myReduce(callbackFn)')
                      .replace(/arrayReduce/g, 'array.myReduce');
     }
+    // Auto-fix assert(a === b) to assertEquals(a, b) for better error messages
+    tcCode = tcCode.replace(/assert\s*\((.+?)\s*===\s*(.+?)\)\s*(;|$)/g, 'assertEquals($1, $2);');
+    // Auto-fix assert(deepEqual(a, b)) to assertEquals(a, b)
+    tcCode = tcCode.replace(/assert\s*\(\s*deepEqual\s*\((.+?),\s*(.+?)\)\s*\)\s*(;|$)/g, 'assertEquals($1, $2);');
     return { ...tc, testCode: tcCode };
   });
 
