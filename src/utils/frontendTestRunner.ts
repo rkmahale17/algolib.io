@@ -192,3 +192,123 @@ export function generateFrontendSubmissionRunner(options: FrontendTestRunnerOpti
     testCases: submissionTestCases.length > 0 ? submissionTestCases : options.testCases
   });
 }
+
+export async function executeFrontendLocally(options: FrontendTestRunnerOptions): Promise<any> {
+  const { userCode, testCases, language } = options;
+  
+  return new Promise((resolve, reject) => {
+    // 1. Build the Worker script string
+    const workerScript = `
+self.onmessage = async function(e) {
+  const { userCode, testCases, language, testHelpers } = e.data;
+  let codeToRun = userCode;
+  
+  if (language === 'typescript') {
+    if (codeToRun.includes('myReduce') && !codeToRun.includes('interface Array')) {
+      codeToRun = \`
+declare global {
+  interface Array<T> {
+    myReduce<U>(callbackFn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
+  }
+}
+\` + codeToRun;
+    }
+    
+    try {
+      importScripts('https://unpkg.com/@babel/standalone/babel.min.js');
+      // Strip types
+      codeToRun = Babel.transform(codeToRun, { filename: 'script.ts', presets: ['typescript'] }).code;
+    } catch (err) {
+      self.postMessage({ type: 'error', error: 'Compilation Error: ' + err.message });
+      return;
+    }
+  }
+
+  // Auto-fix arrayReduce in test cases
+  const sanitizedTestCases = testCases.map(tc => {
+    let tcCode = tc.testCode || '';
+    if (tcCode.includes('arrayReduce')) {
+      tcCode = tcCode.replace(/arrayReduce\s*\(\s*callbackFn\s*,\s*initialValue\s*,\s*array\s*\)/g, 'array.myReduce(callbackFn, initialValue)')
+                     .replace(/arrayReduce\s*\(\s*callbackFn\s*,\s*array\s*\)/g, 'array.myReduce(callbackFn)')
+                     .replace(/arrayReduce/g, 'array.myReduce');
+    }
+    return { ...tc, testCode: tcCode };
+  });
+
+  try {
+    const runAsync = new Function(\`
+      return (async () => {
+        \${testHelpers}
+        \${codeToRun}
+
+        const __testResults = [];
+        \${sanitizedTestCases.map((tc, idx) => \`
+          try {
+            await (async () => {
+              \${tc.testCode}
+            })();
+            __testResults.push({ name: \${JSON.stringify(tc.name)}, status: 'pass', passed: true, error: null });
+          } catch (e) {
+            __testResults.push({ name: \${JSON.stringify(tc.name)}, status: 'fail', passed: false, error: e.message || String(e) });
+          }\`
+        ).join('\\n')}
+        return __testResults;
+      })();
+    \`);
+
+    const __testResults = await runAsync();
+    self.postMessage({ type: 'success', results: __testResults });
+  } catch (err) {
+    self.postMessage({ type: 'error', error: 'Runtime Error: ' + (err.message || String(err)) });
+  }
+};
+`;
+
+    // 2. Create blob and instantiate Worker
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    const workerUrl = URL.createObjectURL(blob);
+    const worker = new Worker(workerUrl);
+
+    let isDone = false;
+    
+    // 3. Setup timeout (5 seconds)
+    const timer = setTimeout(() => {
+      if (!isDone) {
+        worker.terminate();
+        URL.revokeObjectURL(workerUrl);
+        reject(new Error('Execution Timeout: Code ran longer than 5 seconds. Check for infinite loops.'));
+      }
+    }, 5000);
+
+    // 4. Listen for results
+    worker.onmessage = (e) => {
+      isDone = true;
+      clearTimeout(timer);
+      worker.terminate();
+      URL.revokeObjectURL(workerUrl);
+      
+      const { type, results, error } = e.data;
+      if (type === 'error') {
+        reject(new Error(error));
+      } else {
+        resolve(results);
+      }
+    };
+
+    worker.onerror = (e) => {
+      isDone = true;
+      clearTimeout(timer);
+      worker.terminate();
+      URL.revokeObjectURL(workerUrl);
+      reject(new Error('Worker Error: ' + e.message));
+    };
+
+    // 5. Send payload
+    worker.postMessage({
+      userCode,
+      testCases,
+      language,
+      testHelpers: TEST_HELPERS
+    });
+  });
+}
