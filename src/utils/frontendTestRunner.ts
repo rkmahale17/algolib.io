@@ -102,6 +102,18 @@ declare var process: any;
 // -----------------------
 ` : '';
 
+  if (language === 'typescript') {
+    if (userCode.includes('myReduce') && !userCode.includes('interface Array')) {
+      userCode = `
+declare global {
+  interface Array<T> {
+    myReduce<U>(callbackFn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
+  }
+}
+` + userCode;
+    }
+  }
+
   let runnerCode = `
 // ==================== TEST HELPERS ====================
 ${tsDeclarations}
@@ -131,11 +143,19 @@ ${userCode}
 `;
 
   testCases.forEach((tc, index) => {
+    // Auto-fix arrayReduce test cases for frontend problems
+    let testCode = tc.testCode || '';
+    if (testCode.includes('arrayReduce')) {
+        testCode = testCode.replace(/arrayReduce\s*\(\s*callbackFn\s*,\s*initialValue\s*,\s*array\s*\)/g, 'array.myReduce(callbackFn, initialValue)')
+                           .replace(/arrayReduce\s*\(\s*callbackFn\s*,\s*array\s*\)/g, 'array.myReduce(callbackFn)')
+                           .replace(/arrayReduce/g, 'array.myReduce');
+    }
+
     runnerCode += `
         // Test: ${tc.name}
         try {
           await (async () => {
-            ${tc.testCode}
+            ${testCode}
           })();
           results.push({ name: ${JSON.stringify(tc.name)}, status: 'pass', passed: true });
           passedCount++;
