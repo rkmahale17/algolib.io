@@ -685,6 +685,7 @@ export function AlgorithmFormBuilder({
                           <SelectContent>
                             <SelectItem value="dsa">DSA</SelectItem>
                             <SelectItem value="sql">SQL / Database</SelectItem>
+                            <SelectItem value="frontend">Frontend / JavaScript</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -700,6 +701,15 @@ export function AlgorithmFormBuilder({
                             }
                             placeholder="CREATE TABLE ...&#10;INSERT INTO ..."
                           />
+                        </div>
+                      )}
+
+                      {formData.problemType === 'frontend' && (
+                        <div className="space-y-2">
+                          <Label>Frontend Test Info</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Frontend questions use unit test assertions in test_cases. Each test case should have a `name` and `testCode` field. Languages are restricted to JavaScript and TypeScript.
+                          </p>
                         </div>
                       )}
 
@@ -856,6 +866,7 @@ export function AlgorithmFormBuilder({
                   <TestCaseEditor
                     testCases={formData.test_cases}
                     inputSchema={formData.input_schema}
+                    problemType={formData.problemType}
                     onChange={(test_cases) =>
                       setFormData({ ...formData, test_cases })
                     }
