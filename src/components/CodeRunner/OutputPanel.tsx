@@ -452,22 +452,33 @@ export const OutputPanel = React.memo(({
 
               <div className="flex-1 min-h-0">
                 <ScrollArea className="h-full" type="always">
-                  {allTestCases.filter(tc => !tc.isSubmission).map((tc) => (
+                  {allTestCases.filter(tc => !tc.isSubmission).map((tc) => {
+                    const isFrontendProblem = algorithmMeta?.problemType === 'frontend' || algorithmMeta?.problem_type === 'frontend';
+                    return (
                     <TabsContent key={tc.id} value={`case-${tc.id}`} className="h-full m-0 p-4">
                       <div className="relative">
-                        <TestCaseEditor
-                          testCase={tc}
-                          inputSchema={inputSchema}
-                          onSave={(updated) => onUpdateTestCase(tc.id, updated)}
-                          onCancel={() => onCancelEdit()}
-                          isEditing={editingTestCaseId === tc.id}
-                          onEdit={() => onEditTestCase(tc.id)}
-                          canEdit={tc.isCustom}
-                          controls={algorithmMeta?.controls || controls}
-                        />
+                        {isFrontendProblem ? (
+                          <div className="space-y-4">
+                            <div className="text-sm font-medium text-muted-foreground">{tc.name || tc.description || `Case ${tc.id}`}</div>
+                            <div className="p-3 bg-muted/30 border rounded-md font-mono text-xs overflow-x-auto whitespace-pre">
+                              {tc.testCode || tc.test_code || '// No test code available'}
+                            </div>
+                          </div>
+                        ) : (
+                          <TestCaseEditor
+                            testCase={tc}
+                            inputSchema={inputSchema || []}
+                            onSave={(updated) => onUpdateTestCase(tc.id, updated)}
+                            onCancel={() => onCancelEdit()}
+                            isEditing={editingTestCaseId === tc.id}
+                            onEdit={() => onEditTestCase(tc.id)}
+                            canEdit={tc.isCustom}
+                            controls={algorithmMeta?.controls || controls}
+                          />
+                        )}
                       </div>
                     </TabsContent>
-                  ))}
+                  )})}
                 </ScrollArea>
               </div>
             </Tabs>
@@ -578,10 +589,47 @@ export const OutputPanel = React.memo(({
                     </div>
                     <ScrollArea className="h-full" type="always">
                       <div className="p-4">
-                        {output.testResults.map((result: any, index: number) => (
-                          <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
-                            {/* Input */}
-                            <div className="space-y-2">
+                        {output.testResults.map((result: any, index: number) => {
+                          const isFrontendProblem = algorithmMeta?.problemType === 'frontend' || algorithmMeta?.problem_type === 'frontend';
+
+                          if (isFrontendProblem) {
+                            return (
+                              <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
+                                <div className="space-y-4">
+                                  <div className="flex flex-col gap-1">
+                                    <h3 className="font-medium text-base text-foreground break-words">{result.name || `Test Case ${index + 1}`}</h3>
+                                    <div className="flex items-center gap-2 mt-2">
+                                      {result.status === 'pass' ? (
+                                        <span className="flex items-center gap-1.5 text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400 px-2.5 py-1 rounded-full border border-green-500/20">
+                                          <CheckCircle2 className="w-3.5 h-3.5" />
+                                          Passed
+                                        </span>
+                                      ) : (
+                                        <span className="flex items-center gap-1.5 text-xs font-medium bg-red-500/10 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-full border border-red-500/20">
+                                          <XCircle className="w-3.5 h-3.5" />
+                                          Failed
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  
+                                  {result.status !== 'pass' && result.error && (
+                                    <div className="space-y-2">
+                                      <div className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Error Details</div>
+                                      <div className="p-3 rounded-md bg-red-500/5 border border-red-500/10 font-mono text-[13px] text-red-600 dark:text-red-400 whitespace-pre-wrap break-words">
+                                        {result.error}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </TabsContent>
+                            );
+                          }
+
+                          return (
+                            <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
+                              {/* Input */}
+                              <div className="space-y-2">
                               <div className="text-xs font-semibold text-muted-foreground  tracking-wider">Input</div>
                               <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                 {(() => {
@@ -859,7 +907,8 @@ export const OutputPanel = React.memo(({
                               </div>
                             )}
                           </TabsContent>
-                        ))}
+                          );
+                        })}
                       </div>
                     </ScrollArea>
                   </Tabs>
