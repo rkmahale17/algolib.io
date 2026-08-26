@@ -198,35 +198,7 @@ export function generateFrontendSubmissionRunner(options: FrontendTestRunnerOpti
 export async function executeFrontendLocally(options: FrontendTestRunnerOptions): Promise<any> {
   const { userCode, testCases, language } = options;
   
-  return new Promise((resolve, reject) => {
-    // 1. Build the Worker script string
-    const workerScript = `
-self.onmessage = async function(e) {
-  const { userCode, testCases, language, testHelpers } = e.data;
-  let codeToRun = userCode;
-  
-  if (language === 'typescript') {
-    if (codeToRun.includes('myReduce') && !codeToRun.includes('interface Array')) {
-      codeToRun = \`
-declare global {
-  interface Array<T> {
-    myReduce<U>(callbackFn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
-  }
-}
-\` + codeToRun;
-    }
-    
-    try {
-      importScripts('https://unpkg.com/@babel/standalone/babel.min.js');
-      // Strip types
-      codeToRun = Babel.transform(codeToRun, { filename: 'script.ts', presets: ['typescript'] }).code;
-    } catch (err) {
-      self.postMessage({ type: 'error', error: 'Compilation Error: ' + err.message });
-      return;
-    }
-  }
-
-  // Auto-fix arrayReduce in test cases
+  // Auto-fix arrayReduce and assert in test cases BEFORE sending to worker
   const sanitizedTestCases = testCases.map(tc => {
     let tcCode = tc.testCode || '';
     if (tcCode.includes('arrayReduce')) {
@@ -241,27 +213,54 @@ declare global {
     return { ...tc, testCode: tcCode };
   });
 
+  return new Promise((resolve, reject) => {
+    // 1. Build the Worker script string
+    const workerScript = `
+self.onmessage = async function(e) {
+  const { userCode, testCases, language, testHelpers } = e.data;
+  let codeToRun = userCode;
+  
+  if (language === 'typescript') {
+    if (codeToRun.includes('myReduce') && !codeToRun.includes('interface Array')) {
+      codeToRun = \\\`
+declare global {
+  interface Array<T> {
+    myReduce<U>(callbackFn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
+  }
+}
+\\\` + codeToRun;
+    }
+    
+    try {
+      importScripts('https://unpkg.com/@babel/standalone/babel.min.js');
+      // Strip types
+      codeToRun = Babel.transform(codeToRun, { filename: 'script.ts', presets: ['typescript'] }).code;
+    } catch (err) {
+      self.postMessage({ type: 'error', error: 'Compilation Error: ' + err.message });
+      return;
+    }
+  }
+
   try {
-    const runAsync = new Function(\`
-      return (async () => {
-        \${testHelpers}
-        \${codeToRun}
+    let functionBody = "return (async () => {\\n";
+    functionBody += testHelpers + "\\n";
+    functionBody += codeToRun + "\\n";
+    functionBody += "const __testResults = [];\\n";
+    
+    testCases.forEach((tc, idx) => {
+      functionBody += "try {\\n";
+      functionBody += "  await (async () => {\\n";
+      functionBody += "    " + tc.testCode + "\\n";
+      functionBody += "  })();\\n";
+      functionBody += "  __testResults.push({ name: " + JSON.stringify(tc.name) + ", testCode: " + JSON.stringify(tc.testCode) + ", status: 'pass', passed: true, error: null });\\n";
+      functionBody += "} catch (e) {\\n";
+      functionBody += "  __testResults.push({ name: " + JSON.stringify(tc.name) + ", testCode: " + JSON.stringify(tc.testCode) + ", status: 'fail', passed: false, error: e.stack || e.message || String(e) });\\n";
+      functionBody += "}\\n";
+    });
+    
+    functionBody += "return __testResults;\\n})();";
 
-        const __testResults = [];
-        \${sanitizedTestCases.map((tc, idx) => \`
-          try {
-            await (async () => {
-              \${tc.testCode}
-            })();
-            __testResults.push({ name: \${JSON.stringify(tc.name)}, testCode: \${JSON.stringify(tc.testCode)}, status: 'pass', passed: true, error: null });
-          } catch (e) {
-            __testResults.push({ name: \${JSON.stringify(tc.name)}, testCode: \${JSON.stringify(tc.testCode)}, status: 'fail', passed: false, error: e.stack || e.message || String(e) });
-          }\`
-        ).join('\\n')}
-        return __testResults;
-      })();
-    \`);
-
+    const runAsync = new Function(functionBody);
     const __testResults = await runAsync();
     self.postMessage({ type: 'success', results: __testResults });
   } catch (err) {
@@ -312,7 +311,7 @@ declare global {
     // 5. Send payload
     worker.postMessage({
       userCode,
-      testCases,
+      testCases: sanitizedTestCases,
       language,
       testHelpers: TEST_HELPERS
     });
