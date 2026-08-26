@@ -102,15 +102,16 @@ declare var process: any;
 // -----------------------
 ` : '';
 
+  let finalUserCode = userCode;
   if (language === 'typescript') {
-    if (userCode.includes('myReduce') && !userCode.includes('interface Array')) {
-      userCode = `
+    if (finalUserCode.includes('myReduce') && !finalUserCode.includes('interface Array')) {
+      finalUserCode = `
 declare global {
   interface Array<T> {
     myReduce<U>(callbackFn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
   }
 }
-` + userCode;
+` + finalUserCode;
     }
   }
 
@@ -120,7 +121,7 @@ ${tsDeclarations}
 ${TEST_HELPERS}
 
 // ==================== USER CODE ====================
-${userCode}
+${finalUserCode}
 
 // ==================== TEST RUNNER ====================
 (async function runTests() {
