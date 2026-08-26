@@ -247,9 +247,9 @@ declare global {
             await (async () => {
               \${tc.testCode}
             })();
-            __testResults.push({ name: \${JSON.stringify(tc.name)}, status: 'pass', passed: true, error: null });
+            __testResults.push({ name: \${JSON.stringify(tc.name)}, testCode: \${JSON.stringify(tc.testCode)}, status: 'pass', passed: true, error: null });
           } catch (e) {
-            __testResults.push({ name: \${JSON.stringify(tc.name)}, status: 'fail', passed: false, error: e.message || String(e) });
+            __testResults.push({ name: \${JSON.stringify(tc.name)}, testCode: \${JSON.stringify(tc.testCode)}, status: 'fail', passed: false, error: e.stack || e.message || String(e) });
           }\`
         ).join('\\n')}
         return __testResults;

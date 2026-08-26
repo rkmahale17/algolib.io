@@ -396,6 +396,68 @@ export const useCodeExecution = ({
                     setIsSubmitting(false);
                     
                     return { result: finalResult, allPassed, execTime: totalTime };
+                } else if (algo.problemType === 'frontend' || algo.problem_type === 'frontend') {
+                    const { executeFrontendLocally } = await import('@/utils/frontendTestRunner');
+                    const frontendTestCases = (algo.test_cases || []).map((tc: any) => ({
+                        name: tc.name || tc.description || 'Test',
+                        testCode: tc.testCode || tc.test_code || '',
+                        isSubmission: tc.isSubmission || false
+                    }));
+
+                    const casesToUse = isSubmission ? frontendTestCases : frontendTestCases.filter((tc: any) => !tc.isSubmission);
+                    
+                    const startTime = performance.now();
+                    let testCaseResults: any[] = [];
+                    let compileError = '';
+                    
+                    try {
+                        const results = await executeFrontendLocally({
+                            userCode: code,
+                            testCases: casesToUse.length > 0 ? casesToUse : frontendTestCases,
+                            language: language as 'javascript' | 'typescript'
+                        });
+                        
+                        testCaseResults = results.map((r: any) => ({
+                            status: r.passed ? 'pass' : 'fail',
+                            input: r.name,
+                            testCode: r.testCode,
+                            expected: 'Pass',
+                            actual: r.passed ? 'Pass' : 'Fail',
+                            error: r.error || null,
+                            time: 0,
+                            logs: []
+                        }));
+                    } catch (e: any) {
+                        compileError = e.message;
+                        testCaseResults = [{
+                            status: 'fail',
+                            input: 'Execution',
+                            expected: 'Pass',
+                            actual: 'Error',
+                            error: compileError,
+                            time: 0,
+                            logs: []
+                        }];
+                    }
+
+                    const execTime = Math.round(performance.now() - startTime);
+                    const allPassed = !compileError && testCaseResults.every((r: any) => r.status === 'pass');
+                    const finalResult = { testResults: testCaseResults, status: { id: allPassed ? 3 : 4 }, compile_output: compileError || null };
+                    
+                    setOutput(finalResult);
+                    setExecutionTime(execTime);
+                    setMemoryUsage(0);
+                    
+                    if (!isSubmission) {
+                        setLastRunSuccess(allPassed);
+                        setActiveTab("result");
+                        if (allPassed) toast.success("All test cases passed!");
+                        else toast.warning("Code ran, but some test cases failed.");
+                    }
+                    
+                    setIsLoading(false);
+                    setIsSubmitting(false);
+                    return { result: finalResult, allPassed, execTime };
                 } else {
                     const metadata = typeof algo.metadata === 'string'
                         ? JSON.parse(algo.metadata)

@@ -612,11 +612,19 @@ export const OutputPanel = React.memo(({
                                       )}
                                     </div>
                                   </div>
-                                  
+                                  {result.testCode && (
+                                    <div className="space-y-2">
+                                      <div className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Test Code</div>
+                                      <div className="p-3 rounded-md bg-muted/30 border font-mono text-[13px] text-foreground whitespace-pre-wrap break-words">
+                                        {result.testCode}
+                                      </div>
+                                    </div>
+                                  )}
+
                                   {result.status !== 'pass' && result.error && (
                                     <div className="space-y-2">
                                       <div className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Error Details</div>
-                                      <div className="p-3 rounded-md bg-red-500/5 border border-red-500/10 font-mono text-[13px] text-red-600 dark:text-red-400 whitespace-pre-wrap break-words">
+                                      <div className="p-3 rounded-md bg-red-500/5 border border-red-500/10 font-mono text-[13px] text-red-600 dark:text-red-400 whitespace-pre-wrap break-words overflow-x-auto">
                                         {result.error}
                                       </div>
                                     </div>
