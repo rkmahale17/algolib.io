@@ -12,6 +12,7 @@ import {
   Rocket,
   Target,
   Terminal,
+  LayoutTemplate,
 } from "lucide-react";
 import { guidesData } from "@/data/guidesData";
 
@@ -60,7 +61,7 @@ export const DATABASE_ITEMS = [
 
 // ─── Frontend nav items ───────────────────────────────────────────────────────
 export const FRONTEND_ITEMS = [
-  { id: "frontend-questions", title: "Frontend Questions", icon: Terminal, url: "/frontend/questions" },
+  { id: "frontend-questions", title: "Blind 75", icon: LayoutTemplate, url: "/frontend/questions" },
 ] as const;
 
 // ─── Guide nav groups (derived from guidesData) ───────────────────────────────

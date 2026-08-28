@@ -22,6 +22,57 @@ import { content as databaseTerminologyContent } from "./guides/database-termino
 import { content as fastSlowPointersContent } from "./guides/fast-slow-pointers";
 import { content as greedyContent } from "./guides/greedy";
 import { content as bfsDfsContent } from "./guides/bfs-dfs";
+import { content as relationalDatabasesRdbmsContent } from "./guides/relational-databases-rdbms";
+import { content as tablesRowsColumnsContent } from "./guides/tables-rows-columns";
+import { content as primaryKeysForeignKeysContent } from "./guides/primary-keys-foreign-keys";
+import { content as constraintsContent } from "./guides/constraints";
+import { content as normalizationContent } from "./guides/normalization";
+import { content as denormalizationContent } from "./guides/denormalization";
+import { content as databaseRelationshipsContent } from "./guides/database-relationships";
+import { content as erDiagramsContent } from "./guides/er-diagrams";
+import { content as indexesFundamentalsContent } from "./guides/indexes-fundamentals";
+import { content as sqlBasicsContent } from "./guides/sql-basics";
+import { content as selectFilteringContent } from "./guides/select-filtering";
+import { content as sortingLimitingContent } from "./guides/sorting-limiting";
+import { content as aggregateFunctionsContent } from "./guides/aggregate-functions";
+import { content as groupbyHavingContent } from "./guides/groupby-having";
+import { content as joinsContent } from "./guides/joins";
+import { content as subqueriesContent } from "./guides/subqueries";
+import { content as ctesContent } from "./guides/ctes";
+import { content as caseExpressionsContent } from "./guides/case-expressions";
+import { content as nullHandlingContent } from "./guides/null-handling";
+import { content as windowFunctionsContent } from "./guides/window-functions";
+import { content as rankingFunctionsContent } from "./guides/ranking-functions";
+import { content as runningTotalsMovingAggregatesContent } from "./guides/running-totals-moving-aggregates";
+import { content as setOperationsContent } from "./guides/set-operations";
+import { content as recursiveCtesContent } from "./guides/recursive-ctes";
+import { content as viewsContent } from "./guides/views";
+import { content as storedProceduresFunctionsContent } from "./guides/stored-procedures-functions";
+import { content as triggersContent } from "./guides/triggers";
+import { content as transactionsSqlContent } from "./guides/transactions-sql";
+import { content as sqlQueryOptimizationContent } from "./guides/sql-query-optimization";
+import { content as howDatabaseIndexesWorkContent } from "./guides/how-database-indexes-work";
+import { content as btreeBplusTreeIndexesContent } from "./guides/btree-bplus-tree-indexes";
+import { content as hashIndexesContent } from "./guides/hash-indexes";
+import { content as clusteredNonClusteredIndexesContent } from "./guides/clustered-non-clustered-indexes";
+import { content as queryExecutionPlansContent } from "./guides/query-execution-plans";
+import { content as databaseStoragePagesContent } from "./guides/database-storage-pages";
+import { content as bufferPoolCachingContent } from "./guides/buffer-pool-caching";
+import { content as concurrencyLockingContent } from "./guides/concurrency-locking";
+import { content as mvccContent } from "./guides/mvcc";
+import { content as acidPropertiesContent } from "./guides/acid-properties";
+import { content as transactionIsolationLevelsContent } from "./guides/transaction-isolation-levels";
+import { content as deadlocksContent } from "./guides/deadlocks";
+import { content as databaseReplicationContent } from "./guides/database-replication";
+import { content as readReplicasContent } from "./guides/read-replicas";
+import { content as databasePartitioningContent } from "./guides/database-partitioning";
+import { content as databaseShardingContent } from "./guides/database-sharding";
+import { content as capTheoremContent } from "./guides/cap-theorem";
+import { content as consistencyModelsContent } from "./guides/consistency-models";
+import { content as nosqlDatabasesContent } from "./guides/nosql-databases";
+import { content as databaseScalingHighAvailabilityContent } from "./guides/database-scaling-high-availability";
+
+
 
 export interface RelatedQuestion {
   id: string;
@@ -708,7 +759,683 @@ Here is an overview of Space Complexity, followed by the reference table of stan
         },
         content: databaseTerminologyContent,
         questions: []
+      },
+      {
+        slug: "relational-databases-rdbms",
+        title: "Relational Databases & RDBMS",
+        description: "An easy-to-understand introduction to RDBMS, tabular layouts, and database schemas.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: relationalDatabasesRdbmsContent,
+        questions: []
+      },
+      {
+        slug: "tables-rows-columns",
+        title: "Tables, Rows & Columns",
+        description: "Learn how data is organized in rows and columns inside a database table.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: tablesRowsColumnsContent,
+        questions: []
+      },
+      {
+        slug: "primary-keys-foreign-keys",
+        title: "Primary Keys & Foreign Keys",
+        description: "Understand how primary keys uniquely identify rows and foreign keys connect tables.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: primaryKeysForeignKeysContent,
+        questions: []
+      },
+      {
+        slug: "constraints",
+        title: "Constraints",
+        description: "Learn about rules like NOT NULL, UNIQUE, and CHECK constraints that keep data clean.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: constraintsContent,
+        questions: []
+      },
+      {
+        slug: "normalization",
+        title: "Normalization",
+        description: "Organize database tables to reduce redundancy and prevent update errors.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: normalizationContent,
+        questions: []
+      },
+      {
+        slug: "denormalization",
+        title: "Denormalization",
+        description: "Learn when and why to duplicate data to speed up database reads.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: denormalizationContent,
+        questions: []
+      },
+      {
+        slug: "database-relationships",
+        title: "Database Relationships",
+        description: "Explore 1:1, 1:N, and N:M table relationships and junction tables.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: databaseRelationshipsContent,
+        questions: []
+      },
+      {
+        slug: "er-diagrams",
+        title: "ER Diagrams",
+        description: "Create visual blueprints for your database schemas using Entities, Attributes, and Relations.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: erDiagramsContent,
+        questions: []
+      },
+      {
+        slug: "indexes-fundamentals",
+        title: "Indexes — Fundamentals",
+        description: "Speed up query searches using B-Tree index structures and analyze query plans.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: indexesFundamentalsContent,
+        questions: []
+      },
+      {
+        slug: "sql-basics",
+        title: "SQL Basics",
+        description: "Master the structure of SQL commands, including DDL (schema) and DML (data) sub-languages.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: sqlBasicsContent,
+        questions: []
+      },
+      {
+        slug: "select-filtering",
+        title: "SELECT & Filtering",
+        description: "Query and filter database rows using WHERE clauses and logical operators.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: selectFilteringContent,
+        questions: [
+          { id: "trips-and-users", name: "Trips and Users", difficulty: "Hard" }
+        ]
+      },
+      {
+        slug: "sorting-limiting",
+        title: "Sorting & Limiting Results",
+        description: "Sort rows using ORDER BY and paginate lists using LIMIT and OFFSET.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: sortingLimitingContent,
+        questions: [
+          { id: "second-highest-salary", name: "Second Highest Paid Employee", difficulty: "Easy" }
+        ]
+      },
+      {
+        slug: "aggregate-functions",
+        title: "Aggregate Functions",
+        description: "Summarize data rows using math helpers like COUNT, SUM, AVG, MIN, and MAX.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: aggregateFunctionsContent,
+        questions: [
+          { id: "game-play-analysis-i", name: "Game Play Analysis I", difficulty: "Easy" }
+        ]
+      },
+      {
+        slug: "groupby-having",
+        title: "GROUP BY & HAVING",
+        description: "Group records into summary categories and filter them using HAVING clauses.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: groupbyHavingContent,
+        questions: [
+          { id: "duplicate-emails", name: "Duplicate Emails", difficulty: "Easy" },
+          { id: "managers-with-at-least-5-direct-reports", name: "Managers with at Least Five Direct Reports", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "joins",
+        title: "JOINs",
+        description: "Merge data from multiple tables using INNER, LEFT, RIGHT, and FULL JOINs.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: joinsContent,
+        questions: [
+          { id: "combine-two-tables", name: "Combine Two Tables", difficulty: "Easy" },
+          { id: "employees-earning-more-than-their-managers", name: "Employees Earning More Than Their Managers", difficulty: "Easy" },
+          { id: "employee-bonus", name: "Employee Bonus", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "subqueries",
+        title: "Subqueries",
+        description: "Write nested queries inside other SQL statements to solve multi-step problems.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: subqueriesContent,
+        questions: [
+          { id: "nth-highest-salary", name: "Nth Highest Salary", difficulty: "Medium" },
+          { id: "second-highest-salary", name: "Second Highest Paid Employee", difficulty: "Easy" },
+          { id: "delete-duplicate-emails", name: "Delete Duplicate Emails", difficulty: "Easy" }
+        ]
+      },
+      {
+        slug: "ctes",
+        title: "Common Table Expressions (CTEs)",
+        description: "Simplify complex queries using WITH blocks and temporary named query results.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: ctesContent,
+        questions: [
+          { id: "nth-highest-salary", name: "Nth Highest Salary", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "case-expressions",
+        title: "CASE Expressions",
+        description: "Add if-then-else logical statements inside your SQL SELECT statements.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: caseExpressionsContent,
+        questions: [
+          { id: "trips-and-users", name: "Trips and Users", difficulty: "Hard" }
+        ]
+      },
+      {
+        slug: "null-handling",
+        title: "NULL Handling",
+        description: "Learn how to query, filter, and handle missing (NULL) values using COALESCE.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: nullHandlingContent,
+        questions: [
+          { id: "customers-who-never-order", name: "Customers Who Never Order", difficulty: "Easy" },
+          { id: "employee-bonus", name: "Employee Bonus", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "window-functions",
+        title: "Window Functions",
+        description: "Perform running math and aggregate calculations across rows without collapsing them.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: windowFunctionsContent,
+        questions: [
+          { id: "department-top-three-salaries", name: "Department Top Three Salaries", difficulty: "Easy" },
+          { id: "consecutive-numbers", name: "Consecutive Numbers", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "ranking-functions",
+        title: "Ranking Functions",
+        description: "Rank rows inside partitions using ROW_NUMBER, RANK, and DENSE_RANK.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: rankingFunctionsContent,
+        questions: [
+          { id: "rank-scores", name: "Rank Scores", difficulty: "Medium" },
+          { id: "department-top-three-salaries", name: "Department Top Three Salaries", difficulty: "Easy" }
+        ]
+      },
+      {
+        slug: "running-totals-moving-aggregates",
+        title: "Running Totals & Moving Aggregates",
+        description: "Calculate cumulative running sums and moving averages using window frame controls.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: runningTotalsMovingAggregatesContent,
+        questions: [
+          { id: "game-play-analysis-iv", name: "Game Play Analysis IV", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "set-operations",
+        title: "Set Operations — UNION, INTERSECT & EXCEPT",
+        description: "Stack query results vertically using UNION, INTERSECT, and EXCEPT.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: setOperationsContent,
+        questions: []
+      },
+      {
+        slug: "recursive-ctes",
+        title: "Recursive CTEs",
+        description: "Write loops in SQL to traverse organizational structures and count values dynamically.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: recursiveCtesContent,
+        questions: [
+          { id: "consecutive-numbers", name: "Consecutive Numbers", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "views",
+        title: "Views",
+        description: "Create secure, simplified virtual tables that save complex queries.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: viewsContent,
+        questions: [
+          { id: "department-highest-salary", name: "Department Highest Salary", difficulty: "Easy" }
+        ]
+      },
+      {
+        slug: "stored-procedures-functions",
+        title: "Stored Procedures & Functions",
+        description: "Automate complex workflows and execute PL/SQL calculations inside the database.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: storedProceduresFunctionsContent,
+        questions: [
+          { id: "nth-highest-salary", name: "Nth Highest Salary", difficulty: "Medium" }
+        ]
+      },
+      {
+        slug: "triggers",
+        title: "Triggers",
+        description: "Create automated action listeners that execute on table updates, inserts, or deletes.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: triggersContent,
+        questions: []
+      },
+      {
+        slug: "transactions-sql",
+        title: "Transactions in SQL",
+        description: "Enforce ACID safety to ensure queries commit fully or rollback on failure.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: transactionsSqlContent,
+        questions: []
+      },
+      {
+        slug: "sql-query-optimization",
+        title: "SQL Query Optimization",
+        description: "Tune queries, analyze query execution plans, and speed up databases.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: sqlQueryOptimizationContent,
+        questions: []
+      },
+      {
+        slug: "how-database-indexes-work",
+        title: "How Database Indexes Work",
+        description: "Explore the core fundamentals of index lookups, pointers, and table heap structures.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: howDatabaseIndexesWorkContent,
+        questions: []
+      },
+      {
+        slug: "btree-bplus-tree-indexes",
+        title: "B-Tree & B+ Tree Indexes",
+        description: "Understand the balanced tree data structures powering standard database indexes.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: btreeBplusTreeIndexesContent,
+        questions: []
+      },
+      {
+        slug: "hash-indexes",
+        title: "Hash Indexes",
+        description: "Scale exact-match query lookups to O(1) complexity using hash tables.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: hashIndexesContent,
+        questions: []
+      },
+      {
+        slug: "clustered-non-clustered-indexes",
+        title: "Clustered vs Non-Clustered Indexes",
+        description: "Compare index types that define disk layout against secondary maps.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: clusteredNonClusteredIndexesContent,
+        questions: []
+      },
+      {
+        slug: "query-execution-plans",
+        title: "Query Execution Plans",
+        description: "Read GPS route planning maps compiled by the query optimizer using EXPLAIN.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: queryExecutionPlansContent,
+        questions: []
+      },
+      {
+        slug: "database-storage-pages",
+        title: "Database Storage & Pages",
+        description: "Deep dive into 8KB physical storage pages, headers, slots, and data tuples.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: databaseStoragePagesContent,
+        questions: []
+      },
+      {
+        slug: "buffer-pool-caching",
+        title: "Buffer Pool & Caching",
+        description: "Cache active database pages in memory and evict clean pages using LRU.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: bufferPoolCachingContent,
+        questions: []
+      },
+      {
+        slug: "concurrency-locking",
+        title: "Concurrency & Locking",
+        description: "Manage reader/writer locks (S/X) and transaction boundaries safety.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: concurrencyLockingContent,
+        questions: []
+      },
+      {
+        slug: "mvcc",
+        title: "MVCC",
+        description: "Implement Multi-Version Concurrency Control to enable lock-free reads.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: mvccContent,
+        questions: []
+      },
+      {
+        slug: "acid-properties",
+        title: "ACID Properties",
+        description: "Enforce Atomicity, Consistency, Isolation, and Durability transactions safety.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: acidPropertiesContent,
+        questions: []
+      },
+      {
+        slug: "transaction-isolation-levels",
+        title: "Transaction Isolation Levels",
+        description: "Balance concurrency speeds against dirty, non-repeatable, and phantom reads.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: transactionIsolationLevelsContent,
+        questions: []
+      },
+      {
+        slug: "deadlocks",
+        title: "Deadlocks",
+        description: "Detect and resolve dependency cycles where transactions block each other.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: deadlocksContent,
+        questions: []
+      },
+      {
+        slug: "database-replication",
+        title: "Database Replication",
+        description: "Distribute copy logs to replica nodes synchronously or asynchronously.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: databaseReplicationContent,
+        questions: []
+      },
+      {
+        slug: "read-replicas",
+        title: "Read Replicas",
+        description: "Scale read-heavy database query loads using load-balanced copy servers.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: readReplicasContent,
+        questions: []
+      },
+      {
+        slug: "database-partitioning",
+        title: "Database Partitioning",
+        description: "Split massive tables horizontally or vertically to enable partition pruning.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: databasePartitioningContent,
+        questions: []
+      },
+      {
+        slug: "database-sharding",
+        title: "Database Sharding",
+        description: "Distribute database shards horizontally across independent physical servers.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: databaseShardingContent,
+        questions: []
+      },
+      {
+        slug: "cap-theorem",
+        title: "CAP Theorem",
+        description: "Analyze the trade-offs between Consistency, Availability, and Partition Tolerance.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: capTheoremContent,
+        questions: []
+      },
+      {
+        slug: "consistency-models",
+        title: "Consistency Models",
+        description: "Explore Strong, Eventual, and Causal data synchronization rules in distributed nodes.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: consistencyModelsContent,
+        questions: []
+      },
+      {
+        slug: "nosql-databases",
+        title: "NoSQL Databases",
+        description: "Map Key-Value, Document, Column-Family, and Graph non-relational database models.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: nosqlDatabasesContent,
+        questions: []
+      },
+      {
+        slug: "database-scaling-high-availability",
+        title: "Database Scaling & High Availability",
+        description: "Design high availability systems using automatic failovers, RTO, and RPO.",
+        category: "database",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: databaseScalingHighAvailabilityContent,
+        questions: []
       }
     ]
   }
 ];
+

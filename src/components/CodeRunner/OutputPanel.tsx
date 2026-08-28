@@ -547,6 +547,16 @@ export const OutputPanel = React.memo(({
                 </div>
               )}
 
+              {/* Global Stdout */}
+              {output.globalLogs && (
+                <div className="p-4 border-b shrink-0">
+                  <div className="text-xs font-semibold text-muted-foreground tracking-wider mb-2">Global Stdout</div>
+                  <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm whitespace-pre-wrap max-h-40 overflow-y-auto">
+                    {output.globalLogs}
+                  </div>
+                </div>
+              )}
+
               {/* Test Results */}
               {output.testResults && (
                 <div className="h-full flex flex-col min-h-0">
@@ -596,27 +606,17 @@ export const OutputPanel = React.memo(({
                             return (
                               <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
                                 <div className="space-y-4">
-                                  <div className="flex flex-col gap-1">
-                                    <h3 className="font-medium text-base text-foreground break-words">{result.name || `Test Case ${index + 1}`}</h3>
-                                    <div className="flex items-center gap-2 mt-2">
-                                      {result.status === 'pass' ? (
-                                        <span className="flex items-center gap-1.5 text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400 px-2.5 py-1 rounded-full border border-green-500/20">
-                                          <CheckCircle2 className="w-3.5 h-3.5" />
-                                          Passed
-                                        </span>
-                                      ) : (
-                                        <span className="flex items-center gap-1.5 text-xs font-medium bg-red-500/10 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-full border border-red-500/20">
-                                          <XCircle className="w-3.5 h-3.5" />
-                                          Failed
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
                                   {result.testCode && (
+                                    <div className="p-4 rounded-lg bg-muted/30 border font-mono text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+                                      {result.testCode}
+                                    </div>
+                                  )}
+
+                                  {result.logs && result.logs.length > 0 && (
                                     <div className="space-y-2">
-                                      <div className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Test Code</div>
-                                      <div className="p-3 rounded-md bg-muted/30 border font-mono text-[13px] text-foreground whitespace-pre-wrap break-words">
-                                        {result.testCode}
+                                      <div className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Stdout</div>
+                                      <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm whitespace-pre-wrap">
+                                        {Array.isArray(result.logs) ? result.logs.join('\n') : result.logs}
                                       </div>
                                     </div>
                                   )}

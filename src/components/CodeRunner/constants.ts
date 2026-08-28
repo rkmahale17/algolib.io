@@ -29,7 +29,19 @@ int main() {
     }
 }`,
     sql: `-- Write your SQLite query here
-SELECT * FROM table_name;`
+SELECT * FROM table_name;`,
+    javascript: `function solution() {
+  // Write your code here
+  console.log("Hello from JavaScript!");
+}
+
+solution();`,
+    c: `#include <stdio.h>
+
+int main() {
+    printf("Hello from C!\\n");
+    return 0;
+}`
 };
 
 export const LANGUAGE_IDS: Record<Language, number> = {
@@ -37,6 +49,8 @@ export const LANGUAGE_IDS: Record<Language, number> = {
     java: 91, // Java (OpenJDK 17.0.6)
     python: 109, // Python (3.13.2)
     typescript: 101, // TypeScript (5.6.2)
+    javascript: 93, // JavaScript (Node.js 20.x)
     sql: 82, // SQL (SQLite 3.27.2)
+    c: 104, // C (dummy to satisfy type, if needed, though C isn't in LanguageSelector)
 };
 

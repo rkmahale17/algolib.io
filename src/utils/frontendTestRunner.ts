@@ -102,7 +102,10 @@ declare var process: any;
 // -----------------------
 ` : '';
 
-  let finalUserCode = userCode;
+  let finalUserCode = userCode
+    .replace(/^\s*export\s+default\s+/gm, '')
+    .replace(/^\s*export\s+(function|class|const|let|var)\b/gm, '$1')
+    .replace(/^\s*export\s+\{[^}]*\}\s*;?/gm, '');
   if (language === 'typescript') {
     if (finalUserCode.includes('myReduce') && !finalUserCode.includes('interface Array')) {
       finalUserCode = `
@@ -219,16 +222,22 @@ export async function executeFrontendLocally(options: FrontendTestRunnerOptions)
 self.onmessage = async function(e) {
   const { userCode, testCases, language, testHelpers } = e.data;
   let codeToRun = userCode;
+
+  // Strip ES module exports so the code can run in a non-module context
+  codeToRun = codeToRun
+    .replace(/^\\s*export\\s+default\\s+/gm, '')
+    .replace(/^\\s*export\\s+(function|class|const|let|var)\\b/gm, '$1')
+    .replace(/^\\s*export\\s+\\{[^}]*\\}\\s*;?/gm, '');
   
   if (language === 'typescript') {
     if (codeToRun.includes('myReduce') && !codeToRun.includes('interface Array')) {
-      codeToRun = \\\`
+      codeToRun = \`
 declare global {
   interface Array<T> {
     myReduce<U>(callbackFn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
   }
 }
-\\\` + codeToRun;
+\` + codeToRun;
     }
     
     try {
@@ -243,26 +252,88 @@ declare global {
 
   try {
     let functionBody = "return (async () => {\\n";
+    functionBody += "const __globalLogs = [];\\n";
+    functionBody += "const __originalLog = console.log;\\n";
+    functionBody += "let __currentLogs = __globalLogs;\\n";
+    functionBody += "console.log = (...args) => {\\n";
+    functionBody += "  const msg = args.map(a => {\\n";
+    functionBody += "    try { return typeof a === 'object' ? JSON.stringify(a) : String(a); } catch(e) { return String(a); }\\n";
+    functionBody += "  }).join(' ');\\n";
+    functionBody += "  __currentLogs.push(msg);\\n";
+    functionBody += "};\\n";
+    
+    // Async/setTimeout harness for test cases
+    functionBody += "let __testCaseError = null;\\n";
+    functionBody += "const __pendingTimeouts = new Set();\\n";
+    functionBody += "const __originalSetTimeout = self.setTimeout;\\n";
+    functionBody += "const __originalClearTimeout = self.clearTimeout;\\n";
+    
+    functionBody += "const setTimeout = (cb, delay, ...args) => {\\n";
+    functionBody += "  let id;\\n";
+    functionBody += "  const wrapper = async () => {\\n";
+    functionBody += "    try {\\n";
+    functionBody += "      const res = cb(...args);\\n";
+    functionBody += "      if (res instanceof Promise) await res;\\n";
+    functionBody += "    } catch (e) {\\n";
+    functionBody += "      __testCaseError = e;\\n";
+    functionBody += "    } finally {\\n";
+    functionBody += "      __pendingTimeouts.delete(id);\\n";
+    functionBody += "    }\\n";
+    functionBody += "  };\\n";
+    // Note: wrapper must run asynchronously, we use originalSetTimeout
+    functionBody += "  id = __originalSetTimeout(wrapper, delay, ...args);\\n";
+    functionBody += "  __pendingTimeouts.add(id);\\n";
+    // Return a custom object or ID
+    functionBody += "  return id;\\n";
+    functionBody += "};\\n";
+    
+    functionBody += "const clearTimeout = (id) => {\\n";
+    functionBody += "  __pendingTimeouts.delete(id);\\n";
+    functionBody += "  if (id !== undefined) __originalClearTimeout(id);\\n";
+    functionBody += "};\\n";
+
     functionBody += testHelpers + "\\n";
     functionBody += codeToRun + "\\n";
     functionBody += "const __testResults = [];\\n";
     
     testCases.forEach((tc, idx) => {
+      functionBody += "const __tcLogs_" + idx + " = [];\\n";
+      functionBody += "__currentLogs = __tcLogs_" + idx + ";\\n";
+      functionBody += "__testCaseError = null;\\n";
+      functionBody += "__pendingTimeouts.clear();\\n";
       functionBody += "try {\\n";
       functionBody += "  await (async () => {\\n";
       functionBody += "    " + tc.testCode + "\\n";
       functionBody += "  })();\\n";
-      functionBody += "  __testResults.push({ name: " + JSON.stringify(tc.name) + ", testCode: " + JSON.stringify(tc.testCode) + ", status: 'pass', passed: true, error: null });\\n";
+      
+      // Wait for all scheduled timeouts in this test case to finish
+      functionBody += "  const __start_" + idx + " = Date.now();\\n";
+      functionBody += "  while (__pendingTimeouts.size > 0 && !__testCaseError) {\\n";
+      // Sleep 10ms using originalSetTimeout
+      functionBody += "    await new Promise(r => __originalSetTimeout(r, 10));\\n";
+      functionBody += "    if (Date.now() - __start_" + idx + " > 2000) {\\n";
+      functionBody += "      throw new Error('Test case timed out waiting for async operations (2s limit)');\\n";
+      functionBody += "    }\\n";
+      functionBody += "  }\\n";
+      
+      functionBody += "  if (__testCaseError) {\\n";
+      functionBody += "    throw __testCaseError;\\n";
+      functionBody += "  }\\n";
+      
+      functionBody += "  __testResults.push({ name: " + JSON.stringify(tc.name) + ", testCode: " + JSON.stringify(tc.testCode) + ", status: 'pass', passed: true, error: null, logs: __tcLogs_" + idx + " });\\n";
       functionBody += "} catch (e) {\\n";
-      functionBody += "  __testResults.push({ name: " + JSON.stringify(tc.name) + ", testCode: " + JSON.stringify(tc.testCode) + ", status: 'fail', passed: false, error: e.stack || e.message || String(e) });\\n";
+      functionBody += "  for (const id of __pendingTimeouts) __originalClearTimeout(id);\\n";
+      functionBody += "  __pendingTimeouts.clear();\\n";
+      functionBody += "  __testResults.push({ name: " + JSON.stringify(tc.name) + ", testCode: " + JSON.stringify(tc.testCode) + ", status: 'fail', passed: false, error: e.stack || e.message || String(e), logs: __tcLogs_" + idx + " });\\n";
       functionBody += "}\\n";
     });
     
-    functionBody += "return __testResults;\\n})();";
+    functionBody += "console.log = __originalLog;\\n";
+    functionBody += "return { results: __testResults, globalLogs: __globalLogs.join('\\\\n') };\\n})();";
 
     const runAsync = new Function(functionBody);
-    const __testResults = await runAsync();
-    self.postMessage({ type: 'success', results: __testResults });
+    const { results: __testResults, globalLogs: __globalLogs } = await runAsync();
+    self.postMessage({ type: 'success', results: __testResults, globalLogs: __globalLogs });
   } catch (err) {
     self.postMessage({ type: 'error', error: 'Runtime Error: ' + (err.message || String(err)) });
   }
@@ -292,11 +363,11 @@ declare global {
       worker.terminate();
       URL.revokeObjectURL(workerUrl);
       
-      const { type, results, error } = e.data;
+      const { type, results, globalLogs, error } = e.data;
       if (type === 'error') {
         reject(new Error(error));
       } else {
-        resolve(results);
+        resolve({ results, globalLogs });
       }
     };
 

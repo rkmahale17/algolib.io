@@ -90,7 +90,8 @@ export function AlgorithmList() {
     if (problemTypeFilter !== 'all') {
       const pt = algo.problemType || algo.problem_type;
       if (problemTypeFilter === 'dsa' && pt !== 'dsa') return false;
-      if (problemTypeFilter === 'other' && pt === 'dsa') return false;
+      if (problemTypeFilter === 'frontend' && pt !== 'frontend') return false;
+      if (problemTypeFilter === 'other' && pt === 'dsa' || pt === 'frontend') return false;
     }
 
     if (publishedFilter !== 'all') {
@@ -198,6 +199,7 @@ export function AlgorithmList() {
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="dsa">DSA</SelectItem>
+            <SelectItem value="frontend">Frontend</SelectItem>
             <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>

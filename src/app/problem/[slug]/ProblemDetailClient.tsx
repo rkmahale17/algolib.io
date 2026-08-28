@@ -94,10 +94,13 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
   const allAlgorithms = useMemo(
     () => {
       const isSql = activeAlgorithm?.problemType === 'sql' || activeAlgorithm?.problem_type === 'sql' || activeAlgorithm?.problem_type === 'SQL' || activeAlgorithm?.problemType === 'SQL';
+      const isFrontend = activeAlgorithm?.problemType === 'frontend' || activeAlgorithm?.problem_type === 'frontend';
       return (algorithmsData?.algorithms || [])
         .filter((algo) => {
           const algoIsSql = algo.problemType === 'sql' || algo.problem_type === 'sql' || algo.problem_type === 'SQL' || algo.problemType === 'SQL';
-          return isSql ? algoIsSql : (!algoIsSql && algo.problemType === "dsa");
+          const algoIsFrontend = algo.problemType === 'frontend' || algo.problem_type === 'frontend';
+          if (isFrontend) return algoIsFrontend;
+          return isSql ? algoIsSql : (!algoIsSql && !algoIsFrontend && algo.problemType === "dsa");
         })
         .filter((algo) => algo.published !== false || isUserAdmin);
     },
@@ -384,6 +387,9 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
   const availableLanguages = useMemo(() => {
     const isSqlProblem = activeAlgorithm?.problemType === 'sql' || activeAlgorithm?.problem_type === 'sql' || activeAlgorithm?.problem_type === 'SQL' || activeAlgorithm?.problemType === 'SQL';
     if (isSqlProblem) return ['sql'];
+
+    const isFrontendProblem = activeAlgorithm?.problemType === 'frontend' || activeAlgorithm?.problem_type === 'frontend';
+    if (isFrontendProblem) return ['typescript'];
 
     const controls = activeAlgorithm?.controls?.code_runner;
     return controls?.languages
