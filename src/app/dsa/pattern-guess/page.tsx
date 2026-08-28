@@ -5,6 +5,14 @@ import PatternGuessListClient from './PatternGuessListClient';
 export const metadata: Metadata = {
   title: "Guess the Pattern | RulCode",
   description: "Test your algorithmic intuition by guessing the underlying patterns of various problems.",
+  openGraph: {
+    title: "Guess the Pattern | RulCode",
+    description: "Test your algorithmic intuition by guessing the underlying patterns of various problems.",
+    url: 'https://rulcode.com/dsa/pattern-guess',
+  },
+  alternates: {
+    canonical: 'https://rulcode.com/dsa/pattern-guess',
+  },
 };
 
 export default function PatternGuessPage() {

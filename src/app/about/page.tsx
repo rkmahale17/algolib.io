@@ -4,6 +4,7 @@ import AboutClient from './AboutClient';
 export const metadata: Metadata = {
   title: 'About Rulcode',
   description: 'Learn about the mission and team behind Rulcode.',
+  robots: 'noindex, follow',
 };
 
 export default function AboutPage() {

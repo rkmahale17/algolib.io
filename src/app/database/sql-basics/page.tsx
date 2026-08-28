@@ -9,7 +9,10 @@ export const metadata: Metadata = {
     title: "SQL Basics - RulCode",
     description: "Master foundational SQL queries with interactive database problems.",
     url: 'https://rulcode.com/database/sql-basics',
-  }
+  },
+  alternates: {
+    canonical: 'https://rulcode.com/database/sql-basics',
+  },
 };
 
 export default function SqlBasicsPage() {

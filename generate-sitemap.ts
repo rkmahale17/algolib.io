@@ -15,10 +15,17 @@ const baseUrl = 'https://rulcode.com';
 
 const staticRoutes = [
   '/',
-  '/about',
-  '/blind75',
-  '/blog',
+  '/dsa/core',
+  '/dsa/blind-75',
+  '/dsa/rulcode-150',
+  '/dsa/visual-library',
+  '/dsa/pattern-guess',
+  '/dsa/patterns',
+  '/dsa/problems',
+  '/dsa/roadmap',
+  '/database/sql-basics',
   '/guides',
+  '/complexity',
 ];
 
 
@@ -78,7 +85,7 @@ async function generateSitemap() {
   // All algorithms now use unified /problem/ route
   const problemRoutes = algorithms.map((algo) => `/problem/${algo.id}`);
 
-  const allRoutes = [...staticRoutes, ...problemRoutes, ...blogRoutes, ...guideRoutes];
+  const allRoutes = [...staticRoutes, ...problemRoutes, ...guideRoutes];
 
   // Generate sitemap XML
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -87,16 +94,21 @@ ${allRoutes.map(route => `  <url>
     <loc>${baseUrl}${route}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>${route === '/' ? 'daily' :
-      route.startsWith('/problem/') ? 'weekly' :
-        route.startsWith('/blog/') ? 'weekly' :
-          route.startsWith('/guides/') ? 'weekly' :
-            'monthly'
+      route.startsWith('/dsa/') ? 'weekly' :
+        route.startsWith('/database/') ? 'weekly' :
+          route.startsWith('/problem/') ? 'weekly' :
+            route.startsWith('/blog/') ? 'weekly' :
+              route.startsWith('/guides/') ? 'weekly' :
+                'monthly'
     }</changefreq>
     <priority>${route === '/' ? '1.0' :
-      route.startsWith('/problem/') ? '0.8' :
-        route.startsWith('/blog/') ? '0.7' :
-          route.startsWith('/guides/') ? '0.8' :
-            '0.5'
+      route.startsWith('/dsa/') ? '0.9' :
+        route.startsWith('/database/') ? '0.9' :
+          route.startsWith('/problem/') ? '0.8' :
+            route.startsWith('/blog/') ? '0.7' :
+              route.startsWith('/guides/') ? '0.8' :
+                route === '/complexity' ? '0.8' :
+                  '0.5'
     }</priority>
   </url>`).join('\n')}
 </urlset>`;

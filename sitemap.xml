@@ -9,23 +9,65 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Core product pages -->
   <url>
-    <loc>https://rulcode.com/about</loc>
+    <loc>https://rulcode.com/dsa/core</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/dsa/blind-75</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/dsa/rulcode-150</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/dsa/visual-library</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/dsa/pattern-guess</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/dsa/patterns</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/dsa/problems</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/dsa/roadmap</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/database/sql-basics</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/guides</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/complexity</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://rulcode.com/feedback</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://rulcode.com/privacy</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
 
-  <!-- Algorithm pages -->
+
   <url><loc>https://rulcode.com/algorithm/two-pointers</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://rulcode.com/algorithm/sliding-window</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://rulcode.com/algorithm/prefix-sum</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>

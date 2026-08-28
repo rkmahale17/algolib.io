@@ -9,7 +9,10 @@ export const metadata: Metadata = {
     title: "Visual Library - RulCode",
     description: "Interactive visual library of the top 30 algorithm patterns.",
     url: 'https://rulcode.com/dsa/visual-library',
-  }
+  },
+  alternates: {
+    canonical: 'https://rulcode.com/dsa/visual-library',
+  },
 };
 
 export default function VisualLibraryPage() {
