@@ -1,7 +1,7 @@
 export const content = `
-# BFS and DFS: Exploring the Unknown 🗺️
+# BFS and DFS: Exploring the Unknown ️
 
-## 🏰 Introduction: The Castle Maze
+##  Introduction: The Castle Maze
 
 Imagine you are exploring a giant, dark castle looking for a hidden treasure chest. The castle has many rooms, and each room has doors leading to other rooms. 
 
@@ -15,7 +15,7 @@ You start in the entrance. First, you peek into *all* the rooms immediately conn
 
 ---
 
-## 🤔 What are BFS and DFS?
+##  What are BFS and DFS?
 
 **DFS (Depth First Search)** and **BFS (Breadth First Search)** are the two most famous algorithms for exploring **Trees** and **Graphs** (networks of connected data). 
 
@@ -24,7 +24,7 @@ You start in the entrance. First, you peek into *all* the rooms immediately conn
 
 ---
 
-## ✨ The Core Strategies
+##  The Core Strategies
 
 ### The DFS Formula (Recursion is your friend!)
 1. Visit the current room.
@@ -41,7 +41,7 @@ You start in the entrance. First, you peek into *all* the rooms immediately conn
 
 ---
 
-## 🎟️ Real-World Example: Finding a Friend's Phone Number
+## ️ Real-World Example: Finding a Friend's Phone Number
 
 Imagine you need to find the phone number of someone named "Dave", and you can only ask your friends.
 
@@ -50,7 +50,7 @@ Imagine you need to find the phone number of someone named "Dave", and you can o
 
 ---
 
-## 🧩 Problem Walkthrough: Number of Islands
+##  Problem Walkthrough: Number of Islands
 
 Imagine a grid (a map) of \`1\`s (land) and \`0\`s (water). We want to count how many separate islands there are. 
 
@@ -200,14 +200,14 @@ function numIslands(grid: string[][]): number {
 
 ---
 
-## 🚫 Common Mistakes 
+##  Common Mistakes 
 
 1. **Forgetting to mark as Visited**: If you don't change the \`1\` to a \`0\` (or keep a visited set), your DFS will bounce back and forth between two pieces of land forever! 
 2. **Using DFS for Shortest Path**: DFS will find *a* path, but rarely the *shortest* path. If a problem asks for the "shortest", "closest", or "minimum steps", you almost always want to use **BFS**.
 
 ---
 
-## 🎮 Practice Problems
+##  Practice Problems
 
 * [Number of Islands](/problem/number-of-islands) — Practice grid DFS.
 * [Max Area of Island](/problem/max-area-of-island) — A small twist on counting islands.

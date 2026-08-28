@@ -10,17 +10,20 @@ import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface TestCase {
-    input: any[];
-    expectedOutput: any;
+    input?: any[];
+    expectedOutput?: any;
     output?: any;
-    description: string;
+    description?: string;
     isSubmission?: boolean;
+    name?: string;
+    testCode?: string;
 }
 
 interface TestCaseEditorProps {
     testCases: TestCase[];
     inputSchema: Array<{ name: string; type: string; label: string }>;
     onChange: (testCases: TestCase[]) => void;
+    problemType?: string;
 }
 
 // Helper component to manage input state locally
@@ -156,17 +159,27 @@ export function TestCaseEditor({
     testCases,
     inputSchema,
     onChange,
+    problemType,
 }: TestCaseEditorProps) {
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
     const [viewMode, setViewMode] = useState<"list" | "bulk">("list");
 
     const handleAdd = () => {
-        const newTestCase: TestCase = {
-            input: inputSchema.map(() => null),
-            expectedOutput: null,
-            description: "",
-            isSubmission: false,
-        };
+        let newTestCase: TestCase;
+        if (problemType === 'frontend') {
+            newTestCase = {
+                name: "New Test Case",
+                testCode: "assert(true);",
+                isSubmission: false,
+            };
+        } else {
+            newTestCase = {
+                input: inputSchema.map(() => null),
+                expectedOutput: null,
+                description: "",
+                isSubmission: false,
+            };
+        }
         onChange([...testCases, newTestCase]);
         setExpandedIndex(testCases.length);
     };
@@ -197,7 +210,7 @@ export function TestCaseEditor({
                 isSubmission: false,
             };
 
-            const newInputs = [...existing.input];
+            const newInputs = existing.input ? [...existing.input] : Array(inputSchema.length).fill(null);
             // If we have a value for this index, use it. usage of undefined check handled by simple assignment if array is big enough
             if (i < newValues.length) {
                 newInputs[schemaIndex] = newValues[i];
@@ -246,16 +259,18 @@ export function TestCaseEditor({
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <ToggleGroup type="single" value={viewMode} onValueChange={(v) => v && setViewMode(v as "list" | "bulk")}>
-                        <ToggleGroupItem value="list" aria-label="List View">
-                            <LayoutList className="h-4 w-4 mr-2" />
-                            List
-                        </ToggleGroupItem>
-                        <ToggleGroupItem value="bulk" aria-label="Bulk View">
-                            <AlignJustify className="h-4 w-4 mr-2" />
-                            Bulk
-                        </ToggleGroupItem>
-                    </ToggleGroup>
+                    {problemType !== 'frontend' && (
+                        <ToggleGroup type="single" value={viewMode} onValueChange={(v) => v && setViewMode(v as "list" | "bulk")}>
+                            <ToggleGroupItem value="list" aria-label="List View">
+                                <LayoutList className="h-4 w-4 mr-2" />
+                                List
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="bulk" aria-label="Bulk View">
+                                <AlignJustify className="h-4 w-4 mr-2" />
+                                Bulk
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                    )}
 
                     {testCases.length > 3 && (
                         <Button
@@ -290,7 +305,7 @@ export function TestCaseEditor({
                                 <BulkJsonEditor
                                     key={field.name}
                                     label={`Input (${field.name})`}
-                                    value={testCases.map(tc => tc.input[idx])}
+                                    value={testCases.map(tc => tc.input?.[idx])}
                                     onChange={(vals) => handleBulkInputChange(idx, vals)}
                                 />
                             ))}
@@ -400,61 +415,98 @@ export function TestCaseEditor({
                                             </div>
                                         </div>
 
-                                        {/* Inputs */}
-                                        <div className="space-y-3">
-                                            <Label className="text-base font-semibold">Inputs</Label>
-                                            {inputSchema.length === 0 ? (
-                                                <p className="text-sm text-muted-foreground">
-                                                    Define input schema first to add test inputs
-                                                </p>
-                                            ) : (
-                                                <div className="grid gap-3">
-                                                    {inputSchema.map((field, inputIndex) => (
-                                                        <TestCaseInput
-                                                            key={`${field.name}-${inputIndex}`}
-                                                            label={`${field.label} (${field.type})`}
-                                                            type={field.type}
-                                                            value={testCase.input[inputIndex]}
-                                                            onChange={(newValue) => {
-                                                                const updated = [...testCases];
-                                                                const inputs = [...updated[index].input];
-                                                                inputs[inputIndex] = newValue;
-                                                                updated[index].input = inputs;
-                                                                onChange(updated);
+                                        {problemType === 'frontend' ? (
+                                            <div className="space-y-4 pt-4 border-t">
+                                                <div className="space-y-2">
+                                                    <Label>Test Name</Label>
+                                                    <Input
+                                                        value={testCase.name || ""}
+                                                        onChange={(e) => handleUpdate(index, { name: e.target.value })}
+                                                        placeholder="e.g. should handle empty arrays"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>Test Code (JavaScript)</Label>
+                                                    <div className="border rounded-md overflow-hidden">
+                                                        <Editor
+                                                            height="250px"
+                                                            language="javascript"
+                                                            value={testCase.testCode || ""}
+                                                            onChange={(value) => handleUpdate(index, { testCode: value || "" })}
+                                                            theme="vs-dark"
+                                                            options={{
+                                                                minimap: { enabled: false },
+                                                                fontSize: 13,
+                                                                lineNumbers: "on",
+                                                                scrollBeyondLastLine: false,
+                                                                wordWrap: "on",
                                                             }}
                                                         />
-                                                    ))}
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground mt-2">
+                                                        Use built-in helpers: <code>assert(cond, msg)</code>, <code>assertEquals(actual, expected)</code>, <code>assertThrows(fn)</code>, <code>createMockFn()</code>
+                                                    </p>
                                                 </div>
-                                            )}
-                                        </div>
-
-                                        {/* Expected Output */}
-                                        <div className="space-y-2">
-                                            <Label>Expected Output</Label>
-                                            <div className="border rounded-md overflow-hidden">
-                                                <Editor
-                                                    height="150px"
-                                                    language="json"
-                                                    value={JSON.stringify(testCase.output, null, 2)}
-                                                    onChange={(value) => {
-                                                        try {
-                                                            const parsed = JSON.parse(value || "null");
-                                                            handleUpdate(index, { output: parsed });
-                                                        } catch {
-                                                            // Invalid JSON, don't update
-                                                        }
-                                                    }}
-                                                    theme="vs-dark"
-                                                    options={{
-                                                        minimap: { enabled: false },
-                                                        fontSize: 13,
-                                                        lineNumbers: "off",
-                                                        scrollBeyondLastLine: false,
-                                                        wordWrap: "on",
-                                                    }}
-                                                />
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <>
+                                                {/* Inputs */}
+                                                <div className="space-y-3">
+                                                    <Label className="text-base font-semibold">Inputs</Label>
+                                                    {inputSchema.length === 0 ? (
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Define input schema first to add test inputs
+                                                        </p>
+                                                    ) : (
+                                                        <div className="grid gap-3">
+                                                            {inputSchema.map((field, inputIndex) => (
+                                                                <TestCaseInput
+                                                                    key={`${field.name}-${inputIndex}`}
+                                                                    label={`${field.label} (${field.type})`}
+                                                                    type={field.type}
+                                                                    value={testCase.input?.[inputIndex]}
+                                                                    onChange={(newValue) => {
+                                                                        const updated = [...testCases];
+                                                                        const inputs = updated[index].input ? [...updated[index].input!] : Array(inputSchema.length).fill(null);
+                                                                        inputs[inputIndex] = newValue;
+                                                                        updated[index].input = inputs;
+                                                                        onChange(updated);
+                                                                    }}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Expected Output */}
+                                                <div className="space-y-2">
+                                                    <Label>Expected Output</Label>
+                                                    <div className="border rounded-md overflow-hidden">
+                                                        <Editor
+                                                            height="150px"
+                                                            language="json"
+                                                            value={JSON.stringify(testCase.output ?? testCase.expectedOutput, null, 2)}
+                                                            onChange={(value) => {
+                                                                try {
+                                                                    const parsed = JSON.parse(value || "null");
+                                                                    handleUpdate(index, { output: parsed, expectedOutput: parsed });
+                                                                } catch {
+                                                                    // Invalid JSON, don't update
+                                                                }
+                                                            }}
+                                                            theme="vs-dark"
+                                                            options={{
+                                                                minimap: { enabled: false },
+                                                                fontSize: 13,
+                                                                lineNumbers: "off",
+                                                                scrollBeyondLastLine: false,
+                                                                wordWrap: "on",
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
                                     </CardContent>
                                 )}
                             </Card>

@@ -1,7 +1,7 @@
 export const content = `
 # Merge Sort: Divide and Conquer!
 
-## 🃏 Introduction: The Giant Stack of Cards
+##  Introduction: The Giant Stack of Cards
 
 Imagine you have a giant stack of 100 messy, completely unorganized playing cards, and your job is to sort them from smallest to largest. If you try to look at all 100 cards at once, your brain will hurt!
 
@@ -16,7 +16,7 @@ This super-fast, incredibly reliable trick is called **Merge Sort**.
 
 ---
 
-## 🤔 What Exactly IS Merge Sort?
+##  What Exactly IS Merge Sort?
 
 Merge Sort is a classic **sorting algorithm** that uses the power of Recursion. It follows the "Divide and Conquer" strategy. 
 
@@ -24,7 +24,7 @@ Instead of trying to sort a massive array all at once, it breaks the array down 
 
 ---
 
-## 🦸 Why Do We Need To Learn It?
+##  Why Do We Need To Learn It?
 
 If you ever see a problem that says:
 * *"Sort this array in $O(n \\log n)$ time"*
@@ -37,7 +37,7 @@ While simple sorting loops (like Bubble Sort or Insertion Sort) get incredibly s
 
 ---
 
-## ✨ The Two Magical Steps of Merge Sort
+##  The Two Magical Steps of Merge Sort
 
 Every Merge Sort algorithm has two main parts:
 
@@ -50,7 +50,7 @@ This is the real workhorse. It takes two arrays that are *already sorted* and zi
 
 ---
 
-## 🧮 Let's Look at Some Code! (The Merge Sort Template)
+##  Let's Look at Some Code! (The Merge Sort Template)
 
 Here is how you implement Merge Sort to sort an array of numbers. Notice how we use a helper function to do the merging!
 
@@ -218,7 +218,7 @@ function merge(left: number[], right: number[]): number[] {
 
 ---
 
-## 🧩 Problem 1: Merge Two Sorted Lists
+##  Problem 1: Merge Two Sorted Lists
 
 The most common real-world use of the Merge Sort concept is the \`merge\` helper function itself! Often, you will be given two separate lists that are already sorted, and asked to combine them into one.
 
@@ -294,7 +294,7 @@ class Solution {
 
 ---
 
-## 🚫 Common Mistakes (The Infinite Recursion Monster!)
+##  Common Mistakes (The Infinite Recursion Monster!)
 
 Here are the biggest traps to avoid when writing Merge Sort:
 
@@ -304,7 +304,7 @@ Here are the biggest traps to avoid when writing Merge Sort:
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Merge Sort** uses "Divide and Conquer" to chop a huge problem into tiny, easy pieces.
 * It uses a Recursive **Chopper** to split the array down to single elements.
 * It uses a **Zipper** helper function to merge sorted halves back together.
@@ -312,7 +312,7 @@ Here are the biggest traps to avoid when writing Merge Sort:
 
 ---
 
-## 🎮 Practice Problems & Website Verifications
+##  Practice Problems & Website Verifications
 
 Verify your Merge Sort logic by solving these problems on our platform:
 * [Sort an Array](/problem/sort-an-array) — Practice the full Merge Sort template from scratch.

@@ -5,6 +5,7 @@ export enum ListType {
     Blind75 = 'blind75',
     Blind150 = 'blind150',
     SqlBasics = 'sql-basics',
+    FrontendBasics = 'frontend-basics',
 }
 
 export const LIST_TYPE_LABELS: Record<string, string> = {
@@ -13,6 +14,7 @@ export const LIST_TYPE_LABELS: Record<string, string> = {
     [ListType.Blind75]: 'Blind 75',
     [ListType.Blind150]: 'Rulcode 150',
     [ListType.SqlBasics]: 'SQL Basics',
+    [ListType.FrontendBasics]: 'Frontend Basics',
     'pattern-guess': 'Guess the Pattern',
 };
 

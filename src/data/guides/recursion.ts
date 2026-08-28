@@ -1,7 +1,7 @@
 export const content = `
 # Recursion: The Magic of Calling Yourself!
 
-## 🪆 Introduction: The Magic Russian Nesting Dolls
+##  Introduction: The Magic Russian Nesting Dolls
 
 Imagine you are given a giant, beautifully painted wooden doll. It's a special type of toy called a Russian Nesting Doll (or Matryoshka doll). Your friend tells you there is a shiny gold coin hidden inside the very smallest doll, and you want to find it!
 
@@ -15,7 +15,7 @@ Recursion is simply **a function that calls itself**. Instead of trying to solve
 
 ---
 
-## 🤔 What Exactly IS Recursion?
+##  What Exactly IS Recursion?
 
 In normal programming, you might write a function called \`makeSandwich()\`. That function goes to the fridge, gets bread, and makes a sandwich. 
 
@@ -25,7 +25,7 @@ When a computer program uses recursion, it is basically opening nesting dolls ov
 
 ---
 
-## 🦸 Why Do We Need To Learn It?
+##  Why Do We Need To Learn It?
 
 You might think: *"I already know how to use FOR loops and WHILE loops. Loops are easy! Why do I need to learn Recursion?"*
 
@@ -40,7 +40,7 @@ Recursion gives you the superpower to effortlessly explore massive **Trees** (li
 
 ---
 
-## ✨ The Two Golden Rules of Recursion
+##  The Two Golden Rules of Recursion
 
 For the magic of recursion to work without breaking your computer, every recursive function **must** have two very important parts.
 
@@ -54,7 +54,7 @@ The Recursive Case is where the function actually calls itself, but it **must pa
 
 ---
 
-## 🎟️ A Real-World Example: The Movie Theater Line
+## ️ A Real-World Example: The Movie Theater Line
 
 Imagine you are standing in a super long line to see a new superhero movie. You want to know what place you are in line. Are you 10th? 100th? You can't step out of line to count, because you'd lose your spot! How can you figure out your place?
 
@@ -67,7 +67,7 @@ Imagine you are standing in a super long line to see a new superhero movie. You 
 
 ---
 
-## 🧮 Let's Look at Some Code! (Factorial Magic)
+##  Let's Look at Some Code! (Factorial Magic)
 
 Let's write a program to calculate a "Factorial". The factorial of a number (written as \`5!\`) means multiplying that number by every number smaller than it: \`5! = 5 * 4 * 3 * 2 * 1 = 120\`. 
 
@@ -130,7 +130,7 @@ function factorial(n: number): number {
 
 ---
 
-## 🧩 Problem 1: Climbing Stairs
+##  Problem 1: Climbing Stairs
 
 Imagine you are climbing a staircase that has \`n\` steps. You have short legs, so you can only climb **1 step** or **2 steps** at a time. How many distinct ways can you climb all the way to the top?
 
@@ -216,7 +216,7 @@ function climbStairs(n: number): number {
 
 ---
 
-## 🧩 Problem 2: Reverse Linked List
+##  Problem 2: Reverse Linked List
 
 A linked list is a chain of nodes holding hands. Node A points to Node B, which points to Node C. We want to completely reverse the direction they are pointing so C points to B, and B points to A.
 
@@ -331,7 +331,7 @@ function reverseList(head: ListNode | null): ListNode | null {
 
 ---
 
-## 🚫 Common Mistakes (The Infinite Loop Monster!)
+##  Common Mistakes (The Infinite Loop Monster!)
 
 When you are learning recursion, it is very easy to make mistakes. Here are the biggest traps:
 
@@ -340,7 +340,7 @@ When you are learning recursion, it is very easy to make mistakes. Here are the 
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Recursion** is a function that calls itself.
 * Like Russian Nesting Dolls, it breaks big problems into smaller identical problems.
 * It must have a **Base Case** (when to stop).
@@ -349,7 +349,7 @@ When you are learning recursion, it is very easy to make mistakes. Here are the 
 
 ---
 
-## 🎮 Practice Problems & Website Verifications
+##  Practice Problems & Website Verifications
 
 Verify your recursion logic by solving these interactive problems on our platform:
 * [Climbing Stairs](/problem/climbing-stairs) — Understand how Fibonacci sequences naturally map to a recursive decision tree.

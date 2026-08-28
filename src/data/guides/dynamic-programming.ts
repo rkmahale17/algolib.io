@@ -1,7 +1,7 @@
 export const content = `
 # Dynamic Programming: Remembering the Past to Save Time!
 
-## 📓 Introduction: The Magic Notebook Trick
+##  Introduction: The Magic Notebook Trick
 
 Imagine your math teacher walks up to the board and writes down:
 **1 + 1 + 1 + 1 + 1 = ?**
@@ -21,7 +21,7 @@ Dynamic Programming is a super-smart way of solving complex problems by breaking
 
 ---
 
-## 🧠 Recursion vs. Dynamic Programming
+##  Recursion vs. Dynamic Programming
 
 In the **Recursion** guide, we learned that a function can call itself to open smaller "nesting dolls" of a problem. But pure recursion has a huge weakness: **it is extremely forgetful.**
 
@@ -32,23 +32,23 @@ By adding a memory table, we turn a program that would take *billions* of years 
 
 ---
 
-## 🦸 The Two Flavors of DP: Top-Down vs. Bottom-Up
+##  The Two Flavors of DP: Top-Down vs. Bottom-Up
 
 When writing Dynamic Programming solutions, you can choose between two main strategies to fill your "magic notebook."
 
-### 1. Memoization (Top-Down) — The "Lazy" Way 😴
+### 1. Memoization (Top-Down) — The "Lazy" Way 
 * **How it works:** You start with the big problem you want to solve. You break it down recursively, but before doing any math, you check your notebook: *"Have I solved this before?"*
   * **If yes:** Just look up the answer and return it instantly!
   * **If no:** Do the calculation, write the answer in your notebook, and then return it.
 * **Why it's cool:** It follows the natural recursive logic we already know, only adding a memory dictionary or array.
 
-### 2. Tabulation (Bottom-Up) — The "Builder" Way 🧱
+### 2. Tabulation (Bottom-Up) — The "Builder" Way 
 * **How it works:** You don't use recursion. Instead, you start from the very smallest, easiest questions (the base cases) and solve them first. You write them in a table (usually an array), then use those answers to build the next answers, and the next, until you reach the top!
 * **Why it's cool:** It is often faster because it doesn't use the computer's recursion call stack, avoiding "Stack Overflow" errors.
 
 ---
 
-## ✨ The Two Golden Rules of DP
+##  The Two Golden Rules of DP
 
 You can use Dynamic Programming to solve a problem if it meets these two rules:
 
@@ -57,7 +57,7 @@ You can use Dynamic Programming to solve a problem if it meets these two rules:
 
 ---
 
-## 🧩 Problem 1: Climbing Stairs (The DP Upgrade)
+##  Problem 1: Climbing Stairs (The DP Upgrade)
 
 Imagine you are climbing a staircase that has \`n\` steps. You can climb either **1 step** or **2 steps** at a time. How many distinct ways can you climb all the way to the top?
 
@@ -177,7 +177,7 @@ function climbStairs(n: number): number {
 }
 \`\`\`
 
-### 🕵️ Code Breakdown: Why is the code written this way?
+### ️ Code Breakdown: Why is the code written this way?
 
 Let's dissect the Climbing Stairs code line-by-line so we understand the engineering choices:
 
@@ -196,7 +196,7 @@ Let's dissect the Climbing Stairs code line-by-line so we understand the enginee
 
 ---
 
-## 🧩 Problem 2: Coin Change (Making Change Smartly)
+##  Problem 2: Coin Change (Making Change Smartly)
 
 Imagine you are a cashier. You have coins of different values (like \`[1, 2, 5]\` dollars) and you need to make exactly \`11\` dollars using the **fewest number of coins possible**. How do you do it?
 
@@ -325,7 +325,7 @@ function coinChange(coins: number[], amount: number): number {
 }
 \`\`\`
 
-### 🕵️ Code Breakdown: Why is the code written this way?
+### ️ Code Breakdown: Why is the code written this way?
 
 Let's unpack the logic behind the Coin Change solution:
 
@@ -346,7 +346,7 @@ Let's unpack the logic behind the Coin Change solution:
 
 ---
 
-## 🚫 Common Mistakes (The DP Traps!)
+##  Common Mistakes (The DP Traps!)
 
 Dynamic Programming can be tricky at first. Watch out for these standard bugs:
 
@@ -356,7 +356,7 @@ Dynamic Programming can be tricky at first. Watch out for these standard bugs:
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Dynamic Programming** is recursion with memory.
 * It works on problems with **overlapping subproblems** and **optimal substructure**.
 * **Memoization** is top-down recursion that caches results.
@@ -365,7 +365,7 @@ Dynamic Programming can be tricky at first. Watch out for these standard bugs:
 
 ---
 
-## 🎮 Practice Problems & Website Verifications
+##  Practice Problems & Website Verifications
 
 Verify your Dynamic Programming logic by solving these interactive problems on our platform:
 * [Climbing Stairs](/problem/climbing-stairs) — The classic introduction to 1D DP tabulation.

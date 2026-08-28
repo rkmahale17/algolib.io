@@ -29,7 +29,7 @@ Imagine a long row of toy cubbies glued together in a straight line. Each cubby 
 [10, 20, 30, 40, 50]
 \`\`\`
 
-### 💻 Array Deep Dive 
+###  Array Deep Dive 
 An **Array** is a contiguous block of memory cells. Contiguous means the cells are placed directly next to each other in memory, with absolutely no gaps.
 
 Because cells are sequential, finding any item is basic math: \`Address = StartAddress + (Index * ElementSize)\`. The CPU does this math in a single step, meaning reading or writing a value by index takes **\`O(1)\` constant time**. This makes arrays the bedrock of modern hardware caching and fast index-based lookups.
@@ -115,7 +115,7 @@ Imagine you are on a birthday treasure hunt! You start at the first clue card un
 [5, 10, 15, 20, 25]
 \`\`\`
 
-### 💻 Linked List Deep Dive
+###  Linked List Deep Dive
 A **Linked List** is a non-contiguous sequence of **Nodes**. Each node contains a value (the data) and a pointer reference (\`next\`) containing the memory address of the next node. Because nodes are scattered anywhere in memory, we do not have index offsets. Accessing the N-th node requires traversing the links sequentially from the head, resulting in **\`O(n)\` linear access time**.
 
 The huge advantage of linked lists is pointer flexibility. If you want to insert or delete a node in the middle, you do not shift memory. You simply re-route pointers: make node A point to the new node C, and make node C point to node B. This makes insertions and deletions **\`O(1)\` constant time** once you have a pointer to the location, making them popular for queue back-ends and buffer implementations.
@@ -271,7 +271,7 @@ Imagine you have a magical notebook. Whenever you want to store a toy's secret h
 * **Magical Lookup**: When you want to find your Teddy Bear, you don't flip through page 1, page 2, page 3... You just say the magic word: *"Teddy Bear!"* and the book instantly flies open to the exact page (\`O(1)\`). It takes only one quick step!
 * **Oops, a Collision!**: Sometimes, the magic spell tries to put two different toys on the same page. We call this a **Collision** (like two kids trying to sit on the same chair!). When this happens, the book has them share the page by making a little chain of toys on that page.
 
-### 💻 Hash Map Deep Dive 
+###  Hash Map Deep Dive 
 A **Hash Map** (or Dictionary) maps keys to values using a mathematical formula called a **Hash Function**. The hash function takes your key (like a string of characters) and converts it into a numerical index. It then reads or writes the value at that specific index in a backing array. This index mapping takes **\`O(1)\` average time** for lookups, insertions, and deletions.
 
 What if two different keys generate the same number? This is called a **Hash Collision**. Modern hash maps handle this by creating chains (linked lists or red-black trees) inside each index bucket. If your hash function is poor or your map is crowded (high load factor), many items end up in the same bucket, degrading lookup times to **\`O(n)\` worst-case time**.
@@ -407,7 +407,7 @@ Imagine a high stack of warm, delicious chocolate-chip pancakes!
 ["Bottom Pancake", "Middle Pancake", "Top Pancake"]
 \`\`\`
 
-### 💻 Stack Deep Dive 
+###  Stack Deep Dive 
 A **Stack** is a linear structure governed by the **Last-In, First-Out (LIFO)** rule. The last element pushed onto the stack is the first element popped off. Because all operations are restricted to the head of the list, both \`push\` and \`pop\` execute in **\`O(1)\` constant time**.
 
 Stacks are critical in computers. The CPU uses a "Call Stack" to track active functions and local variables. In algorithms, stacks are used to parse matching brackets, reverse histories (like the browser back button), evaluate calculator formulas, and implement **Monotonic Stacks** (retaining sorted order to identify next greater elements).
@@ -565,7 +565,7 @@ Imagine you and your friends are waiting in a line for the giant, awesome water 
 ["Kid A", "Kid B", "Kid C", "Kid D"]
 \`\`\`
 
-### 💻 Queue Deep Dive 
+###  Queue Deep Dive 
 A **Queue** is a linear structure based on the **First-In, First-Out (FIFO)** principle. The first item inserted is the first item removed. Queues support two main operations: \`enqueue\` (adding to the back) and \`dequeue\` (removing from the front), both taking **\`O(1)\` time**.
 
 Queues are used in asynchronous environments (buffers, print jobs, routing systems) to schedule tasks fairly. In algorithm interviews, queues are the central structure for performing a **Breadth-First Search (BFS)** traversal on trees and graphs, allowing nodes to be visited layer-by-layer in concentric circles.
@@ -768,7 +768,7 @@ Imagine you are at the doctor's office waiting room. A kid with a tiny papercut 
 * **Min-Heap vs. Max-Heap**: In a **Min-Heap**, the smallest number is treated as the most important and stays at the top. In a **Max-Heap**, the biggest number is at the top.
 * **Bubble and Slide**: Whenever you add a new item or remove the top one, the items slide up or down like a kid on a slide until everyone is in the correct order of importance!
 
-### 💻 Heap Deep Dive 
+###  Heap Deep Dive 
 A **Heap** is a specialized tree structure (usually a complete binary tree stored inside an array) that maintains the "Heap Property". In a **Min-Heap**, the parent node is always smaller than or equal to its child nodes, putting the absolute minimum value at the root. In a **Max-Heap**, the parent is always larger, putting the maximum at the root.
 
 We can peek at the minimum or maximum instantly in **\`O(1)\` time**. However, extracting it or inserting a new element requires restoring the tree order. The element moves up or down the height of the tree (sifting), which takes **\`O(log n)\` logarithmic time**. Heaps are the default tool for scheduling processes, finding K-th largest values, and merging sorted data streams.

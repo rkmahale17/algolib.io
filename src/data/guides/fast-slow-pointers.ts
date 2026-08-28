@@ -1,9 +1,9 @@
 export const content = `
-# Fast and Slow Pointers: The Tortoise and the Hare 🐢🐇
+# Fast and Slow Pointers: The Tortoise and the Hare 
 
-## 🏃 Introduction: The Racetrack Mystery
+##  Introduction: The Racetrack Mystery
 
-Imagine you and your friend are running on a circular racetrack. Your friend is a super-fast runner (the Hare 🐇), and you are a bit slower (the Tortoise 🐢). 
+Imagine you and your friend are running on a circular racetrack. Your friend is a super-fast runner (the Hare ), and you are a bit slower (the Tortoise ). 
 
 If you both start at the same time, your fast friend will zoom ahead. But because the track is a circle, eventually, your fast friend will lap you and pass you again! 
 
@@ -13,7 +13,7 @@ This is the secret behind the **Fast and Slow Pointers** pattern! We use two "ru
 
 ---
 
-## 🤔 What is this Pattern?
+##  What is this Pattern?
 
 In computer science, we often have linked lists or sequences where we don't know if there is an end, or if it loops around in a circle forever (a cycle). 
 
@@ -25,7 +25,7 @@ If there is a loop, the Fast Pointer will eventually run laps around the loop an
 
 ---
 
-## ✨ The Core Strategy
+##  The Core Strategy
 
 1. Start both the \`slow\` and \`fast\` pointers at the very beginning.
 2. Use a \`while\` loop that keeps running as long as the \`fast\` pointer can take 2 steps forward.
@@ -35,7 +35,7 @@ If there is a loop, the Fast Pointer will eventually run laps around the loop an
 
 ---
 
-## 🎟️ Real-World Example: Finding the Middle
+## ️ Real-World Example: Finding the Middle
 
 You can also use this pattern to find the exact middle of a line! 
 
@@ -43,7 +43,7 @@ Imagine a long line of 10 people. If you take 1 step per second, and your friend
 
 ---
 
-## 🧩 Problem Walkthrough: Linked List Cycle
+##  Problem Walkthrough: Linked List Cycle
 
 Let's write code to figure out if a Linked List has a cycle (a loop).
 
@@ -146,14 +146,14 @@ function hasCycle(head: ListNode | null): boolean {
 
 ---
 
-## 🚫 Common Mistakes 
+##  Common Mistakes 
 
 1. **Null Pointer Errors**: Always check \`fast\` AND \`fast.next\` before moving the fast pointer 2 steps! If \`fast.next\` is null, trying to do \`fast.next.next\` will crash your program.
 2. **Starting Positions**: Make sure both pointers start at the exact same spot (the \`head\`), or else the math for finding the exact middle of a list won't work out perfectly.
 
 ---
 
-## 🎮 Practice Problems
+##  Practice Problems
 
 * [Linked List Cycle](/problem/detect-cycle-in-a-linked-list) — The classic Tortoise and Hare problem.
 * [Middle of the Linked List](/problem/middle-node) — Use the different speeds to easily find the center.

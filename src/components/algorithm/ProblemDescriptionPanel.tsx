@@ -56,7 +56,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -247,6 +247,41 @@ export const ProblemDescriptionPanel = React.memo(
     const isInitialLoadRef = useRef(true);
 
     // Reset the submission detail tab whenever the problem changes.
+    const derivedSolutionControls = useMemo(() => {
+      let controls = algorithm?.controls?.solutions || {};
+      const isFrontend = algorithm?.problemType === 'frontend' || algorithm?.problem_type === 'frontend';
+      const isSql = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problemType === 'SQL' || algorithm?.problem_type === 'SQL';
+
+      if (isFrontend) {
+        controls = {
+          ...controls,
+          languages: {
+            typescript: true,
+            javascript: false,
+            python: false,
+            cpp: false,
+            java: false,
+            sql: false,
+            ...(typeof controls.languages === 'object' ? controls.languages : {})
+          }
+        };
+      } else if (isSql) {
+        controls = {
+          ...controls,
+          languages: {
+            sql: true,
+            typescript: false,
+            javascript: false,
+            python: false,
+            cpp: false,
+            java: false,
+            ...(typeof controls.languages === 'object' ? controls.languages : {})
+          }
+        };
+      }
+      return controls;
+    }, [algorithm]);
+
     useEffect(() => {
       setSelectedSubmissionDetail(null);
       initialTopSubmissionId.current = null;
@@ -370,6 +405,7 @@ export const ProblemDescriptionPanel = React.memo(
     ];
 
     const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
+    const isFrontendProblem = algorithm?.problemType === 'frontend' || algorithm?.problem_type === 'frontend';
 
     const rawActiveTabsList = tabs || (panelId === "left"
       ? ["description", "visualizations", "solutions", "submissions"]
@@ -377,6 +413,8 @@ export const ProblemDescriptionPanel = React.memo(
       
     const activeTabsList = isSqlProblem 
       ? rawActiveTabsList.filter(t => t !== "visualizations" && t !== "thinkpad")
+      : isFrontendProblem
+      ? rawActiveTabsList.filter(t => t !== "visualizations")
       : rawActiveTabsList;
 
     // Detect tab scroll overflow to show left/right gradient fades
@@ -578,6 +616,7 @@ export const ProblemDescriptionPanel = React.memo(
                                   .filter(t => {
                                     if (activeTabsList.includes(t.id)) return false;
                                     if (isSqlProblem && (t.id === 'thinkpad' || t.id === 'visualizations')) return false;
+                                    if (isFrontendProblem && (t.id === 'visualizations')) return false;
                                     if (isPatternGuessContext && (t.id === 'rulo' || t.id === 'visualizations' || t.id === 'thinkpad' || t.id === 'submissions')) return false;
                                     if (t.id === 'thinkpad') {
                                       return isBrainstormEnabled && algorithm?.controls?.brainstorm !== false;
@@ -601,6 +640,7 @@ export const ProblemDescriptionPanel = React.memo(
                                 {ALL_AVAILABLE_TABS.filter(t => {
                                   if (activeTabsList.includes(t.id)) return false;
                                   if (isSqlProblem && (t.id === 'thinkpad' || t.id === 'visualizations')) return false;
+                                  if (isFrontendProblem && (t.id === 'visualizations')) return false;
                                   if (t.id === 'thinkpad') {
                                     return isBrainstormEnabled && algorithm?.controls?.brainstorm !== false;
                                   }
@@ -906,7 +946,7 @@ export const ProblemDescriptionPanel = React.memo(
                   )}
 
                   {/* Workspace Playgrounds renamed to Helpful Tools to Learn & Understand */}
-                  {algorithm.problemType !== 'sql' && algorithm.problem_type !== 'sql' && algorithm.problem_type !== 'SQL' && algorithm.problemType !== 'SQL' && (
+                  {algorithm.problemType !== 'sql' && algorithm.problem_type !== 'sql' && algorithm.problem_type !== 'SQL' && algorithm.problemType !== 'SQL' && algorithm.problemType !== 'frontend' && algorithm.problem_type !== 'frontend' && (
                   <div className="max-w-[600px] my-6 rounded-xl border border-border/50 bg-card p-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 text-primary shadow-sm">
@@ -1873,7 +1913,7 @@ export const ProblemDescriptionPanel = React.memo(
                           <SolutionViewer
                             implementations={algorithm.implementations}
                             approachName="Optimal Solution"
-                            controls={algorithm?.controls?.solutions}
+                            controls={derivedSolutionControls}
                             tutorial={algorithm.tutorials?.[0]}
                             problemName={algorithm.name}
                           />

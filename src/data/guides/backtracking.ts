@@ -1,7 +1,7 @@
 export const content = `
 # Backtracking: The Art of Trying Every Path!
 
-## 🏰 Introduction: The Great Maze Adventure
+##  Introduction: The Great Maze Adventure
 
 Imagine you are a brave explorer trapped inside a giant, mysterious hedge maze. Your goal is to find the hidden treasure chest right in the center. But there's a problem: you don't have a map! All you have is a pocket full of shiny breadcrumbs.
 
@@ -19,7 +19,7 @@ In computer science, this clever strategy is called **Backtracking**!
 
 ---
 
-## 🤔 What Exactly IS Backtracking?
+##  What Exactly IS Backtracking?
 
 Backtracking is a super smart way to solve puzzles by testing out possibilities one by one. It is closely related to **Recursion** (when a function calls itself to do a repetitive job).
 
@@ -29,7 +29,7 @@ Backtracking means making a choice, moving forward, and if you realize later tha
 
 ---
 
-## 🦸 Why Do We Need To Learn It?
+##  Why Do We Need To Learn It?
 
 You might be thinking, "Can't I just use simple loops to solve problems?"
 
@@ -43,7 +43,7 @@ It is the foundation of Artificial Intelligence in board games!
 
 ---
 
-## ✨ The Three Magic Steps of Backtracking
+##  The Three Magic Steps of Backtracking
 
 Every backtracking algorithm follows three magical steps. We call them: **Choose, Explore, and Un-choose**. Let's look at how they work using an Ice Cream Shop example.
 
@@ -63,7 +63,7 @@ If your exploration leads to a dead end, or if you already explored everything d
 
 ---
 
-## 🧩 Problem 1: Picking Your Toys (Subsets)
+##  Problem 1: Picking Your Toys (Subsets)
 
 Imagine you have a toy box with a Car, a Ball, and a Doll. You want to know every possible group of toys you can pull out to play with. You could pull out nothing, just the Car, the Car and the Doll, or all three!
 
@@ -202,7 +202,7 @@ function subsets(nums: number[]): number[][] {
 
 ---
 
-## 🧩 Problem 2: The Magic Lineup (Permutations)
+##  Problem 2: The Magic Lineup (Permutations)
 
 Given a list of numbers (or people), return every possible order they can stand in line! This is called a **Permutation**.
 
@@ -355,7 +355,7 @@ function permute(nums: number[]): number[][] {
 
 ---
 
-## 🚫 Common Mistakes (The Forgetting Trap)
+##  Common Mistakes (The Forgetting Trap)
 
 The most common mistake when writing backtracking code is forgetting to **Un-choose**. 
 
@@ -365,7 +365,7 @@ Always remember: if you add something to an array before you explore, you MUST \
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Backtracking** explores all possibilities to solve a problem by systematically testing choices.
 * It's required for puzzles like Sudoku, finding all combinations, and game AI.
 * The golden rule is the three steps: **Choose, Explore, Un-choose**.
@@ -373,7 +373,7 @@ Always remember: if you add something to an array before you explore, you MUST \
 
 ---
 
-## 🎮 Practice Problems & Website Verifications
+##  Practice Problems & Website Verifications
 
 Verify your backtracking logic by solving these interactive problems on our platform:
 * [Combination Sum](/problem/combination-sum) — Learn to backtrack with an unlimited supply of elements.

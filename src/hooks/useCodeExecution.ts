@@ -396,6 +396,71 @@ export const useCodeExecution = ({
                     setIsSubmitting(false);
                     
                     return { result: finalResult, allPassed, execTime: totalTime };
+                } else if (algo.problemType === 'frontend' || algo.problem_type === 'frontend') {
+                    const { executeFrontendLocally } = await import('@/utils/frontendTestRunner');
+                    const frontendTestCases = (algo.test_cases || []).map((tc: any) => ({
+                        name: tc.name || tc.description || 'Test',
+                        testCode: tc.testCode || tc.test_code || '',
+                        isSubmission: tc.isSubmission || false
+                    }));
+
+                    const casesToUse = isSubmission ? frontendTestCases : frontendTestCases.filter((tc: any) => !tc.isSubmission);
+                    
+                    const startTime = performance.now();
+                    let testCaseResults: any[] = [];
+                    let compileError = '';
+                    
+                    try {
+                        const { results, globalLogs } = await executeFrontendLocally({
+                            userCode: code,
+                            testCases: casesToUse.length > 0 ? casesToUse : frontendTestCases,
+                            language: language as 'javascript' | 'typescript'
+                        });
+                        
+                        testCaseResults = results.map((r: any) => ({
+                            status: r.passed ? 'pass' : 'fail',
+                            input: r.name,
+                            testCode: r.testCode,
+                            expected: 'Pass',
+                            actual: r.passed ? 'Pass' : 'Fail',
+                            error: r.error || null,
+                            time: 0,
+                            logs: r.logs || []
+                        }));
+                        
+                        // We attach globalLogs outside later
+                        var globalLogsExtracted = globalLogs;
+                    } catch (e: any) {
+                        compileError = e.message;
+                        testCaseResults = [{
+                            status: 'fail',
+                            input: 'Execution',
+                            expected: 'Pass',
+                            actual: 'Error',
+                            error: compileError,
+                            time: 0,
+                            logs: []
+                        }];
+                    }
+
+                    const execTime = Math.round(performance.now() - startTime);
+                    const allPassed = !compileError && testCaseResults.every((r: any) => r.status === 'pass');
+                    const finalResult = { testResults: testCaseResults, status: { id: allPassed ? 3 : 4 }, compile_output: compileError || null, globalLogs: typeof globalLogsExtracted !== 'undefined' ? globalLogsExtracted : undefined };
+                    
+                    setOutput(finalResult);
+                    setExecutionTime(execTime);
+                    setMemoryUsage(0);
+                    
+                    if (!isSubmission) {
+                        setLastRunSuccess(allPassed);
+                        setActiveTab("result");
+                        if (allPassed) toast.success("All test cases passed!");
+                        else toast.warning("Code ran, but some test cases failed.");
+                    }
+                    
+                    setIsLoading(false);
+                    setIsSubmitting(false);
+                    return { result: finalResult, allPassed, execTime };
                 } else {
                     const metadata = typeof algo.metadata === 'string'
                         ? JSON.parse(algo.metadata)
@@ -457,13 +522,17 @@ export const useCodeExecution = ({
 
             if (result.stdout && !result.stderr && !result.compile_output) {
                 try {
-                        const startMarker = '___TEST_RESULTS_START___';
-                        const endMarker = '___TEST_RESULTS_END___';
+                    const startMarker = '___TEST_RESULTS_START___';
+                    const endMarker = '___TEST_RESULTS_END___';
                     const startIdx = result.stdout.indexOf(startMarker);
                     const endIdx = result.stdout.indexOf(endMarker);
                     let parsedResults = [];
+                    let beforeJson = '';
+                    let afterJson = '';
 
                     if (startIdx !== -1 && endIdx !== -1) {
+                        beforeJson = result.stdout.substring(0, startIdx).trim();
+                        afterJson = result.stdout.substring(endIdx + endMarker.length).trim();
                         const jsonStr = result.stdout.substring(startIdx + startMarker.length, endIdx).trim();
                         parsedResults = JSON.parse(jsonStr);
                     } else {
@@ -471,18 +540,39 @@ export const useCodeExecution = ({
                         let jsonStr = '';
                         let inJson = false;
                         let bracketCount = 0;
-                        for (const line of lines) {
+                        let inJsonStartLineIdx = -1;
+                        let inJsonEndLineIdx = -1;
+
+                        for (let i = 0; i < lines.length; i++) {
+                            const line = lines[i];
                             const trimmed = line.trim();
-                            if (!inJson && trimmed.startsWith('[')) { inJson = true; bracketCount = 0; }
+                            if (!inJson && trimmed.startsWith('[')) { 
+                                inJson = true; 
+                                bracketCount = 0; 
+                                inJsonStartLineIdx = i;
+                            }
                             if (inJson) {
                                 jsonStr += line;
                                 for (const char of line) {
                                     if (char === '[') bracketCount++;
                                     if (char === ']') bracketCount--;
                                 }
-                                if (bracketCount === 0) break;
+                                if (bracketCount === 0) {
+                                    inJsonEndLineIdx = i;
+                                    break;
+                                }
                             }
                         }
+
+                        if (inJsonStartLineIdx !== -1) {
+                            beforeJson = lines.slice(0, inJsonStartLineIdx).join('\n').trim();
+                            if (inJsonEndLineIdx !== -1) {
+                                afterJson = lines.slice(inJsonEndLineIdx + 1).join('\n').trim();
+                            }
+                        } else {
+                            beforeJson = result.stdout.trim();
+                        }
+
                         if (jsonStr) parsedResults = JSON.parse(jsonStr);
                     }
 
@@ -490,8 +580,15 @@ export const useCodeExecution = ({
                         parsedResults.pop();
                     }
                     result.testResults = parsedResults;
+                    
+                    const globalLogs = [beforeJson, afterJson].filter(Boolean).join('\n');
+                    if (globalLogs) {
+                        result.globalLogs = globalLogs;
+                    }
                 } catch (e) {
                     console.warn("Failed to parse test results JSON", e);
+                    // If parsing completely fails, assume all of it might be logs
+                    result.globalLogs = result.stdout.trim();
                 }
             }
 

@@ -193,7 +193,9 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           expectedOutput: tc.expectedOutput || tc.output,
           isCustom: false,
           description: tc.description,
-          isSubmission: tc.isSubmission
+          isSubmission: tc.isSubmission,
+          name: tc.name,
+          testCode: tc.testCode || tc.test_code
         }));
         setTestCases(initialTestCases);
       }
@@ -201,7 +203,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       const initialValues: Record<string, string> = {};
       if (algorithmData.input_schema) {
         algorithmData.input_schema.forEach((field: any, index: number) => {
-          const defaultVal = algorithmData.test_cases?.[0]?.input[index];
+          const firstTestCase = algorithmData.test_cases?.[0];
+          const defaultVal = firstTestCase?.input && Array.isArray(firstTestCase.input) ? firstTestCase.input[index] : undefined;
           initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
         });
         setInputValues(initialValues);

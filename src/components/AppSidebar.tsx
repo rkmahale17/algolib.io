@@ -20,6 +20,8 @@ import {
   Target,
   Database,
   Compass,
+  Terminal,
+  LayoutTemplate,
 } from "lucide-react";
 
 import { Button } from "./ui/button";
@@ -46,6 +48,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import { useApp } from "@/contexts/AppContext";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ListType } from "@/types/algorithm";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,6 +62,7 @@ import {
   getGuideUrl,
   DSA_ITEMS,
   DATABASE_ITEMS,
+  FRONTEND_ITEMS,
   GUIDE_GROUPS,
   isSidebarRoute,
   isGuideRoute,
@@ -226,6 +230,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme, setTheme } = useTheme();
   const { user, hasPremiumAccess } = useApp();
   const { data: algorithmsData } = useAlgorithms();
+  const isFrontendEnabled = useFeatureFlag("frontend_questions_enabled");
 
   const isCollapsed = state === "collapsed" && !isMobile;
   const isGuides = isGuideRoute(pathname);
@@ -236,6 +241,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       pathname?.startsWith("/problem/")) &&
     !isVisualLibrary;
   const isDatabase = pathname?.startsWith("/database");
+  const isFrontend = pathname?.startsWith("/frontend");
   const isDashboard = pathname?.startsWith("/dashboard");
   const isProfile = pathname?.startsWith("/profile");
 
@@ -258,11 +264,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       });
   }, [algorithmsData]);
 
-  const headerSubtitle = isGuides ? "Guides" : isVisualLibrary ? "Visual" : isPractice ? "DSA" : isDatabase ? "Database" : isDashboard ? "Dashboard" : isProfile ? "Profile" : "Dashboard";
+  const headerSubtitle = isGuides ? "Guides" : isVisualLibrary ? "Visual" : isPractice ? "DSA" : isDatabase ? "Database" : isFrontend ? "Frontend" : isDashboard ? "Dashboard" : isProfile ? "Profile" : "Dashboard";
 
   // Independent accordion states
   const [isPracticeExpanded, setIsPracticeExpanded] = React.useState(isPractice);
   const [isDatabaseExpanded, setIsDatabaseExpanded] = React.useState(isDatabase);
+  const [isFrontendExpanded, setIsFrontendExpanded] = React.useState(isFrontend);
   const [isVisualExpanded, setIsVisualExpanded] = React.useState(isVisualLibrary);
   const [isGuidesExpanded, setIsGuidesExpanded] = React.useState(isGuides);
 
@@ -272,7 +279,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (isVisualLibrary) setIsVisualExpanded(true);
     if (isPractice) setIsPracticeExpanded(true);
     if (isDatabase) setIsDatabaseExpanded(true);
-  }, [pathname, isGuides, isVisualLibrary, isPractice, isDatabase]);
+    if (isFrontend) setIsFrontendExpanded(true);
+  }, [pathname, isGuides, isVisualLibrary, isPractice, isDatabase, isFrontend]);
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>(() => {
     const state: Record<string, boolean> = {
       "time-complexity": false,
@@ -419,6 +427,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         />
                       ))}
                     </SidebarHoverCard>
+
+                    {isFrontendEnabled && (
+                      <SidebarHoverCard
+                        title="Frontend"
+                        icon={LayoutTemplate}
+                        isActive={isFrontend}
+                      >
+                        {FRONTEND_ITEMS.map((item) => (
+                          <SidebarLink
+                            key={item.id}
+                            href={item.url}
+                            title={item.title}
+                            icon={item.icon}
+                            isActive={pathname === item.url}
+                            onClick={closeMobileNav}
+                          />
+                        ))}
+                      </SidebarHoverCard>
+                    )}
                     
                     {isVisualLibrary ? (
                       <SidebarHoverCard
@@ -685,6 +712,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             />
                           ))}
                         </SidebarCollapsible>
+
+                        {isFrontendEnabled && (
+                          <SidebarCollapsible
+                            title="Frontend"
+                            icon={LayoutTemplate}
+                            isExpanded={isFrontendExpanded}
+                            onToggle={() => setIsFrontendExpanded(!isFrontendExpanded)}
+                          >
+                            {FRONTEND_ITEMS.map((item) => (
+                              <SidebarLink
+                                key={item.id}
+                                href={item.url}
+                                title={item.title}
+                                icon={item.icon}
+                                isActive={pathname === item.url}
+                                onClick={closeMobileNav}
+                              />
+                            ))}
+                          </SidebarCollapsible>
+                        )}
 
                         <SidebarCollapsible
                           title="Guidebook"

@@ -1,7 +1,7 @@
 export const content = `
 # Cyclic Sort: The Perfect Seating Chart!
 
-## 🪑 Introduction: The Scrambled Classroom
+##  Introduction: The Scrambled Classroom
 
 Imagine you are a teacher, and you have a classroom with exactly 5 students. Their names are just numbers: **1, 2, 3, 4, and 5**. 
 
@@ -21,7 +21,7 @@ This simple but incredibly powerful trick is called **Cyclic Sort**!
 
 ---
 
-## 🤔 What Exactly IS Cyclic Sort?
+##  What Exactly IS Cyclic Sort?
 
 Cyclic Sort is a special pattern used to sort an array of numbers when you know the numbers are in a specific, continuous range—like **1 to N** or **0 to N**. 
 
@@ -29,7 +29,7 @@ Because you know exactly where each number *should* go (Number 1 belongs at inde
 
 ---
 
-## 🦸 Why Do We Need To Learn It?
+##  Why Do We Need To Learn It?
 
 If you ever see a problem that says:
 * *"Find the missing number in an array from 1 to N"*
@@ -42,7 +42,7 @@ It allows you to sort the array and find missing or duplicate numbers in **O(n) 
 
 ---
 
-## ✨ The Golden Rule of Cyclic Sort
+##  The Golden Rule of Cyclic Sort
 
 The core rule of Cyclic Sort is: **"Put the number in its correct index."**
 
@@ -55,7 +55,7 @@ We just loop through the array. If the number at the current index is NOT in its
 
 ---
 
-## 🧮 Let's Look at Some Code! (The Cyclic Sort Template)
+##  Let's Look at Some Code! (The Cyclic Sort Template)
 
 Here is the standard template to sort an array of numbers from \`1\` to \`n\`.
 
@@ -152,7 +152,7 @@ function cyclicSort(nums: number[]): void {
 
 ---
 
-## 🧩 Problem 1: Missing Number
+##  Problem 1: Missing Number
 
 You are given an array containing \`n\` distinct numbers taken from the range \`0\` to \`n\`. Since the array has only \`n\` numbers out of a total of \`n + 1\` possible numbers, one number is missing. Find it!
 
@@ -291,7 +291,7 @@ function missingNumber(nums: number[]): number {
 
 ---
 
-## 🚫 Common Mistakes (The Infinite Swap Loop!)
+##  Common Mistakes (The Infinite Swap Loop!)
 
 Here are the biggest traps to avoid with Cyclic Sort:
 
@@ -300,7 +300,7 @@ Here are the biggest traps to avoid with Cyclic Sort:
 
 ---
 
-## 📚 Summary
+##  Summary
 * **Cyclic Sort** is a powerful trick used when numbers belong in a specific, continuous range (like 1 to N or 0 to N).
 * Like a teacher fixing a seating chart, you look at a number and immediately swap it to its "correct desk".
 * It runs in incredibly fast **O(n) time** without using any extra memory.
@@ -308,7 +308,7 @@ Here are the biggest traps to avoid with Cyclic Sort:
 
 ---
 
-## 🎮 Practice Problems & Website Verifications
+##  Practice Problems & Website Verifications
 
 Verify your Cyclic Sort logic by solving these problems on our platform:
 * [Missing Number](/problem/missing-number) — Find the one missing student from the seating chart!

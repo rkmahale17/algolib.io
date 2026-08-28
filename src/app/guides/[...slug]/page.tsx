@@ -16,6 +16,8 @@ export async function generateStaticParams() {
         slugs.push({ slug: ["fundamentals", guide.slug] });
       } else if (category.id === "database") {
         slugs.push({ slug: ["database", guide.slug] });
+      } else if (category.id === "system-design") {
+        slugs.push({ slug: ["system-design", guide.slug] });
       } else if (category.id === "time-complexity" || category.id === "space-complexity") {
         // Exclude because they are dedicated static routes
       } else {

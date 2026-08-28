@@ -21,6 +21,7 @@ const languages: { id: Language; name: string; icon: React.ElementType }[] = [
   { id: 'cpp', name: 'C++', icon: Code2 },
   { id: 'java', name: 'Java', icon: Coffee },
   { id: 'typescript', name: 'TypeScript', icon: FileJson },
+  { id: 'javascript', name: 'JavaScript', icon: FileJson },
   { id: 'sql', name: 'SQLite', icon: Database },
 ];
 

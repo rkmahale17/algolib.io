@@ -11,6 +11,8 @@ import {
   ListTodo,
   Rocket,
   Target,
+  Terminal,
+  LayoutTemplate,
 } from "lucide-react";
 import { guidesData } from "@/data/guidesData";
 
@@ -39,6 +41,7 @@ export function getGuideUrl(categoryId: string, slug: string): string {
   if (categoryId === "space-complexity") return "/guides/space-complexity";
   if (categoryId === "fundamentals") return `/guides/fundamentals/${slug}`;
   if (categoryId === "database") return `/guides/database/${slug}`;
+  if (categoryId === "system-design") return `/guides/system-design/${slug}`;
   return `/guides/patterns/${slug}`;
 }
 
@@ -54,6 +57,11 @@ export const DSA_ITEMS = [
 // ─── Database nav items ───────────────────────────────────────────────────────
 export const DATABASE_ITEMS = [
   { id: "sql-basics", title: "SQL Basics", icon: HardDrive, url: "/database/sql-basics" },
+] as const;
+
+// ─── Frontend nav items ───────────────────────────────────────────────────────
+export const FRONTEND_ITEMS = [
+  { id: "frontend-questions", title: "Blind 75", icon: LayoutTemplate, url: "/frontend/questions" },
 ] as const;
 
 // ─── Guide nav groups (derived from guidesData) ───────────────────────────────
@@ -103,7 +111,7 @@ function buildGuideGroups() {
       icon: Database,
       isSingleLink: false,
       guides: databaseCat?.guides ?? [],
-    },
+    }
   ];
 }
 
@@ -147,6 +155,8 @@ export const DSA_NAV_SECTIONS = [
         ? "/guides/fundamentals/core-data-structures"
         : g.id === "database"
         ? "/guides/database/what-is-database"
+        : g.id === "system-design"
+        ? "/guides/system-design/introduction-to-system-design"
         : "/guides/patterns/arrays-hashing",
     })),
   },
@@ -165,6 +175,7 @@ export const SIDEBAR_ROUTES = [
   "/dsa/pattern-guess",
   "/dashboard",
   "/database",
+  "/frontend",
 ];
 
 /** Returns true if the given pathname should show the sidebar */
