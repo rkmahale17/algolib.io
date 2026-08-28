@@ -10,7 +10,10 @@ export const metadata: Metadata = {
     title: "Rulcode 150 Collection - RulCode",
     description: "Master 150 essential problems with interactive visualizations.",
     url: 'https://rulcode.com/dsa/rulcode-150',
-  }
+  },
+  alternates: {
+    canonical: 'https://rulcode.com/dsa/rulcode-150',
+  },
 };
 
 export default function Rulcode150Page() {

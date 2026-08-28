@@ -9,7 +9,10 @@ export const metadata: Metadata = {
     title: "Core Patterns Library - RulCode",
     description: "Master essential algorithm patterns with step-by-step visualizations.",
     url: 'https://rulcode.com/dsa/core',
-  }
+  },
+  alternates: {
+    canonical: 'https://rulcode.com/dsa/core',
+  },
 };
 
 export default function CorePage() {

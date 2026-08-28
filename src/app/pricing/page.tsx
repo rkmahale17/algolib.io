@@ -5,6 +5,7 @@ import { Footer } from '@/components/Footer';
 export const metadata: Metadata = {
   title: "Pricing - RulCode Premium",
   description: "Join RulCode Premium to get full access to all algorithms, interactive visualizations, and curated interview roadmaps. Invest in your career today.",
+  robots: 'noindex, follow',
   openGraph: {
     title: "Pricing - RulCode Premium",
     description: "Unlock all premium competitive coding features and algorithm visualizations.",

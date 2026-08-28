@@ -10,7 +10,10 @@ export const metadata: Metadata = {
     title: "Blind 75 Collection - RulCode",
     description: "Master 75 essential problems with interactive visualizations.",
     url: 'https://rulcode.com/dsa/blind-75',
-  }
+  },
+  alternates: {
+    canonical: 'https://rulcode.com/dsa/blind-75',
+  },
 };
 
 export default function Blind75Page() {

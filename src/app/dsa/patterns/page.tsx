@@ -8,7 +8,10 @@ export const metadata: Metadata = {
     title: "Pattern Practice - Master Category Wise Topics | RulCode",
     description: "Browse and practice problems by specific topics and patterns.",
     url: 'https://rulcode.com/dsa/patterns',
-  }
+  },
+  alternates: {
+    canonical: 'https://rulcode.com/dsa/patterns',
+  },
 };
 
 export default function PatternsPage() {

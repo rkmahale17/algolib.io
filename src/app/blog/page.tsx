@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ guides",
   description: "Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Resources for competitive programming.",
   keywords: "algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions",
+  robots: 'noindex, follow',
   alternates: {
     canonical: "https://rulcode.com/blog",
   },
