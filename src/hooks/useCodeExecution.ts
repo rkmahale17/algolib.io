@@ -634,9 +634,16 @@ export const useCodeExecution = ({
             return { result, allPassed, execTime, memoryUsage: result.memory };
         } catch (err: any) {
             console.error(err);
-            const errorMessage = err.response?.data?.error || err.message || "An unexpected error occurred";
+            const isTimeout = err.message?.includes('timeout') || err.message?.includes('Timeout') || err.code === 'ECONNABORTED';
+            const isNetworkError = err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !navigator.onLine;
+            const errorMessage = isTimeout
+                ? "Execution timed out. The server may be warming up (cold start) — please try again in a moment."
+                : isNetworkError
+                    ? "Network error — please check your connection and try again."
+                    : err.response?.data?.error || err.message || "An unexpected error occurred";
             setOutput({ stderr: errorMessage });
-            toast.error("Failed to execute code");
+            setActiveTab("result");
+            toast.error(isTimeout ? "Execution timed out" : isNetworkError ? "Network error" : "Failed to execute code");
             return { result: { stderr: errorMessage }, allPassed: false, execTime: 0 };
         } finally {
             setIsLoading(false);
