@@ -4,13 +4,17 @@ import { ArrowRight, PlaySquare, Star } from "lucide-react";
 import React, { useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
-import { HeroFlowDiagram } from "./HeroFlowDiagram";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/analytics";
 import { useApp } from "@/contexts/AppContext";
 import { useAppSelector } from "@/store/hooks";
 import { usePostHog } from "@posthog/react";
+import dynamic from "next/dynamic";
+
+const HeroFlowDiagram = dynamic(
+  () => import("./HeroFlowDiagram").then((m) => ({ default: m.HeroFlowDiagram })),
+  { ssr: false }
+);
 
 export function HeroSection() {
   const posthog = usePostHog();
@@ -69,11 +73,8 @@ export function HeroSection() {
       <div className="w-full mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-12 items-center">
           {/* Left Column: Text Content */}
-          <motion.div
-            className="flex flex-col justify-center pl-4 lg:pl-12 "
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+          <div
+            className="flex flex-col justify-center pl-4 lg:pl-12 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both"
           >
             {/* Top Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 w-[200px] rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 mb-8 backdrop-blur-md">
@@ -227,7 +228,7 @@ export function HeroSection() {
 
               {!hasPremiumAccess && continueBlock}
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Interactive Diagram */}
           <div className="hidden lg:flex items-center justify-center relative w-full h-[800px] mt-10 xl:mt-0">

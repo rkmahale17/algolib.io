@@ -430,9 +430,13 @@ export const MaximumSubarrayVisualization = () => {
                           <motion.div
                             className={`w-5 rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
                               } ${isCurrent ? 'ring-4 ring-primary/40 ring-offset-2 ring-offset-background' : ''}`}
-                            initial={{ height: 0 }}
-                            animate={{
+                            style={{ 
                               height: Math.abs(value) * 15 + 20,
+                              transformOrigin: 'bottom' 
+                            }}
+                            initial={{ scaleY: 0 }}
+                            animate={{
+                              scaleY: 1,
                               backgroundColor: isCurrent
                                 ? 'var(--primary)'
                                 : (value < 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)')
