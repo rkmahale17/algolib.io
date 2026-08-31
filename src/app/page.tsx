@@ -1,13 +1,31 @@
-import { DashboardWidgets } from "@/components/listing/DashboardWidgets";
-import { GuidedSection } from "@/components/Home/sections/GuidedSection";
 // ── Above-the-fold sections (static imports for fast LCP) ───────────────────
 import { HeroSection } from "@/components/Home/sections/HeroSection";
-import HomeClient from "./HomeClient";
-import { InteractiveSandboxTeaser } from "@/components/Home/sections/InteractiveSandboxTeaser";
 import { Metadata } from "next";
-import { ProblemsSection } from "@/components/Home/sections/ProblemsSection";
 import Script from "next/script";
 import dynamic from "next/dynamic";
+
+// ── Below-the-fold sections (lazy loaded to reduce initial bundle) ───────────
+const DashboardWidgets = dynamic(() =>
+  import("@/components/listing/DashboardWidgets").then((m) => ({
+    default: m.DashboardWidgets,
+  })),
+);
+const InteractiveSandboxTeaser = dynamic(() =>
+  import("@/components/Home/sections/InteractiveSandboxTeaser").then((m) => ({
+    default: m.InteractiveSandboxTeaser,
+  })),
+);
+const GuidedSection = dynamic(() =>
+  import("@/components/Home/sections/GuidedSection").then((m) => ({
+    default: m.GuidedSection,
+  })),
+);
+const ProblemsSection = dynamic(() =>
+  import("@/components/Home/sections/ProblemsSection").then((m) => ({
+    default: m.ProblemsSection,
+  })),
+);
+const HomeClient = dynamic(() => import("./HomeClient"));
 
 // ── Below-the-fold sections (lazy loaded to reduce initial bundle) ───────────
 const ScratchpadSection = dynamic(() =>

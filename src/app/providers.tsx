@@ -18,21 +18,29 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import PostHogIdentify from "./PostHogIdentify";
 import SidebarController from "./SidebarController";
 
-// Initialize PostHog synchronously at module load (client-side only).
-// This ensures the SDK is ready before any component mounts and tries to
-// capture events — eliminates the race condition when init was in useEffect.
+// Defer PostHog initialization to after the critical rendering path.
+// PostHog queues events internally, so nothing is lost during the deferral window.
 if (typeof window !== 'undefined') {
-  const isProduction =
-    window.location.hostname === "rulcode.com" ||
-    window.location.hostname === "www.rulcode.com";
+  const initPostHog = () => {
+    const isProduction =
+      window.location.hostname === "rulcode.com" ||
+      window.location.hostname === "www.rulcode.com";
 
-  if (isProduction && !posthog.__loaded) {
-    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_TOKEN || '', {
-      api_host: `${window.location.origin}/p`,
-      person_profiles: 'identified_only',
-      ui_host: 'https://app.posthog.com',
-      capture_pageview: false, // Next.js handles this via PostHogPageView
-    });
+    if (isProduction && !posthog.__loaded) {
+      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_TOKEN || '', {
+        api_host: `${window.location.origin}/p`,
+        person_profiles: 'identified_only',
+        ui_host: 'https://app.posthog.com',
+        capture_pageview: false, // Next.js handles this via PostHogPageView
+      });
+    }
+  };
+
+  // Use requestIdleCallback to defer until browser is idle, with a 3s timeout fallback
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(initPostHog, { timeout: 3000 });
+  } else {
+    setTimeout(initPostHog, 1500);
   }
 }
 

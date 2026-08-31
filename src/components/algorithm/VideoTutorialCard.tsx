@@ -38,6 +38,7 @@ export const VideoTutorialCard: React.FC<VideoTutorialCardProps> = ({ tutorial, 
             title={title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            loading="lazy"
           />
         </div>
         <div className="pt-2 border-t border-border/50">

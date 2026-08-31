@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import React, { Suspense } from "react";
 import Navbar from "@/components/Navbar";
@@ -7,13 +7,24 @@ import { Providers } from "./providers";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { FeedbackButton } from "@/components/FeedbackButton";
-import { GoogleAnalytics } from '@next/third-parties/google';
+import Script from "next/script";
 import PostHogPageView from "./PostHogPageView";
 import AdminViewToggle from "@/admin/components/AdminViewToggle";
 import { AnnouncementStack } from "@/components/AnnouncementStack";
 import { GlobalPromoBanner } from "@/components/GlobalPromoBanner";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jetbrains",
+  weight: ["400", "500", "600"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://rulcode.com'),
@@ -46,15 +57,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${inter.className}`}>
         <Providers>
           <Suspense fallback={null}>
             <PostHogPageView />
           </Suspense>
 
-          {/* Google Analytics 4 */}
+          {/* Google Analytics 4 (Deferred) */}
           {process.env.NEXT_PUBLIC_GA_ID && (
-            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+            <Script
+              strategy="lazyOnload"
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            />
+          )}
+          {process.env.NEXT_PUBLIC_GA_ID && (
+            <Script id="google-analytics" strategy="lazyOnload">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+              `}
+            </Script>
           )}
 
           <Suspense fallback={null}>

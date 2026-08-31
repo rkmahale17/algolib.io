@@ -1,41 +1,17 @@
 'use client';
 
 import {
-  Sparkles,
-  Zap,
   Terminal,
-  Play,
   ArrowRight,
-  Github,
   Globe,
-  Eye,
-  Lightbulb,
   Trophy,
-  Keyboard,
-  ExternalLink,
   Layers,
-  Check,
-  MessageCircle,
-  BarChart3,
-  Star,
-  Users,
-  Layout,
-  Globe2,
-  Lock,
-  MessageSquare,
-  Mail,
-  Linkedin,
-  Twitter,
-  PenTool,
-  Loader2,
+  Play,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import React, { lazy, Suspense } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { FAQ } from "@/components/FAQ";
-import { FeaturedSection } from "@/components/FeaturedSection";
-import { Footer } from "@/components/Footer";
 import {
   Tabs,
   TabsContent,
