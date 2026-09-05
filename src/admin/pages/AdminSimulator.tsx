@@ -158,7 +158,7 @@ const AdminSimulator: React.FC = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('algorithms')
-        .select('id, title, category, difficulty, serial_no, list_type, list_types, published')
+        .select('id, title, category, difficulty, serial_no, list_type, list_types, published, problem_type, metadata')
         .order('serial_no', { ascending: true })
         .limit(1000);
       if (error) throw error;
@@ -279,6 +279,54 @@ const AdminSimulator: React.FC = () => {
         }
         
         return { testResults };
+      }
+
+      if (algo.problem_type === 'frontend' || metadata.problem_type === 'frontend' || algo.category?.toLowerCase() === 'frontend') {
+        const { executeFrontendLocally } = await import('@/utils/frontendTestRunner');
+        const frontendTestCases = (testCases || []).map((tc: any) => ({
+            name: tc.name || tc.description || 'Test',
+            testCode: tc.testCode || tc.test_code || '',
+            isSubmission: tc.isSubmission || false
+        }));
+
+        const startTime = performance.now();
+        let testCaseResults: any[] = [];
+        let compileError = '';
+        
+        try {
+            const { results, globalLogs } = await executeFrontendLocally({
+                userCode: code,
+                testCases: frontendTestCases,
+                language: language as 'javascript' | 'typescript'
+            });
+            
+            testCaseResults = results.map((r: any) => ({
+                status: r.passed ? 'pass' : 'fail',
+                input: r.name,
+                testCode: r.testCode,
+                expected: 'Pass',
+                actual: r.passed ? 'Pass' : 'Fail',
+                error: r.error || null,
+                time: 0,
+                logs: r.logs || []
+            }));
+        } catch (e: any) {
+            compileError = e.message;
+            testCaseResults = [{
+                status: 'fail',
+                input: 'Execution',
+                expected: 'Pass',
+                actual: 'Error',
+                error: compileError,
+                time: 0,
+                logs: []
+            }];
+        }
+
+        const execTime = Math.round(performance.now() - startTime);
+        const allPassed = !compileError && testCaseResults.every((r: any) => r.status === 'pass');
+        const finalResult = { testResults: testCaseResults, status: { id: allPassed ? 3 : 4 }, compile_output: compileError || null };
+        return finalResult;
       }
 
       let fullCode: string;
@@ -514,6 +562,7 @@ const AdminSimulator: React.FC = () => {
 
     try {
       const testCases = (algo.test_cases as any[])?.map((tc: any) => ({
+        ...tc,
         input: tc.input,
         expectedOutput: tc.expectedOutput || tc.output
       })) || [];
@@ -601,6 +650,7 @@ const AdminSimulator: React.FC = () => {
         }
 
         const testCases = (algo.test_cases as any[])?.map((tc: any) => ({
+          ...tc,
           input: tc.input,
           expectedOutput: tc.expectedOutput || tc.output
         })) || [];
@@ -688,8 +738,17 @@ const AdminSimulator: React.FC = () => {
   const filteredAlgorithms = algorithms?.filter(a => {
     const matchesSearch = a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesListType = listTypeFilter === 'all' || 
-      (a.list_types || (a.list_type ? [a.list_type] : ['core'])).includes(listTypeFilter);
+    
+    let matchesListType = false;
+    if (listTypeFilter === 'all') {
+      matchesListType = true;
+    } else if (listTypeFilter === 'frontend') {
+      const metadataObj = typeof a.metadata === 'string' ? JSON.parse(a.metadata) : (a.metadata || {});
+      matchesListType = a.problem_type === 'frontend' || metadataObj.problem_type === 'frontend' || a.category?.toLowerCase() === 'frontend';
+    } else {
+      matchesListType = (a.list_types || (a.list_type ? [a.list_type] : ['core'])).includes(listTypeFilter);
+    }
+
     return matchesSearch && matchesListType;
   });
 
@@ -750,6 +809,13 @@ const AdminSimulator: React.FC = () => {
                 onClick={() => setListTypeFilter('blind150')}
               >
                 Blind 150
+              </Badge>
+              <Badge
+                variant={listTypeFilter === 'frontend' ? 'default' : 'outline'}
+                className="cursor-pointer text-[10px] px-1.5 py-0"
+                onClick={() => setListTypeFilter('frontend')}
+              >
+                Frontend
               </Badge>
             </div>
           </div>
