@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Frontend Questions - RulCode",
     description: "Master JavaScript and TypeScript through practical coding challenges. Practice implementing utility functions, polyfills, DOM manipulation, and more.",
-    url: 'https://rulcode.com/frontend/questions',
+    url: 'https://rulcode.com/frontend/blind75',
   }
 };
 

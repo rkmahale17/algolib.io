@@ -1,3 +1,4 @@
+import { getProblemUrl } from '@/utils/url';
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import {
@@ -1697,7 +1698,7 @@ export const ProblemDescriptionPanel = React.memo(
                           </h3>
                           <div className="space-y-2">
                             <Link
-                              href={`/problem/${nextProblem.slug || nextProblem.id}`}
+                              href={getProblemUrl(nextProblem)}
                               className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                             >
                               <div className="flex-1">

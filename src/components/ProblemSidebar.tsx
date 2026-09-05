@@ -16,6 +16,7 @@ import { ProblemFilterPopup } from "./ProblemFilterPopup";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
+import { getProblemUrl } from "@/utils/url";
 
 interface ProblemSidebarProps {
   algorithms: AlgorithmListItem[];
@@ -212,7 +213,7 @@ export const ProblemSidebar = ({
           return (
             <Link
               key={algo.id}
-              href={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
+              href={getProblemUrl(algo)}
               onClick={onItemClick}
               className={cn(
                 "group flex items-center gap-3 px-4 py-3 border-l-2 transition-all duration-200",

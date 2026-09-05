@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getProblemUrl } from "@/utils/url";
 import { Check, ArrowRight, Lock, Unlock, Flame, FileCode2, Layout, Calendar, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlgorithmListItem, DIFFICULTY_MAP } from "@/types/algorithm";
@@ -320,7 +321,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
 
     return (
         <Link
-            href={isLockedLink ? '/pricing' : (algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`)}
+            href={isLockedLink ? '/pricing' : getProblemUrl(algorithm)}
             className="group block relative w-full break-words"
         >
             {innerContent}
