@@ -521,7 +521,7 @@ export const ProblemsList = ({
     const randomIndex = Math.floor(Math.random() * selectPool.length);
     const randomAlgo = selectPool[randomIndex];
     const targetUrl = randomAlgo.problemType === 'frontend' || randomAlgo.problem_type === 'frontend' 
-      ? `/frontend/problem/${randomAlgo.slug || randomAlgo.id}`
+      ? `/frontend/blind75/${randomAlgo.slug || randomAlgo.id}`
       : randomAlgo.slug ? `/problem/${randomAlgo.slug}` : `/problem/${randomAlgo.id}`;
     router.push(targetUrl);
   };

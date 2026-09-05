@@ -61,7 +61,7 @@ export const DATABASE_ITEMS = [
 
 // ─── Frontend nav items ───────────────────────────────────────────────────────
 export const FRONTEND_ITEMS = [
-  { id: "frontend-questions", title: "Blind 75", icon: LayoutTemplate, url: "/frontend/questions" },
+  { id: "frontend-questions", title: "Blind 75", icon: LayoutTemplate, url: "/frontend/blind75" },
 ] as const;
 
 // ─── Guide nav groups (derived from guidesData) ───────────────────────────────
@@ -175,12 +175,13 @@ export const SIDEBAR_ROUTES = [
   "/dsa/pattern-guess",
   "/dashboard",
   "/database",
-  "/frontend",
+  "/frontend/blind75",
 ];
 
 /** Returns true if the given pathname should show the sidebar */
 export function isSidebarRoute(pathname: string | null): boolean {
   if (!pathname) return false;
+  if (pathname.startsWith("/frontend/blind75/") && pathname !== "/frontend/blind75/") return false;
   if (
     pathname.startsWith("/guides") &&
     pathname !== "/guides" &&

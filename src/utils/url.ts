@@ -3,7 +3,7 @@ export function getProblemUrl(algorithm: any): string {
   const type = algorithm.problemType || algorithm.problem_type;
   
   if (type === 'frontend') {
-    return `/frontend/problem/${baseId}`;
+    return `/frontend/blind75/${baseId}`;
   } else if (type === 'sql' || type === 'SQL') {
     return `/problem/sql/${baseId}`;
   }

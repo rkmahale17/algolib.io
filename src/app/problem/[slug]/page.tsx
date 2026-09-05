@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { supabase } from '@/integrations/supabase/client';
 import ProblemDetailClient from './ProblemDetailClient';
 import Script from 'next/script';
@@ -123,6 +123,10 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
 
   if (!algorithm) {
     notFound();
+  }
+
+  if (algorithm.problem_type === 'frontend' || algorithm.problemType === 'frontend') {
+    redirect(`/frontend/blind75/${slug}`);
   }
 
   const reqHeaders = await headers();
