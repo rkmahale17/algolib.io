@@ -14,20 +14,12 @@ export const metadata: Metadata = {
 };
 
 export default async function FrontendQuestionsPage() {
-  let isFrontendEnabled = false;
+  const isFrontendEnabled = true; // Feature launched
   let isAdmin = false;
 
   try {
     const { createClient } = await import('@/utils/supabase/server');
     const supabaseServer = await createClient();
-
-    // Check feature flag
-    const { data: flagData } = await supabaseServer
-      .from('feature_flags')
-      .select('is_enabled')
-      .eq('key', 'frontend_questions_enabled')
-      .maybeSingle();
-    isFrontendEnabled = flagData?.is_enabled ?? false;
 
     // Check user admin role
     const { data: { user } } = await supabaseServer.auth.getUser();

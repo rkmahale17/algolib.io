@@ -13,7 +13,7 @@ const DEFAULT_FLAGS: Record<string, boolean> = {
   code_runner_tab: true,
   brainstrom_tab: true,
   code_panel: true,
-  frontend_questions_enabled: false,
+  frontend_questions_enabled: true,
 };
 
 interface FeatureFlagContextType {

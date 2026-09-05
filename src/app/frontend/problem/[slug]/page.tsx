@@ -28,18 +28,11 @@ async function getAlgorithm(slug: string) {
   if (error || !data) return null;
 
   // Gate behind feature flag
-  let isFrontendEnabled = false;
+  const isFrontendEnabled = true; // Feature launched
   let isAdmin = false;
   try {
     const { createClient } = await import('@/utils/supabase/server');
     const supabaseServer = await createClient();
-    
-    const { data: flagData } = await supabaseServer
-      .from('feature_flags')
-      .select('is_enabled')
-      .eq('key', 'frontend_questions_enabled')
-      .maybeSingle();
-    isFrontendEnabled = flagData?.is_enabled ?? false;
 
     const { data: { user } } = await supabaseServer.auth.getUser();
     if (user) {

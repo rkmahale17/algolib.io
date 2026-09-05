@@ -230,7 +230,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme, setTheme } = useTheme();
   const { user, hasPremiumAccess } = useApp();
   const { data: algorithmsData } = useAlgorithms();
-  const isFrontendEnabled = useFeatureFlag("frontend_questions_enabled");
+  const isFrontendEnabled = true; // Feature launched
 
   const isCollapsed = state === "collapsed" && !isMobile;
   const isGuides = isGuideRoute(pathname);
