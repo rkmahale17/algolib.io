@@ -160,7 +160,7 @@ export const generateTestRunner = (
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string,
-    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
+    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number; isJavascript?: boolean }
 ): string => {
     // 1. Preprocess ALL test cases up front
     // We need both the processed inputs and the common processed schema
@@ -173,7 +173,8 @@ export const generateTestRunner = (
 
     switch (language) {
         case 'typescript':
-            return generateTypeScriptRunner(userCode, processedTestCases, finalSchema, entryFunctionName, options);
+        case 'javascript':
+            return generateTypeScriptRunner(userCode, processedTestCases, finalSchema, entryFunctionName, { ...options, isJavascript: language === 'javascript' });
         case 'python':
             return generatePythonRunner(userCode, processedTestCases, finalSchema, entryFunctionName, options);
         case 'java':
@@ -497,7 +498,7 @@ const generateTypeScriptRunner = (
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string,
-    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
+    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number; isJavascript?: boolean }
 ): string => {
     const entryInfo = findEntryFunction(userCode, 'typescript', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
@@ -518,7 +519,7 @@ ${definitions}
 ${parsers}
 ${serializers}
 
-${userCode}
+${options?.isJavascript ? '// @ts-nocheck\n' : ''}${userCode}
 
 // Test Runner
 const testCases = [
@@ -2048,7 +2049,8 @@ public class Main {
 
 const generateTypeScriptClassRunner = (
     userCode: string,
-    testCases: ClassTestCase[]
+    testCases: ClassTestCase[],
+    isJavascript?: boolean
 ): string => {
     const testCasesStr = testCases.map(tc => {
         return `{ methods: ${JSON.stringify(tc.input[0])}, args: ${JSON.stringify(tc.input[1])}, expected: ${JSON.stringify(tc.expectedOutput)} }`;
@@ -2057,7 +2059,7 @@ const generateTypeScriptClassRunner = (
     return `
 export {};
 /// <reference lib="esnext" />
-${userCode}
+${isJavascript ? '// @ts-nocheck\n' : ''}${userCode}
 const __classMap: Record<string, any> = {};
 ${testCases.map(tc => {
         const className = tc.input[0][0];
@@ -2152,7 +2154,9 @@ export const generateClassTestRunner = (
     testCases: ClassTestCase[]
 ): string => {
     switch (language) {
-        case 'typescript': return generateTypeScriptClassRunner(userCode, testCases);
+        case 'typescript': 
+        case 'javascript':
+            return generateTypeScriptClassRunner(userCode, testCases, language === 'javascript');
         case 'python': return generatePythonClassRunner(userCode, testCases);
         case 'java': return generateJavaClassRunner(userCode, testCases);
         case 'cpp': return generateCppClassRunner(userCode, testCases);

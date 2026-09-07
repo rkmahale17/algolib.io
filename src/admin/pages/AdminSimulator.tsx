@@ -361,12 +361,17 @@ const AdminSimulator: React.FC = () => {
       const { data: { session } } = await supabase.auth.getSession();
 
       const apiUrl = env.apiUrl;
+      
+      const isJs = language === 'javascript';
+      const langId = isJs ? LANGUAGE_IDS['typescript'] : LANGUAGE_IDS[language];
+      const compOptions = (language === 'typescript' || isJs) ? "--target ES2020 --module CommonJS --downlevelIteration" : undefined;
+
       const response = await axios.post(`${apiUrl}/api/execute`, {
-        language_id: LANGUAGE_IDS[language],
+        language_id: langId,
         source_code: fullCode,
         stdin: "",
         problem_id: algo.id,
-        compiler_options: language === 'typescript' ? "--target ES2020 --downlevelIteration" : undefined
+        compiler_options: compOptions
       }, {
         headers: {
           Authorization: `Bearer ${session?.access_token}`

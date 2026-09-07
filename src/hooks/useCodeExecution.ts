@@ -396,7 +396,7 @@ export const useCodeExecution = ({
                     setIsSubmitting(false);
                     
                     return { result: finalResult, allPassed, execTime: totalTime };
-                } else if (algo.problemType === 'frontend' || algo.problem_type === 'frontend') {
+                } else if (algo.problemType === 'frontend' || algo.problem_type === 'frontend' || algo.category?.toLowerCase() === 'frontend' || (typeof algo.metadata === 'string' ? JSON.parse(algo.metadata) : (algo.metadata || {})).problem_type === 'frontend') {
                     const { executeFrontendLocally } = await import('@/utils/frontendTestRunner');
                     const frontendTestCases = (algo.test_cases || []).map((tc: any) => ({
                         name: tc.name || tc.description || 'Test',
@@ -494,12 +494,17 @@ export const useCodeExecution = ({
             }
 
             const { data: { session } } = await supabase.auth.getSession();
+            
+            const isJs = language === 'javascript';
+            const langId = isJs ? LANGUAGE_IDS['typescript'] : LANGUAGE_IDS[language];
+            const compOptions = (language === 'typescript' || isJs) ? "--target ES2020 --module CommonJS --downlevelIteration" : undefined;
+
             const response = await axios.post(`${env.apiUrl}/api/execute`, {
-                language_id: LANGUAGE_IDS[language],
+                language_id: langId,
                 source_code: fullCode,
                 stdin: "",
                 problem_id: algorithmId,
-                compiler_options: language === 'typescript' ? "--target ES2020 --downlevelIteration" : undefined
+                compiler_options: compOptions
             }, {
                 headers: {
                     Authorization: `Bearer ${session?.access_token}`
