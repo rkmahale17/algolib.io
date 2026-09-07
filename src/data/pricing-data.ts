@@ -84,8 +84,7 @@ export const pricingData = {
                 "Whiteboard",
                 "Rulo AI Assistant",
                 "Future Feature Updates",
-                "Priority Discord Support",
-                "1-on-1 discussion",
+                "Email/Discord Priority Support",
                 "Price Lock Guarantee"
             ],
         }
